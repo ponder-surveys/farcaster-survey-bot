@@ -9,11 +9,11 @@ import {
 
 console.log('Surveying the casters...')
 
-const CRON_NEXT_QUESTION = '0 11 * * 1,3' // 11am EST on Mondays and Wednesdays
-const CRON_NEXT_RESULT = '0 10 * * 3,5' // 10am EST on Wednesdays and Fridays
+const nextQuestion = process.env.NEXT_QUESTION_CRON as string
+const nextResult = process.env.NEXT_RESULT_CRON as string
 
-console.log(formatCronTime(CRON_NEXT_QUESTION, 'question'))
-console.log(formatCronTime(CRON_NEXT_RESULT, 'result'))
+console.log(formatCronTime(nextQuestion, 'question'))
+console.log(formatCronTime(nextResult, 'result'))
 
-schedulePublishNextQuestion(CRON_NEXT_QUESTION)
-schedulePublishNextResult(CRON_NEXT_RESULT)
+schedulePublishNextQuestion(nextQuestion)
+schedulePublishNextResult(nextResult)

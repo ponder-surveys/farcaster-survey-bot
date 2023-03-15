@@ -32,9 +32,9 @@ const formatQuestion = (question: Question) => {
 
 const formatReply = () => {
   const title = 'When submitting your vote:'
-  const options = `✅ put your option # first\n✅ add additional comments after your chosen #\n👁 follow me to see results`
+  const options = `✅ put your option # first\n✅ add additional comments after your chosen #`
 
-  return `${title}\n\n${options}`
+  return process.env.NEXT_QUESTION_REPLY || `${title}\n\n${options}`
 }
 
 export { formatQuestion, formatReply }
