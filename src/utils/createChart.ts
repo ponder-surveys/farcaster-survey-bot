@@ -1,6 +1,7 @@
 import * as echarts from 'echarts'
 import { createCanvas } from 'canvas'
 import { buildImgurClient } from '../clients/imgur'
+import { getDateTag } from './getDateTag'
 
 const uploadChart = async (id: number, canvas: Buffer) => {
   const imgur = buildImgurClient()
@@ -11,7 +12,7 @@ const uploadChart = async (id: number, canvas: Buffer) => {
   })
 
   if (response.status !== 200 || !response.data.link) {
-    throw new Error('Error uploading chart')
+    throw new Error(`${getDateTag()} Error uploading chart`)
   }
 
   return response.data.link

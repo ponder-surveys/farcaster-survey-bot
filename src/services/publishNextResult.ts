@@ -1,70 +1,28 @@
-import { buildSupabaseClient } from '../clients/supabase'
-import { buildFarcasterClient } from '../clients/farcaster'
+import { getNextResult } from '../api/results'
+import { getResponses, updateResponses } from '../api/responses'
+import { getCastsInThread, publishCast } from '../api/casts'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import { formatResult } from '../utils/formatResult'
-
-const getNextResult = async (): Promise<Question> => {
-  const supabase = buildSupabaseClient()
-
-  const { data, error } = await supabase
-    .from('questions')
-    .select('*')
-    .not('cast_hash', 'eq', null)
-    .order('id', { ascending: false })
-    .limit(1)
-
-  if (error) {
-    console.error(error)
-    throw new Error(error.message)
-  }
-
-  const question = data[0] as Question
-  return question
-}
-
-const getResponses = async (question_id: number) => {
-  const supabase = buildSupabaseClient()
-
-  const { data, error } = await supabase
-    .from('responses')
-    .select('*')
-    .eq('question_id', question_id)
-
-  if (error) {
-    console.error(error)
-    throw new Error(error.message)
-  }
-
-  return data as Res[]
-}
+import { calculateByteSize } from '../utils/byteSize'
+import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
+import { getDateTag } from '../utils/getDateTag'
 
 const publishNextResult = async () => {
   const result = await getNextResult()
-
-  if (!result.cast_hash) {
-    throw Error('Error retrieving cast hash')
-  }
-
-  const farcaster = buildFarcasterClient()
-  const castIterator = await farcaster.fetchCastsInThread({
-    hash: result.cast_hash,
-  })
-
-  if (!castIterator) {
-    throw Error('Error retrieving cast replies')
-  }
+  const castIterator = await getCastsInThread(result.cast_hash as string)
 
   const responses: Res[] = []
   const optionCounts: OptionCounts = {}
 
-  // Populate option counts
+  // Initialize option counts
   for (let i = 1; i <= 5; i++) {
     if (result[`option_${i}` as keyof Question]) {
       optionCounts[i] = 0
     }
   }
 
+  // Populate responses and option counts
   for await (const cast of castIterator) {
     const match = validateResponse(cast.text)
 
@@ -82,6 +40,7 @@ const publishNextResult = async () => {
     }
   }
 
+  // Add extra responses manually from db
   const extraResponses = await getResponses(result.id)
   for (const extraResponse of extraResponses) {
     const optionIndex = extraResponse.selected_option
@@ -94,23 +53,28 @@ const publishNextResult = async () => {
 
   const totalResponses = responses.length + extraResponses.length
   const formattedResult = formatResult(result, optionCounts, totalResponses)
-  const chartUrl = await createChart(result.id, optionCounts, totalResponses)
+  const chartUrl =
+    process.env.NODE_ENV === 'production'
+      ? await createChart(result.id, optionCounts, totalResponses)
+      : MOCK_IMGUR_URL
+
+  const response = `${formattedResult}\n${chartUrl}`
+  const resultByteSize = calculateByteSize(response)
+
+  if (resultByteSize >= MAX_BYTE_SIZE) {
+    console.error(
+      `${getDateTag()} Error: Result is too large to publish.\nSize: ${resultByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
+    )
+    throw new Error(
+      `Result too large (${resultByteSize}/${MAX_BYTE_SIZE} bytes).`
+    )
+  }
 
   if (process.env.NODE_ENV === 'production') {
-    const supabase = buildSupabaseClient()
-    const farcaster = buildFarcasterClient()
-
-    const cast = await farcaster.publishCast(`${formattedResult}\n${chartUrl}`)
-    console.log(`Result published successfully:\n${cast.hash}`)
-
-    const { error } = await supabase.from('responses').upsert(responses)
-
-    if (error) {
-      console.error(error)
-      throw new Error(error.message)
-    }
+    await publishCast('result', response)
+    await updateResponses(responses)
   } else {
-    console.log(`Mock result:\n\n${formattedResult}\n${chartUrl}`)
+    console.log(`${getDateTag()} Mock result:\n\n${response}`)
   }
 }
 

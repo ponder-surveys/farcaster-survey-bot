@@ -1,51 +1,45 @@
-import { buildSupabaseClient } from '../clients/supabase'
-import { buildFarcasterClient } from '../clients/farcaster'
+import { publishCast } from '../api/casts'
+import { getNextQuestion, updateNextQuestionHash } from '../api/questions'
 import { formatQuestion, formatReply } from '../utils/formatQuestion'
-
-const getNextQuestion = async (): Promise<Question> => {
-  const supabase = buildSupabaseClient()
-
-  const { data, error } = await supabase
-    .from('questions')
-    .select('*')
-    .is('cast_hash', null)
-    .order('id', { ascending: true })
-    .limit(1)
-
-  if (error) {
-    console.error(error)
-    throw new Error(error.message)
-  }
-
-  const question = data[0] as Question
-  return question
-}
+import { calculateByteSize } from '../utils/byteSize'
+import { MAX_BYTE_SIZE } from '../utils/constants'
+import { getDateTag } from '../utils/getDateTag'
 
 const publishNextQuestion = async () => {
   const question = await getNextQuestion()
   const formattedQuestion = formatQuestion(question)
   const formattedReply = formatReply()
 
+  const questionByteSize = calculateByteSize(formattedQuestion)
+  if (questionByteSize >= MAX_BYTE_SIZE) {
+    console.error(
+      `${getDateTag()} Error: Question is too large to publish.\nSize: ${questionByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
+    )
+    throw new Error(
+      `Question too large (${questionByteSize}/${MAX_BYTE_SIZE} bytes).`
+    )
+  }
+
+  const replyByteSize = calculateByteSize(formattedReply)
+  if (replyByteSize >= MAX_BYTE_SIZE) {
+    console.error(
+      `${getDateTag()} Error: Reply is too large to publish.\nSize: ${replyByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
+    )
+    throw new Error(
+      `Reply too large (${replyByteSize}/${MAX_BYTE_SIZE} bytes).`
+    )
+  }
+
   if (process.env.NODE_ENV === 'production') {
-    const supabase = buildSupabaseClient()
-    const farcaster = buildFarcasterClient()
-
-    const cast = await farcaster.publishCast(formattedQuestion)
-    await farcaster.publishCast(formattedReply, cast)
-    console.log(`Cast published successfully:\n\n${cast.hash}`)
-
-    const { error } = await supabase
-      .from('questions')
-      .update({ cast_hash: cast.hash })
-      .eq('id', question.id)
-
-    if (error) {
-      console.error(error)
-      throw new Error(error.message)
-    }
+    const { hash } = await publishCast(
+      'question',
+      formattedQuestion,
+      formattedReply
+    )
+    updateNextQuestionHash(hash, question.id)
   } else {
-    console.log(`Mock cast:\n\n${formattedQuestion}`)
-    console.log(`\nMock reply:\n\n${formattedReply}`)
+    console.log(`${getDateTag()} Mock cast:\n\n${formattedQuestion}`)
+    console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
   }
 }
 
