@@ -2,9 +2,9 @@ import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from './constants'
 import { formatQuestion } from './formatQuestion'
 import { formatResult } from './formatResult'
 
-const calculateByteSize = (text: BlobPart) => {
-  const blob = new Blob([text])
-  return blob.size
+const calculateByteSize = (text: string) => {
+  const buffer = Buffer.from(text, 'utf-8')
+  return buffer.byteLength
 }
 
 const validateByteSize = async (question: Question) => {
