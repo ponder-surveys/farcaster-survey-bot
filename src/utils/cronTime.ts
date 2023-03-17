@@ -28,8 +28,8 @@ const getQuestionAndResultTime = (
   nextQuestionTime: string,
   nextResultTime: string
 ) => {
-  const questionTime = formatCronTime(nextQuestionTime, 'question')
-  const resultTime = formatCronTime(nextResultTime, 'result')
+  const questionTime = formatCronTime('question', nextQuestionTime)
+  const resultTime = formatCronTime('result', nextResultTime)
 
   console.log(questionTime, resultTime)
 }
