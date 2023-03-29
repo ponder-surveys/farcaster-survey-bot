@@ -23,11 +23,11 @@ const formatQuestion = (question: Question) => {
     .map((o, i) => `${i + 1}. ${o.option}`)
     .join('\n')
 
-  const by = author ? `Question by @${author}` : 'Question posted anonymously'
+  const by = author ? `\n\nQuestion by @${author}` : ''
 
   const image = `\n${image_url}` || ''
 
-  return `${title}\n\n${options}\n\n${by}${image}`
+  return `${title}\n\n${options}${by}${image}`
 }
 
 const formatReply = () => {

@@ -8,7 +8,7 @@ const formatResult = (
   const { title, option_1, option_2, option_3, option_4, option_5, author } =
     result
 
-  const top = `Survey results ${author ? `for @${author}` : ''}`
+  const top = `Survey results${author ? ` for @${author}` : ''}`
 
   const values = Object.values(optionCounts)
   const percentOptions = roundPercentages(values.map((o) => (o / total) * 100))
