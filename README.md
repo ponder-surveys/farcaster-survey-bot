@@ -1,6 +1,6 @@
 # Surveycaster
 
-A Farcaster bot that posts surveys every Monday and Wednesday.
+A Farcaster bot that posts surveys every Monday.
 
 ## Quick Start
 
