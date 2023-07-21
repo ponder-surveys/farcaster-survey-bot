@@ -70,11 +70,18 @@ const publishNextResult = async () => {
     )
   }
 
+  const reply = `Original survey: https://warpcast.com/survey/${result.cast_hash?.substring(
+    0,
+    6
+  )}\n\n(Join our Telegram for exclusive access to upcoming surveys) https://t.me/+u-W5Q3w6ec83NjRh`
+
   if (process.env.NODE_ENV === 'production') {
-    await publishCast('result', response)
+    await publishCast('result', response, reply)
     await updateResponses(responses)
   } else {
-    console.log(`${getDateTag()} Mock result:\n\n${response}`)
+    console.log(
+      `${getDateTag()} Mock result:\n${response}\n\nMock reply:\n${reply}`
+    )
   }
 }
 
