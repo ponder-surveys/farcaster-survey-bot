@@ -30,4 +30,5 @@ interface Bookmark {
   cast_text: string
   cast_author_username: string
   cast_author_fid: number
+  referred_by_fid: number
 }

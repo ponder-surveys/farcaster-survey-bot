@@ -59,7 +59,7 @@ const handleNotification = async (
 
   processedNotifications.add(hash)
 
-  const reply = `This cast has been tagged as a potential survey! If viable, it will be voted on in the group Telegram this Sunday, then launched on Monday 🗳️\n\nWant to join the 100 others voting on surveys? Join us here: https://t.me/+QdtIIDi8uzZlNTcx`
+  const reply = `🗳️ This cast has been tagged as a potential weekly survey! If viable, it will be voted on this Sunday, then launched on Monday. Follow me to see the results.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
   
   if (process.env.NODE_ENV === 'production') {
     const farcaster = buildFarcasterClient()
@@ -71,6 +71,7 @@ const handleNotification = async (
       cast_text: parentCast?.text as string,
       cast_author_username: parentAuthor.username as string,
       cast_author_fid: parentAuthor.fid,
+      referred_by_fid: actorFid,
     })
 
     await publishReply(reply, hash, actorFid)
