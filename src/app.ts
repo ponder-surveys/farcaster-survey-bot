@@ -6,6 +6,7 @@ import {
   schedulePublishNextQuestion,
   schedulePublishNextResult,
 } from './services/cron'
+import { replyToMentions } from './services/replyToMentions'
 import { getCronTimeMinus24Hours } from './utils/cronTime'
 
 console.log('Surveying the casters...')
@@ -20,3 +21,6 @@ scheduleValidateNextQuestion(nextValidateTime)
 // Schedule the next question and result
 schedulePublishNextQuestion(nextQuestionTime)
 schedulePublishNextResult(nextResultTime)
+
+// Poll for '@' mentions
+replyToMentions()

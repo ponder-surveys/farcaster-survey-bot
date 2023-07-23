@@ -22,3 +22,12 @@ interface Res {
 interface OptionCounts {
   [key: number]: number
 }
+
+interface Bookmark {
+  id?: number
+  comment?: string
+  cast_hash: string
+  cast_text: string
+  cast_author_username: string
+  cast_author_fid: number
+}

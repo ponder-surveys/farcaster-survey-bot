@@ -30,4 +30,19 @@ const publishCast = async (
   return cast
 }
 
-export { getCastsInThread, publishCast }
+const publishReply = async (
+  formattedReply: string,
+  castHash: string,
+  fid: number
+) => {
+  const farcaster = buildFarcasterClient()
+
+  const cast = await farcaster.publishCast(formattedReply, {
+    hash: castHash,
+    fid,
+  })
+
+  console.log(`${getDateTag()} Reply published successfully: ${cast.hash}`)
+}
+
+export { getCastsInThread, publishCast, publishReply }
