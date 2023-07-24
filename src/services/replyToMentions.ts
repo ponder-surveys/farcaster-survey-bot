@@ -48,7 +48,13 @@ const handleNotification = async (
   const { text, hash, parentHash, parentAuthor } = notification.content.cast
 
   // Check if it has text, a hash, a parent hash, and a parent author
-  if (!text || !hash || !parentHash || !parentAuthor) {
+  if (
+    !text ||
+    !hash ||
+    !parentHash ||
+    !parentAuthor ||
+    parentAuthor?.username?.toLowerCase() === 'survey'
+  ) {
     return
   }
 
