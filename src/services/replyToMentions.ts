@@ -26,10 +26,7 @@ const handleNotification = async (
   notification: NotificationCastMention | NotificationCastReply
 ) => {
   // Check if mention
-  if (
-    notification.type !== 'cast-mention' &&
-    notification.type !== 'cast-reply'
-  ) {
+  if (notification.type !== 'cast-mention') {
     return
   }
 
@@ -46,14 +43,15 @@ const handleNotification = async (
   }
 
   const { text, hash, parentHash, parentAuthor } = notification.content.cast
+  const parentUsername = parentAuthor?.username
 
-  // Check if it has text, a hash, a parent hash, and a parent author
+  // Check if it has text, a hash, a parent hash, and a parent author that isn't a self-notification
   if (
     !text ||
     !hash ||
     !parentHash ||
-    !parentAuthor ||
-    parentAuthor?.username?.toLowerCase() === 'survey'
+    !parentUsername ||
+    parentUsername.toLowerCase() === 'survey'
   ) {
     return
   }
@@ -66,7 +64,7 @@ const handleNotification = async (
   processedNotifications.add(hash)
 
   const reply = `🗳️ This cast has been tagged as a potential weekly survey! If viable, it will be voted on this Sunday, then launched on Monday. Follow me to see the results.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
-  
+
   if (process.env.NODE_ENV === 'production') {
     const farcaster = buildFarcasterClient()
     const parentCast = await farcaster.fetchCast(parentHash)
@@ -75,7 +73,7 @@ const handleNotification = async (
       comment: text.replace('@survey', '').trim(),
       cast_hash: parentHash,
       cast_text: parentCast?.text as string,
-      cast_author_username: parentAuthor.username as string,
+      cast_author_username: parentUsername,
       cast_author_fid: parentAuthor.fid,
       referred_by_fid: actorFid,
     })
