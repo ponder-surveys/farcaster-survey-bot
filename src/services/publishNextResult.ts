@@ -1,12 +1,13 @@
 import { getNextResult } from '../api/results'
 import { getResponses, updateResponses } from '../api/responses'
-import { getCastsInThread, publishCast } from '../api/casts'
+import { getCastsInThread, publishCast, publishReply } from '../api/casts'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import { formatResult } from '../utils/formatResult'
 import { calculateByteSize } from '../utils/byteSize'
-import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
+import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
+import { getChannelHash } from '../utils/getChannelHash'
 
 const publishNextResult = async () => {
   const result = await getNextResult()
@@ -76,7 +77,12 @@ const publishNextResult = async () => {
   )}\n\n(Join our Telegram for exclusive access to upcoming surveys) https://t.me/+u-W5Q3w6ec83NjRh`
 
   if (process.env.NODE_ENV === 'production') {
-    await publishCast('result', response, reply)
+    if (result.channel) {
+      const channelHash = getChannelHash(result.channel.toLowerCase())
+      await publishReply(response, channelHash, CONTENT_FID, reply)
+    } else {
+      await publishCast('result', response, reply)
+    }
     await updateResponses(responses)
   } else {
     console.log(

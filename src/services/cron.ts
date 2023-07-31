@@ -1,15 +1,15 @@
 import * as cron from 'node-cron'
-import { validateQuestion } from '../utils/validateQuestion'
-import { publishNextQuestion } from '../services/publishNextQuestion'
-import { publishNextResult } from '../services/publishNextResult'
+import { validateQuestions } from '../utils/validateQuestions'
+import { publishNextQuestions } from './publishNextQuestions'
+import { publishNextResult } from './publishNextResult'
 
 const scheduleValidateNextQuestion = (cronTime: string) =>
-  cron.schedule(cronTime, validateQuestion, {
+  cron.schedule(cronTime, validateQuestions, {
     timezone: 'UTC',
   })
 
 const schedulePublishNextQuestion = (cronTime: string) =>
-  cron.schedule(cronTime, publishNextQuestion, {
+  cron.schedule(cronTime, publishNextQuestions, {
     timezone: 'UTC',
   })
 

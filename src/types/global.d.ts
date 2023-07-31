@@ -9,6 +9,7 @@ interface Question {
   author?: string
   image_url?: string
   cast_hash?: string
+  channel?: string
 }
 
 interface Res {
@@ -21,6 +22,10 @@ interface Res {
 
 interface OptionCounts {
   [key: number]: number
+}
+
+interface HashPairs {
+  [key: string]: string
 }
 
 interface Bookmark {

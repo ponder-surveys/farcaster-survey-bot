@@ -1,5 +1,6 @@
 import { buildFarcasterClient } from '../clients/farcaster'
 import { getDateTag } from '../utils/getDateTag'
+import { CONTENT_FID } from '../utils/constants'
 
 const getCastsInThread = async (hash: string) => {
   const farcaster = buildFarcasterClient()
@@ -33,16 +34,33 @@ const publishCast = async (
 const publishReply = async (
   formattedReply: string,
   castHash: string,
-  fid: number
+  fid: number,
+  formattedChainedReply?: string
 ) => {
   const farcaster = buildFarcasterClient()
 
-  const cast = await farcaster.publishCast(formattedReply, {
+  const replyCast = await farcaster.publishCast(formattedReply, {
     hash: castHash,
     fid,
   })
 
-  console.log(`${getDateTag()} Reply published successfully: ${cast.hash}`)
+  if (formattedChainedReply) {
+    await farcaster.publishCast(formattedChainedReply, replyCast)
+  }
+
+  if (fid === CONTENT_FID) {
+    console.log(
+      `${getDateTag()} Next question published successfully: ${
+        replyCast.hash
+      }`
+    )
+  } else {
+    console.log(
+      `${getDateTag()} Reply published successfully: ${replyCast.hash}`
+    )
+  }
+
+  return replyCast
 }
 
 export { getCastsInThread, publishCast, publishReply }
