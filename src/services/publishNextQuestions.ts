@@ -1,5 +1,5 @@
 import { publishCast, publishReply } from '../api/casts'
-import { getNextQuestions, updateNextQuestionHash } from '../api/questions'
+import { getNextQuestions, updateNextQuestion } from '../api/questions'
 import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE } from '../utils/constants'
@@ -50,10 +50,10 @@ const publishNextQuestions = async () => {
         hash = result.hash
       }
 
-      await updateNextQuestionHash(hash, question.id)
+      await updateNextQuestion(hash, question.id)
     } else {
       console.log(
-        `${getDateTag()} Mock cast${
+        `${getDateTag()} Mock question cast${
           question.channel ? ` in ${question.channel} channel` : ''
         }:\n\n${formattedQuestion}`
       )

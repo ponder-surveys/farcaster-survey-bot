@@ -17,7 +17,7 @@ const getResponses = async (question_id: number) => {
   return data as Res[]
 }
 
-const updateResponses = async (responses: Res[]) => {
+const addResponses = async (responses: Res[]) => {
   const supabase = buildSupabaseClient()
 
   const { error } = await supabase.from('responses').upsert(responses)
@@ -30,4 +30,4 @@ const updateResponses = async (responses: Res[]) => {
   console.log(`${getDateTag()} Responses successfully uploaded on db`)
 }
 
-export { getResponses, updateResponses }
+export { getResponses, addResponses }

@@ -7,7 +7,7 @@ const getNextQuestions = async (): Promise<Question[]> => {
   const { data, error } = await supabase
     .from('questions')
     .select('*')
-    .is('cast_hash', null)
+    .eq('status', 'pending')
     .order('id', { ascending: true })
 
   if (error) {
@@ -19,12 +19,15 @@ const getNextQuestions = async (): Promise<Question[]> => {
   return questions
 }
 
-const updateNextQuestionHash = async (hash: string, questionId: number) => {
+const updateNextQuestion = async (hash: string, questionId: number) => {
   const supabase = buildSupabaseClient()
 
   const { error } = await supabase
     .from('questions')
-    .update({ cast_hash: hash })
+    .update({
+      cast_hash: hash,
+      status: 'posted',
+    })
     .eq('id', questionId)
 
   if (error) {
@@ -32,7 +35,9 @@ const updateNextQuestionHash = async (hash: string, questionId: number) => {
     throw new Error(error.message)
   }
 
-  console.log(`${getDateTag()} Question cast hash successfully updated on db`)
+  console.log(
+    `${getDateTag()} Question status and cast hash successfully updated on db`
+  )
 }
 
-export { getNextQuestions, updateNextQuestionHash }
+export { getNextQuestions, updateNextQuestion }

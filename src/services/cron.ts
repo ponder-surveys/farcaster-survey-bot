@@ -1,7 +1,7 @@
 import * as cron from 'node-cron'
 import { validateQuestions } from '../utils/validateQuestions'
 import { publishNextQuestions } from './publishNextQuestions'
-import { publishNextResult } from './publishNextResult'
+import { publishNextResults } from './publishNextResults'
 
 const scheduleValidateNextQuestion = (cronTime: string) =>
   cron.schedule(cronTime, validateQuestions, {
@@ -14,7 +14,7 @@ const schedulePublishNextQuestion = (cronTime: string) =>
   })
 
 const schedulePublishNextResult = (cronTime: string) =>
-  cron.schedule(cronTime, publishNextResult, {
+  cron.schedule(cronTime, publishNextResults, {
     timezone: 'UTC',
   })
 
