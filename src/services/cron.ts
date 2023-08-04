@@ -3,18 +3,27 @@ import { validateQuestions } from '../utils/validateQuestions'
 import { publishNextQuestions } from './publishNextQuestions'
 import { publishNextResults } from './publishNextResults'
 
-const scheduleValidateNextQuestion = (cronTime: string) =>
-  cron.schedule(cronTime, validateQuestions, {
+const scheduleValidateNextQuestion = (
+  cronTime: string,
+  type: 'general' | 'channel'
+) =>
+  cron.schedule(cronTime, () => validateQuestions(type), {
     timezone: 'UTC',
   })
 
-const schedulePublishNextQuestion = (cronTime: string) =>
-  cron.schedule(cronTime, publishNextQuestions, {
+const schedulePublishNextQuestion = (
+  cronTime: string,
+  type: 'general' | 'channel'
+) =>
+  cron.schedule(cronTime, () => publishNextQuestions(type), {
     timezone: 'UTC',
   })
 
-const schedulePublishNextResult = (cronTime: string) =>
-  cron.schedule(cronTime, publishNextResults, {
+const schedulePublishNextResult = (
+  cronTime: string,
+  type: 'general' | 'channel'
+) =>
+  cron.schedule(cronTime, () => publishNextResults(type), {
     timezone: 'UTC',
   })
 

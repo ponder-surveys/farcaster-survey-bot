@@ -9,8 +9,8 @@ import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { getChannelHash } from '../utils/getChannelHash'
 
-const publishNextResults = async () => {
-  const results = await getNextResults()
+const publishNextResults = async (type: 'general' | 'channel') => {
+  const results = await getNextResults(type)
 
   for (const result of results) {
     const castIterator = await getCastsInThread(result.cast_hash as string)
@@ -78,7 +78,7 @@ const publishNextResults = async () => {
     )}\n\n(Join our Telegram for exclusive access to upcoming surveys) https://t.me/+u-W5Q3w6ec83NjRh`
 
     if (process.env.NODE_ENV === 'production') {
-      if (result.channel) {
+      if (type === 'channel' && result.channel) {
         const channelHash = getChannelHash(result.channel.toLowerCase())
         await publishReply(response, channelHash, CONTENT_FID, reply)
       } else {

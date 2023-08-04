@@ -1,14 +1,24 @@
 import { buildSupabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
-const getNextQuestions = async (): Promise<Question[]> => {
+const getNextQuestions = async (
+  type: 'general' | 'channel'
+): Promise<Question[]> => {
   const supabase = buildSupabaseClient()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('questions')
     .select('*')
     .eq('status', 'pending')
     .order('id', { ascending: true })
+
+  if (type === 'general') {
+    query = query.is('channel', null)
+  } else {
+    query = query.not('channel', 'eq', null)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)

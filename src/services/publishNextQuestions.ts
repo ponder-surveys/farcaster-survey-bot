@@ -6,8 +6,8 @@ import { CONTENT_FID, MAX_BYTE_SIZE } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { getChannelHash } from '../utils/getChannelHash'
 
-const publishNextQuestions = async () => {
-  const questions = await getNextQuestions()
+const publishNextQuestions = async (type: 'general' | 'channel') => {
+  const questions = await getNextQuestions(type)
 
   for (const question of questions) {
     const formattedQuestion = formatQuestion(question)
@@ -32,7 +32,7 @@ const publishNextQuestions = async () => {
     if (process.env.NODE_ENV === 'production') {
       let hash = ''
 
-      if (question.channel) {
+      if (type === 'channel' && question.channel) {
         const channelHash = getChannelHash(question.channel.toLowerCase())
         const result = await publishReply(
           formattedQuestion,

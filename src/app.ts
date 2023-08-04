@@ -8,19 +8,34 @@ import {
 } from './services/cron'
 import { replyToMentions } from './services/replyToMentions'
 import { getCronTimeMinus24Hours } from './utils/cronTime'
+import { getDateTag } from './utils/getDateTag'
 
-console.log('Surveying the casters...')
+console.log(`${getDateTag()} Surveying the casters...`)
 
-const nextQuestionTime = process.env.NEXT_QUESTION_CRON as string
-const nextResultTime = process.env.NEXT_RESULT_CRON as string
+const nextGeneralQuestionTime = process.env.NEXT_GENERAL_QUESTION_CRON as string
+const nextChannelQuestionsTime = process.env
+  .NEXT_CHANNEL_QUESTIONS_CRON as string
 
-// Warn 24 hours in advance if the next question is estimated to be invalid
-const nextValidateTime = getCronTimeMinus24Hours(nextQuestionTime)
-scheduleValidateNextQuestion(nextValidateTime)
+const nextGeneralResultTime = process.env.NEXT_GENERAL_RESULT_CRON as string
+const nextChannelResultsTime = process.env.NEXT_CHANNEL_RESULTS_CRON as string
 
-// Schedule the next question and result
-schedulePublishNextQuestion(nextQuestionTime)
-schedulePublishNextResult(nextResultTime)
+// Warn 24 hours in advance if the next questions are estimated to be invalid
+const nextGeneralQuestionValidateTime = getCronTimeMinus24Hours(
+  nextGeneralQuestionTime
+)
+const nextChannelQuestionsValidateTime = getCronTimeMinus24Hours(
+  nextChannelQuestionsTime
+)
+scheduleValidateNextQuestion(nextGeneralQuestionValidateTime, 'general')
+scheduleValidateNextQuestion(nextChannelQuestionsValidateTime, 'channel')
+
+// Schedule next questions
+schedulePublishNextQuestion(nextGeneralQuestionTime, 'general')
+schedulePublishNextQuestion(nextChannelQuestionsTime, 'channel')
+
+// Schedule next results
+schedulePublishNextResult(nextGeneralResultTime, 'general')
+schedulePublishNextResult(nextChannelResultsTime, 'channel')
 
 // Poll for '@' mentions
 replyToMentions()

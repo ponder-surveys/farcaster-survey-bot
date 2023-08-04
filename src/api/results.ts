@@ -1,14 +1,24 @@
 import { buildSupabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
-const getNextResults = async (): Promise<Question[]> => {
+const getNextResults = async (
+  type: 'general' | 'channel'
+): Promise<Question[]> => {
   const supabase = buildSupabaseClient()
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('questions')
     .select('*')
     .eq('status', 'posted')
     .order('id', { ascending: false })
+
+  if (type === 'general') {
+    query = query.is('channel', null)
+  } else {
+    query = query.not('channel', 'eq', null)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)
@@ -34,9 +44,7 @@ const updateNextResult = async (questionId: number) => {
     throw new Error(error.message)
   }
 
-  console.log(
-    `${getDateTag()} Question status successfully updated on db`
-  )
+  console.log(`${getDateTag()} Question status successfully updated on db`)
 }
 
 export { getNextResults, updateNextResult }
