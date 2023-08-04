@@ -1,6 +1,6 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
-import { getCastsInThread, publishCast, publishReply } from '../api/casts'
+import { getCastsInThread, publishReply } from '../api/casts'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import { formatResult } from '../utils/formatResult'
@@ -78,20 +78,14 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     )}\n\n(Join our Telegram for exclusive access to upcoming surveys) https://t.me/+u-W5Q3w6ec83NjRh`
 
     if (process.env.NODE_ENV === 'production') {
-      if (type === 'channel' && result.channel) {
-        const channelHash = getChannelHash(result.channel.toLowerCase())
-        await publishReply(response, channelHash, CONTENT_FID, reply)
-      } else {
-        await publishCast('result', response, reply)
-      }
+      const channelHash = getChannelHash('surveycaster')
+      await publishReply(response, channelHash, CONTENT_FID, reply)
 
       await addResponses(responses)
       await updateNextResult(result.id)
     } else {
       console.log(
-        `${getDateTag()} Mock result cast${
-          result.channel ? ` in ${result.channel} channel` : ''
-        }:\n\n${response}`
+        `${getDateTag()} Mock result cast in surveycaster channel:\n\n${response}`
       )
       console.log(`${getDateTag()} Mock reply:\n\n${reply}`)
     }
