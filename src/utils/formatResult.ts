@@ -31,4 +31,12 @@ const formatResult = (
   return `${top}\n\n${title}\n${options}`
 }
 
-export { formatResult }
+const formatReply = (hash: string) => {
+  const title = `Original survey: https://warpcast.com/survey/${hash}`
+  const subtitle =
+    '🎉 Mint the NFT to submit surveys, join gated channels, and earn rewards\nhttps://bit.ly/surveycaster'
+
+  return `${title}\n\n${subtitle}`
+}
+
+export { formatResult, formatReply }

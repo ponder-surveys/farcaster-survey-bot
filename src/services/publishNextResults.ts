@@ -3,7 +3,7 @@ import { getResponses, addResponses } from '../api/responses'
 import { getCastsInThread, publishReply } from '../api/casts'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
-import { formatResult } from '../utils/formatResult'
+import { formatResult, formatReply } from '../utils/formatResult'
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
@@ -57,6 +57,8 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     const totalResponses = responses.length + extraResponses.length
 
     const formattedResult = formatResult(result, optionCounts, totalResponses)
+    const resultHash = result.cast_hash?.substring(0, 6) as string
+    const formattedReply = formatReply(resultHash)
     const chartUrl =
       process.env.NODE_ENV === 'production'
         ? await createChart(result.id, optionCounts, totalResponses)
@@ -72,14 +74,9 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       continue
     }
 
-    const reply = `Original survey: https://warpcast.com/survey/${result.cast_hash?.substring(
-      0,
-      6
-    )}\n\n(Join our Telegram for exclusive access to upcoming surveys) https://t.me/+u-W5Q3w6ec83NjRh`
-
     if (process.env.NODE_ENV === 'production') {
       const channelHash = getChannelHash('surveycaster')
-      await publishReply(response, channelHash, CONTENT_FID, reply)
+      await publishReply(response, channelHash, CONTENT_FID, formattedReply)
 
       await addResponses(responses)
       await updateNextResult(result.id)
@@ -87,7 +84,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       console.log(
         `${getDateTag()} Mock result cast in surveycaster channel:\n\n${response}`
       )
-      console.log(`${getDateTag()} Mock reply:\n\n${reply}`)
+      console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
     }
   }
 }
