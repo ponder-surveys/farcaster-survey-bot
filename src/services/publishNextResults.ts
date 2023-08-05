@@ -65,7 +65,6 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     const formattedResult = formatResult(result, optionCounts, totalResponses)
     const resultHashShorthand = resultHash.substring(0, 6)
     const formattedReply = formatReply(resultHashShorthand)
-    const replyToSurvey = formatReplyToSurvey(resultHashShorthand)
     const chartUrl =
       process.env.NODE_ENV === 'production'
         ? await createChart(result.id, optionCounts, totalResponses)
@@ -83,11 +82,17 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
     if (process.env.NODE_ENV === 'production') {
       const channelHash = getChannelHash('surveycaster')
-      await publishReply(response, channelHash, CONTENT_FID, formattedReply)
+      const resultCast = await publishReply(
+        response,
+        channelHash,
+        CONTENT_FID,
+        formattedReply
+      )
+      const replyToSurvey = formatReplyToSurvey(resultCast.hash)
 
       const farcaster = buildFarcasterClient()
-      const me = await farcaster.fetchCurrentUser()
-      await publishReply(replyToSurvey, result.cast_hash as string, me.fid)
+      const { fid } = await farcaster.fetchCurrentUser()
+      await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
       await addResponses(responses)
       await updateNextResult(result.id)
@@ -96,9 +101,6 @@ const publishNextResults = async (type: 'general' | 'channel') => {
         `${getDateTag()} Mock result cast in surveycaster channel:\n\n${response}`
       )
       console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
-      console.log(
-        `${getDateTag()} Mock reply to original survey:\n\n${replyToSurvey}`
-      )
     }
   }
 }
