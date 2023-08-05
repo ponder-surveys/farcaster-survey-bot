@@ -39,4 +39,11 @@ const formatReply = (hash: string) => {
   return `${title}\n\n${subtitle}`
 }
 
-export { formatResult, formatReply }
+const formatReplyToSurvey = (hash: string) => {
+  const title = 'The survey results are in!'
+  const subtitle = `https://warpcast.com/survey/${hash}`
+
+  return `${title}\n${subtitle}`
+}
+
+export { formatResult, formatReply, formatReplyToSurvey }
