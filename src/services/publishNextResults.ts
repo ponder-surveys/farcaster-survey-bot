@@ -1,6 +1,6 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
-import { getCastsInThread, publishReply } from '../api/casts'
+import { getCastsInThread, publishCast, publishReply } from '../api/casts'
 import { buildFarcasterClient } from '../clients/farcaster'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
@@ -81,15 +81,23 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     }
 
     if (process.env.NODE_ENV === 'production') {
-      const channelHash = getChannelHash('surveycaster')
-      const resultCast = await publishReply(
-        response,
-        channelHash,
-        CONTENT_FID,
-        formattedReply
-      )
-      const replyToSurvey = formatReplyToSurvey(resultCast.hash)
+      let hash = ''
 
+      if (type === 'channel' && result.channel) {
+        const channelHash = getChannelHash(result.channel.toLowerCase())
+        const cast = await publishReply(
+          response,
+          channelHash,
+          CONTENT_FID,
+          formattedReply
+        )
+        hash = cast.hash
+      } else {
+        const cast = await publishCast('result', response, formattedReply)
+        hash = cast.hash
+      }
+
+      const replyToSurvey = formatReplyToSurvey(hash)
       const farcaster = buildFarcasterClient()
       const { fid } = await farcaster.fetchCurrentUser()
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
@@ -98,7 +106,9 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       await updateNextResult(result.id)
     } else {
       console.log(
-        `${getDateTag()} Mock result cast in surveycaster channel:\n\n${response}`
+        `${getDateTag()} Mock result cast${
+          result.channel ? ` in ${result.channel} channel` : ''
+        }:\n\n${response}`
       )
       console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
     }
