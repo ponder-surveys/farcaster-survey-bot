@@ -31,7 +31,7 @@ export const HASH_PAIRS: HashPairs = {
   art: '0xe08b87602aee6c9e32a1657002512b3ccc5bc222',
   soccer: '0x1f2a79624fa9143afa12298812b93e9336977912',
   travel: '0x84cd844e99d8b593d8aaeca08e5417423c2a7479',
-  philoshopy: '0xcec71c5ed8d23b36aa38d83aa25464f34f246713',
+  philosophy: '0xcec71c5ed8d23b36aa38d83aa25464f34f246713',
   music: '0x867c2d0c45b5ce71306016947b2df28c3ccd0e26',
   e_m: '0x32b3af188de66292817e0af077157e0edccc1092',
   news: '0x5ef0874de47dec4e4b560e1db989ca52f3e179b0',
