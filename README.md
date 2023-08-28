@@ -1,36 +1,83 @@
-# Surveycaster
+# 📋 Surveycaster
 
-A Farcaster bot that posts surveys every Monday.
+An open-source NodeJS bot designed to post engaging general and channel-based surveys directly on Farcaster. Built on top of Warpcast API, Supabase, and Imgur to produce automated casts, calculate results, and record both quantitative and qualitative responses.
+
+## Table of Contents
+- [How It Works](#how-it-works)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgments](#acknowledgments)
+
+## How It Works
+
+1. **Scheduled Surveys**: Using cron jobs, Surveycaster is programmed to post queued surveys at specific intervals.
+2. **Imgur Integration**: Surveycaster can generate images by leveraging Imgur API, the native image hosting layer of Farcaster.
+3. **Supabase Backend**: All survey data, including questions, options, and results, as well as bookmarks, are stored and managed in Supabase.
+4. **Customizable Replies**: Create personalized replies and call-to-actions when casting a new question or result.
+
+## Prerequisites
+
+Before you begin, ensure you have met the following requirements:
+
+- **Node.js**: Version 14.x.x or higher. [Download here](https://nodejs.org/)
+- **Yarn**: Version 3.3.1 or higher. [Download here](https://yarnpkg.com/)
+- **Accounts**: Ensure you have accounts on Farcaster, Supabase, and Imgur.
 
 ## Quick Start
 
-#### 1. Clone the repository
+### 1. Clone the repository
 
 ```commandline
 git clone https://github.com/benadamsky/surveycaster
 ```
 
-#### 2. Create `.env` with the following environment variables
+### 2. Set up your environment variables
 
-| Environment Variable | Description                                           | Example Value               |
-| -------------------- | ----------------------------------------------------- | --------------------------- |
-| FARCASTER_MNEMONIC   | Farcaster wallet seed phrase                          | video stairs rabbit tuna... |
-| SUPABASE_URL         | Project URL                                           | https://abc123.supabase.co  |
-| SUPABASE_KEY         | API key with read & write access to the project       | eyJsadfklj34lkjsdflkj324    |
-| IMGUR_CLIENT_ID      | Client ID for Imgur API authentication                | 23dc9ac23d9c23d9            |
-| IMGUR_CLIENT_SECRET  | Client secret for Imgur API authentication            | a823cd9823cd9823cd          |
-| IMGUR_REFRESH_TOKEN  | Refresh token generated via Imgur endpoint            | fd9234234g09udf9023         |
-| NEXT_RESULT_CRON     | Task scheduler (UTC) in cron syntax for next result   | 0 15 * * 5                  |
-| NEXT_QUESTION_CRON   | Task scheduler (UTC) in cron syntax for next question | 0 15 * * 1                  |
-| NEXT_QUESTION_REPLY  | Customizable reply to question cast (optional)        | Reply:\n\nHey @dwr and @v!  |
+Farcaster
+```commandline
+FARCASTER_MNEMONIC="Farcaster wallet seed phrase"
+```
 
-#### 3. Install dependencies
+Supabase
+```commandline
+SUPABASE_URL="Project URL"
+SUPABASE_KEY="API key with read & write access to the project"
+```
+
+Imgur
+```commandline
+IMGUR_CLIENT_ID="Client ID for Imgur API authentication"
+IMGUR_CLIENT_SECRET="Client secret for Imgur API authentication"
+IMGUR_REFRESH_TOKEN="Refresh token generated via Imgur endpoint"
+```
+
+Survey questions
+```commandline
+NEXT_GENERAL_QUESTION_CRON="Task scheduler (UTC) in cron syntax for general questions"
+NEXT_CHANNEL_QUESTIONS_CRON="Task scheduler (UTC) in cron syntax for channel-specific questions"
+NEXT_QUESTION_REPLY="Customizable reply to question cast"
+```
+
+Survey results
+```commandline
+NEXT_GENERAL_RESULT_CRON="Task scheduler (UTC) in cron syntax for general results"
+NEXT_CHANNEL_RESULTS_CRON="Task scheduler (UTC) in cron syntax for channel-specific results"
+```
+
+General
+```commandline
+CALL_TO_ACTION="A message or action for users to take in the reply casts"
+```
+
+### 3. Install dependencies
 
 ```commandline
 yarn install
 ```
 
-#### 4. Run application
+### 4. Run the application
 
 ```commandline
 yarn start
@@ -38,10 +85,17 @@ yarn start
 
 ## Contributing
 
-Feel free to fork this project and submit pull requests.
+Your contributions are always welcome! Feel free to fork this project and submit pull requests. If you have any suggestions, ideas, or feedback, don't hesitate to reach out via direct cast on Farcaster.
 
-Have any suggestions or feedback you'd like to share? Reach out via direct cast on Farcaster.
+## License
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+## Acknowledgments
+
+- Thanks to [botcaster](https://github.com/BigWhaleLabs/botcaster) for paving the way on the initial core bot functionality
+- Inspired by projects with awesome bots like [Launchcaster](https://www.launchcaster.xyz/) and [Eventcaster](https://www.eventcaster.xyz/)
 
 ---
 
-> Made with 💜 by [@colin-](https://warpcast.com/colin-) and [@ba](https://warpcast.com/ba)
+> Made with 💜 by [@cojo.eth](https://warpcast.com/cojo.eth) and [@ba](https://warpcast.com/ba)
