@@ -12,10 +12,10 @@ const getResponses = async (question_id: number) => {
     throw new Error(error.message)
   }
 
-  return data as Res[]
+  return data as QuestionResponse[]
 }
 
-const addResponses = async (responses: Res[]) => {
+const addResponses = async (responses: QuestionResponse[]) => {
   const { error } = await supabaseClient.from('responses').upsert(responses)
 
   if (error) {

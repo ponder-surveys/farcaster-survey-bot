@@ -1,6 +1,6 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
-import { getUsername } from '../api/users'
+import { getUserId, getUsername } from '../api/users'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
 import { farcasterClient } from '../clients/farcaster'
 import { validateResponse } from '../utils/validateResponse'
@@ -23,7 +23,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     const resultHash = result.cast_hash as string
     const castIterator = await getCastsInThread(resultHash)
 
-    const responses: Res[] = []
+    const responses: QuestionResponse[] = []
     const optionCounts: OptionCounts = {}
 
     // Initialize option counts
@@ -40,12 +40,16 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       if (match) {
         const selected_option = Number(match[1])
         const comment = match[2] !== undefined ? match[2].trim() : ''
+        const userId = await getUserId(
+          cast.author.fid,
+          cast.author.username || ''
+        )
 
         responses.push({
           question_id: result.id,
           selected_option,
           comment,
-          fid: cast.author.fid,
+          user_id: userId,
         })
         optionCounts[selected_option]++
       }

@@ -12,12 +12,12 @@ interface Question {
   user_id?: number
 }
 
-interface Res {
+interface QuestionResponse {
   id?: number
   question_id: number
   selected_option: number
   comment?: string
-  fid: number
+  user_id: number
 }
 
 interface OptionCounts {
@@ -36,4 +36,11 @@ interface Bookmark {
   cast_author_username: string
   cast_author_fid: number
   referred_by_fid: number
+}
+
+interface User {
+  id: number
+  fid: number
+  username: string
+  eth_address?: string | null
 }

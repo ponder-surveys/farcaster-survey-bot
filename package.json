@@ -15,6 +15,7 @@
   "dependencies": {
     "@standard-crypto/farcaster-js": "^5.5.1",
     "@supabase/supabase-js": "^2.8.0",
+    "alchemy-sdk": "^2.10.0",
     "canvas": "^2.11.0",
     "cron-parser": "^4.8.1",
     "dotenv": "^16.0.3",
