@@ -1,7 +1,7 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
-import { buildFarcasterClient } from '../clients/farcaster'
+import { farcasterClient } from '../clients/farcaster'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import {
@@ -98,8 +98,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       }
 
       const replyToSurvey = formatReplyToSurvey(hash)
-      const farcaster = buildFarcasterClient()
-      const { fid } = await farcaster.fetchCurrentUser()
+      const { fid } = await farcasterClient.fetchCurrentUser()
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
       await addResponses(responses)

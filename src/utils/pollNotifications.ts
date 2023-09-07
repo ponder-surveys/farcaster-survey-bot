@@ -2,7 +2,7 @@ import {
   NotificationCastMention,
   NotificationCastReply,
 } from '@standard-crypto/farcaster-js'
-import { buildFarcasterClient } from '../clients/farcaster'
+import { farcasterClient } from '../clients/farcaster'
 
 let lastPollTime = Date.now()
 let polling = false
@@ -12,14 +12,13 @@ const pollNotifications = async (
     notification: NotificationCastMention | NotificationCastReply
   ) => void
 ) => {
-  const farcaster = buildFarcasterClient()
   if (polling) return
   polling = true
 
   try {
     const notifications = []
 
-    for await (const notification of farcaster.fetchMentionAndReplyNotifications()) {
+    for await (const notification of farcasterClient.fetchMentionAndReplyNotifications()) {
       if (notification.content.cast?.timestamp > lastPollTime) {
         notifications.unshift(notification)
       } else {

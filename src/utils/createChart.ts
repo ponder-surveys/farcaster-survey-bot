@@ -1,12 +1,10 @@
 import * as echarts from 'echarts'
 import { createCanvas } from 'canvas'
-import { buildImgurClient } from '../clients/imgur'
+import { imgurClient } from '../clients/imgur'
 import { getDateTag } from './getDateTag'
 
 const uploadChart = async (id: number, canvas: Buffer) => {
-  const imgur = buildImgurClient()
-
-  const response = await imgur.upload({
+  const response = await imgurClient.upload({
     image: canvas,
     type: 'stream',
   })

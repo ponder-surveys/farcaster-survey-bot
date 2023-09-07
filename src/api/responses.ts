@@ -1,10 +1,8 @@
-import { buildSupabaseClient } from '../clients/supabase'
+import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
 const getResponses = async (question_id: number) => {
-  const supabase = buildSupabaseClient()
-
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from('responses')
     .select('*')
     .eq('question_id', question_id)
@@ -18,9 +16,7 @@ const getResponses = async (question_id: number) => {
 }
 
 const addResponses = async (responses: Res[]) => {
-  const supabase = buildSupabaseClient()
-
-  const { error } = await supabase.from('responses').upsert(responses)
+  const { error } = await supabaseClient.from('responses').upsert(responses)
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)

@@ -1,10 +1,9 @@
-import { buildFarcasterClient } from '../clients/farcaster'
+import { farcasterClient } from '../clients/farcaster'
 import { getDateTag } from '../utils/getDateTag'
 import { CONTENT_FID } from '../utils/constants'
 
 const getCastsInThread = async (hash: string) => {
-  const farcaster = buildFarcasterClient()
-  const castIterator = await farcaster.fetchCastsInThread({ hash })
+  const castIterator = await farcasterClient.fetchCastsInThread({ hash })
 
   if (!castIterator) {
     throw new Error(`${getDateTag()} Error retrieving cast replies`)
@@ -18,11 +17,9 @@ const publishCast = async (
   formattedCast: string,
   formattedReply?: string
 ) => {
-  const farcaster = buildFarcasterClient()
-
-  const cast = await farcaster.publishCast(formattedCast)
+  const cast = await farcasterClient.publishCast(formattedCast)
   if (formattedReply) {
-    await farcaster.publishCast(formattedReply, cast)
+    await farcasterClient.publishCast(formattedReply, cast)
   }
   console.log(
     `${getDateTag()} Next ${type} published successfully: ${cast.hash}`
@@ -37,15 +34,13 @@ const publishReply = async (
   fid: number,
   formattedChainedReply?: string
 ) => {
-  const farcaster = buildFarcasterClient()
-
-  const replyCast = await farcaster.publishCast(formattedReply, {
+  const replyCast = await farcasterClient.publishCast(formattedReply, {
     hash: castHash,
     fid,
   })
 
   if (formattedChainedReply) {
-    await farcaster.publishCast(formattedChainedReply, replyCast)
+    await farcasterClient.publishCast(formattedChainedReply, replyCast)
   }
 
   if (fid === CONTENT_FID) {

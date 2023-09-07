@@ -1,12 +1,10 @@
-import { buildSupabaseClient } from '../clients/supabase'
+import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
 const getNextQuestions = async (
   type: 'general' | 'channel'
 ): Promise<Question[]> => {
-  const supabase = buildSupabaseClient()
-
-  let query = supabase
+  let query = supabaseClient
     .from('questions')
     .select('*')
     .eq('status', 'pending')
@@ -30,9 +28,7 @@ const getNextQuestions = async (
 }
 
 const updateNextQuestion = async (hash: string, questionId: number) => {
-  const supabase = buildSupabaseClient()
-
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from('questions')
     .update({
       cast_hash: hash,
