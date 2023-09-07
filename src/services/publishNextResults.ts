@@ -1,5 +1,6 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
+import { getUsername } from '../api/users'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
 import { farcasterClient } from '../clients/farcaster'
 import { validateResponse } from '../utils/validateResponse'
@@ -18,6 +19,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
   const results = await getNextResults(type)
 
   for (const result of results) {
+    const username = await getUsername(result.user_id)
     const resultHash = result.cast_hash as string
     const castIterator = await getCastsInThread(resultHash)
 
@@ -62,7 +64,12 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
     const totalResponses = responses.length + extraResponses.length
 
-    const formattedResult = formatResult(result, optionCounts, totalResponses)
+    const formattedResult = formatResult(
+      result,
+      username,
+      optionCounts,
+      totalResponses
+    )
     const resultHashShorthand = resultHash.substring(0, 6)
     const formattedReply = formatReply(resultHashShorthand)
     const chartUrl =

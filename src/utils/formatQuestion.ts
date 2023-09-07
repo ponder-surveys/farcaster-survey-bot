@@ -1,4 +1,4 @@
-const formatQuestion = (question: Question) => {
+const formatQuestion = (question: Question, username: string | null) => {
   const {
     title,
     option_1,
@@ -6,7 +6,6 @@ const formatQuestion = (question: Question) => {
     option_3,
     option_4,
     option_5,
-    author,
     image_url,
   } = question
 
@@ -23,7 +22,7 @@ const formatQuestion = (question: Question) => {
     .map((o, i) => `${i + 1}. ${o.option}`)
     .join('\n')
 
-  const by = author ? `\n\nQuestion by @${author}` : ''
+  const by = username ? `\n\nQuestion by @${username}` : ''
 
   const image = `\n${image_url}` || ''
 

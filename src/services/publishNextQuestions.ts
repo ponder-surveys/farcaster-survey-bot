@@ -1,5 +1,6 @@
 import { publishCast, publishReply } from '../api/casts'
 import { getNextQuestions, updateNextQuestion } from '../api/questions'
+import { getUsername } from '../api/users'
 import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE } from '../utils/constants'
@@ -10,7 +11,8 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
   const questions = await getNextQuestions(type)
 
   for (const question of questions) {
-    const formattedQuestion = formatQuestion(question)
+    const username = await getUsername(question.user_id)
+    const formattedQuestion = formatQuestion(question, username)
     const formattedReply = formatReply()
 
     const questionByteSize = calculateByteSize(formattedQuestion)

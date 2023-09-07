@@ -1,5 +1,6 @@
 import { getNextQuestions } from '../api/questions'
-import { validateByteSize } from './byteSize'
+import { getUsername } from '../api/users'
+import { validateQuestionAndResultByteSize } from './byteSize'
 import { getDateTag } from './getDateTag'
 
 const validateQuestions = async (type: 'general' | 'channel') => {
@@ -9,7 +10,8 @@ const validateQuestions = async (type: 'general' | 'channel') => {
 
   const questions = await getNextQuestions(type)
   for (const question of questions) {
-    validateByteSize(question)
+    const username = await getUsername(question.user_id)
+    validateQuestionAndResultByteSize(question, username)
   }
 }
 

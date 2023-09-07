@@ -7,9 +7,9 @@ const calculateByteSize = (text: string) => {
   return buffer.byteLength
 }
 
-const validateByteSize = async (question: Question) => {
+const validateQuestionAndResultByteSize = async (question: Question, username: string | null) => {
   // Validate question (estimate)
-  const formattedQuestion = formatQuestion(question)
+  const formattedQuestion = formatQuestion(question, username)
   const formattedQuestionSize = calculateByteSize(formattedQuestion)
 
   if (formattedQuestionSize >= MAX_BYTE_SIZE) {
@@ -26,7 +26,7 @@ const validateByteSize = async (question: Question) => {
     4: 10,
     5: 10,
   }
-  const formattedResult = formatResult(question, mockOptionCounts, 55) // Using magic numbers for option counts
+  const formattedResult = formatResult(question, username, mockOptionCounts, 55) // Using magic numbers for option counts
   const mockChartUrl = MOCK_IMGUR_URL
   const response = `${formattedResult}\n${mockChartUrl}`
   const responseSize = calculateByteSize(response)
@@ -43,4 +43,4 @@ const validateByteSize = async (question: Question) => {
   )
 }
 
-export { calculateByteSize, validateByteSize }
+export { calculateByteSize, validateQuestionAndResultByteSize }

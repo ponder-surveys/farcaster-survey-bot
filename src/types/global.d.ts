@@ -6,10 +6,10 @@ interface Question {
   option_3?: string
   option_4?: string
   option_5?: string
-  author?: string
   image_url?: string
   cast_hash?: string
   channel?: string
+  user_id?: number
 }
 
 interface Res {

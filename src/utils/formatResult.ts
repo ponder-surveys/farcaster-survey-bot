@@ -2,13 +2,13 @@ import { roundPercentages } from './roundPercentages'
 
 const formatResult = (
   result: Question,
+  username: string | null,
   optionCounts: OptionCounts,
   total: number
 ) => {
-  const { title, option_1, option_2, option_3, option_4, option_5, author } =
-    result
+  const { title, option_1, option_2, option_3, option_4, option_5 } = result
 
-  const top = `Survey results${author ? ` for @${author}` : ''}`
+  const top = `Survey results${username ? ` for @${username}` : ''}`
 
   const values = Object.values(optionCounts)
   const percentOptions = roundPercentages(values.map((o) => (o / total) * 100))
