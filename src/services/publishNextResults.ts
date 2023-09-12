@@ -50,6 +50,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
           selected_option,
           comment,
           user_id: userId,
+          cast_hash: cast.hash,
         })
         optionCounts[selected_option]++
       }

@@ -18,6 +18,7 @@ interface QuestionResponse {
   selected_option: number
   comment?: string
   user_id: number
+  cast_hash?: string
 }
 
 interface OptionCounts {
