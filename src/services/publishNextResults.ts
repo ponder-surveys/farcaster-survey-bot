@@ -45,14 +45,16 @@ const publishNextResults = async (type: 'general' | 'channel') => {
           cast.author.username || ''
         )
 
-        responses.push({
-          question_id: result.id,
-          selected_option,
-          comment,
-          user_id: userId,
-          cast_hash: cast.hash,
-        })
-        optionCounts[selected_option]++
+        if (!responses.some((response) => response.user_id === userId)) {
+          responses.push({
+            question_id: result.id,
+            selected_option,
+            comment,
+            user_id: userId,
+            cast_hash: cast.hash,
+          })
+          optionCounts[selected_option]++
+        }
       }
     }
 
