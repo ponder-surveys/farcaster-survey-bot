@@ -1,6 +1,8 @@
 # 📋 Surveycaster
 
-An open-source NodeJS bot designed to post engaging general and channel-based surveys directly on Farcaster. Built on top of Warpcast API, Supabase, and Imgur to produce automated casts, calculate results, and record both quantitative and qualitative responses.
+An open-source NodeJS bot designed to post engaging surveys directly on Farcaster. Built on top of Warpcast API, Supabase, and Imgur to produce automated casts, calculate results, and record both quantitative and qualitative responses.
+
+Surveycaster is a part of the Ponder survey ecosystem. [Learn more](https://weponder.io/)
 
 ## Table of Contents
 - [How It Works](#how-it-works)

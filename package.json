@@ -1,9 +1,9 @@
 {
-  "name": "surveycaster",
+  "name": "farcaster-survey-bot",
   "version": "1.0.0",
-  "description": "A Farcaster bot that posts surveys every Monday and Wednesday.",
+  "description": "An open-source NodeJS bot designed to post engaging surveys directly on Farcaster.",
   "main": "dist/app.js",
-  "repository": "https://github.com/benadamsky/surveycaster",
+  "repository": "https://github.com/ponder-surveys/farcaster-survey-bot",
   "author": "benadamsky <benadamsky@gmail.com>",
   "license": "MIT",
   "scripts": {
