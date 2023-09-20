@@ -33,6 +33,7 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
 
     if (process.env.NODE_ENV === 'production') {
       let hash = ''
+      let createdAt = ''
 
       if (type === 'channel' && question.channel) {
         const channelHash = getChannelHash(question.channel.toLowerCase())
@@ -43,6 +44,9 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
           formattedReply
         )
         hash = result.hash
+        const timestampInMilliseconds = result.timestamp
+        const date = new Date(timestampInMilliseconds)
+        createdAt = date.toISOString()
       } else {
         const result = await publishCast(
           'question',
@@ -50,9 +54,12 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
           formattedReply
         )
         hash = result.hash
+        const timestampInMilliseconds = result.timestamp
+        const date = new Date(timestampInMilliseconds)
+        createdAt = date.toISOString()
       }
 
-      await updateNextQuestion(hash, question.id)
+      await updateNextQuestion(hash, question.id, createdAt)
     } else {
       console.log(
         `${getDateTag()} Mock question cast${

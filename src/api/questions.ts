@@ -27,11 +27,12 @@ const getNextQuestions = async (
   return questions
 }
 
-const updateNextQuestion = async (hash: string, questionId: number) => {
+const updateNextQuestion = async (hash: string, questionId: number, createdAt: string) => {
   const { error } = await supabaseClient
     .from('questions')
     .update({
       cast_hash: hash,
+      created_at: createdAt,
       status: 'posted',
     })
     .eq('id', questionId)
