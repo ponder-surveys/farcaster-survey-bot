@@ -8,7 +8,7 @@ const getNextResults = async (
     .from('questions')
     .select('*')
     .eq('status', 'posted')
-    .order('id', { ascending: false })
+    .order('id', { ascending: true })
 
   if (type === 'general') {
     query = query.is('channel', null)
