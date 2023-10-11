@@ -72,4 +72,5 @@ export const HASH_PAIRS: HashPairs = {
   nfl: '0x473bccd98afb66b7e9daacb16efb67400054cc61',
   tezos: '0xdb29faf1f41c8c7e7695bdd2b4becd5cb7559e21',
   welcome: '0xb1f0a5bde22b48c8ca4f3e1b5afebf7c390ca768',
+  network_states: '0x16ccb339a0ba61bce7d05185fa76cff7716216c8',
 }
