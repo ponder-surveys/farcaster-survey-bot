@@ -32,7 +32,7 @@ Before you begin, ensure you have met the following requirements:
 ### 1. Clone the repository
 
 ```commandline
-git clone https://github.com/benadamsky/surveycaster
+git clone https://github.com/ponder-surveys/farcaster-survey-bot
 ```
 
 ### 2. Set up your environment variables
