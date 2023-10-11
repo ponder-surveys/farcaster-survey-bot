@@ -34,7 +34,7 @@ const formatResult = (
 const formatReply = (hash: string) => {
   const title = `Original survey: https://warpcast.com/survey/${hash}`
 
-  return `${title}\n\n${process.env.CALL_TO_ACTION}`
+  return `${title}\n\n${process.env.RESULTS_CALL_TO_ACTION}`
 }
 
 const formatReplyToSurvey = (hash: string) => {

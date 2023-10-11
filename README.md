@@ -55,6 +55,12 @@ IMGUR_CLIENT_SECRET="Client secret for Imgur API authentication"
 IMGUR_REFRESH_TOKEN="Refresh token generated via Imgur endpoint"
 ```
 
+NFTs (Base mainnet)
+```commandline
+NFT_ALCHEMY_KEY="API key to retrieve NFT collection"
+NFT_COLLECTION_ADDRESS="Address of NFT collection"
+```
+
 Survey questions
 ```commandline
 NEXT_GENERAL_QUESTION_CRON="Task scheduler (UTC) in cron syntax for general questions"
@@ -71,6 +77,7 @@ NEXT_CHANNEL_RESULTS_CRON="Task scheduler (UTC) in cron syntax for channel-speci
 General
 ```commandline
 CALL_TO_ACTION="A message or action for users to take in the reply casts"
+RESULTS_CALL_TO_ACTION="A message or action for users to take in the results reply casts"
 ```
 
 ### 3. Install dependencies

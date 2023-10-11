@@ -111,7 +111,8 @@ const publishNextResults = async (type: 'general' | 'channel') => {
         hash = cast.hash
       }
 
-      const replyToSurvey = formatReplyToSurvey(hash)
+      const replyHashShorthand = hash.substring(0, 6)
+      const replyToSurvey = formatReplyToSurvey(replyHashShorthand)
       const { fid } = await farcasterClient.fetchCurrentUser()
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 

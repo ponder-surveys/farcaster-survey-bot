@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { farcasterClient } from '../clients/farcaster'
 import { supabaseClient } from '../clients/supabase'
 import { alchemyClient } from '../clients/alchemy'
@@ -40,16 +41,23 @@ const getUserId = async (fid: number, username: string): Promise<number> => {
 
   // If user doesn't exist, insert a new user and return the new user_id
   const address = process.env.NFT_COLLECTION_ADDRESS as string
-  const { owners } = await alchemyClient.nft.getOwnersForContract(address)
   let walletWithNft: string | null = null
 
-  // Use fetchUserVerifications function here
   for await (const verification of farcasterClient.fetchUserVerifications({
     fid,
   })) {
-    if (owners.includes(verification.address)) {
-      walletWithNft = verification.address
-      break
+    const { tokenBalances } = await alchemyClient.core.getTokenBalances(
+      verification.address,
+      [address]
+    )
+    if (tokenBalances[0].tokenBalance) {
+      const balance = ethers.BigNumber.from(
+        tokenBalances[0].tokenBalance as `0x${string}`
+      ).toNumber()
+      if (balance > 0) {
+        walletWithNft = verification.address
+        break
+      }
     }
   }
 
