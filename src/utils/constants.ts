@@ -73,4 +73,5 @@ export const HASH_PAIRS: HashPairs = {
   tezos: '0xdb29faf1f41c8c7e7695bdd2b4becd5cb7559e21',
   welcome: '0xb1f0a5bde22b48c8ca4f3e1b5afebf7c390ca768',
   network_states: '0x16ccb339a0ba61bce7d05185fa76cff7716216c8',
+  founders: '0x31e0231ebc4296a00925ed17da301390ec5f96c1',
 }
