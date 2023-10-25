@@ -7,6 +7,7 @@ const formatQuestion = (question: Question, username: string | null) => {
     option_4,
     option_5,
     image_url,
+    inspired_by,
   } = question
 
   const optionsData = [
@@ -22,7 +23,9 @@ const formatQuestion = (question: Question, username: string | null) => {
     .map((o, i) => `${i + 1}. ${o.option}`)
     .join('\n')
 
-  const by = username ? `\n\nQuestion by @${username}` : ''
+  const by = username
+    ? `\n\n${inspired_by ? 'Inspired' : 'Question'} by @${username}`
+    : ''
 
   const image = `\n${image_url}` || ''
 

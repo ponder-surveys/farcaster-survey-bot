@@ -10,6 +10,7 @@ interface Question {
   cast_hash?: string
   channel?: string
   user_id?: number
+  inspired_by: boolean
 }
 
 interface QuestionResponse {
