@@ -46,9 +46,7 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
         )
         hash = result.hash
         const resultCast = await farcasterClient.v2.fetchCast(hash)
-        const timestampInMilliseconds = resultCast?.timestamp
-        const date = new Date(timestampInMilliseconds as string)
-        createdAt = date.toISOString()
+        createdAt = resultCast?.timestamp as string
       } else {
         const result = await publishCast(
           'question',
@@ -57,9 +55,7 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
         )
         hash = result.hash
         const resultCast = await farcasterClient.v2.fetchCast(hash)
-        const timestampInMilliseconds = resultCast?.timestamp
-        const date = new Date(timestampInMilliseconds as string)
-        createdAt = date.toISOString()
+        createdAt = resultCast?.timestamp as string
       }
 
       await updateNextQuestion(hash, question.id, createdAt)
