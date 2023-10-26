@@ -47,7 +47,7 @@ interface User {
   eth_address?: string | null
 }
 
-interface NeynarProfile {
+interface NeynarUser {
   fid: number
   custodyAddress: string
   username: string
@@ -65,11 +65,11 @@ interface NeynarNotification {
   parentHash: string
   parentUrl: null | string
   parentAuthor: { fid: string, username: string }
-  author: NeynarProfile
+  author: NeynarUser
   text: string
   timestamp: string
   embeds: any[]
-  mentionedProfiles: NeynarProfile[]
+  mentionedProfiles: NeynarUser[]
   type: string
   reactions: { count: number; fids: number[] }
   recasts: { count: number; fids: number[] }
