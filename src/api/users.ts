@@ -43,22 +43,32 @@ const getUserId = async (fid: number, username: string): Promise<number> => {
   const address = process.env.NFT_COLLECTION_ADDRESS as string
   let walletWithNft: string | null = null
 
-  for await (const verification of farcasterClient.fetchUserVerifications({
-    fid,
-  })) {
-    const { tokenBalances } = await alchemyClient.core.getTokenBalances(
-      verification.address,
-      [address]
-    )
-    if (tokenBalances[0].tokenBalance) {
-      const balance = ethers.BigNumber.from(
-        tokenBalances[0].tokenBalance as `0x${string}`
-      ).toNumber()
-      if (balance > 0) {
-        walletWithNft = verification.address
-        break
+  try {
+    const verificationResponse =
+      await farcasterClient.v1.fetchUserVerifications(fid)
+
+    if (verificationResponse && verificationResponse.verifications) {
+      for (const verification of verificationResponse.verifications) {
+        const { tokenBalances } = await alchemyClient.core.getTokenBalances(
+          verification,
+          [address]
+        )
+
+        if (tokenBalances[0].tokenBalance) {
+          const balance = ethers.BigNumber.from(
+            tokenBalances[0].tokenBalance
+          ).toNumber()
+
+          if (balance > 0) {
+            walletWithNft = verification
+            break
+          }
+        }
       }
     }
+  } catch (verificationError) {
+    console.error('Error fetching verifications:', verificationError)
+    throw verificationError
   }
 
   const userId = await addUser(fid, username, walletWithNft)

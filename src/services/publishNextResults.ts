@@ -37,12 +37,14 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     for await (const cast of castIterator) {
       const match = validateResponse(cast.text)
 
+      const castAuthor = cast.author as any // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
+
       if (match) {
         const selected_option = Number(match[1])
         const comment = match[2] !== undefined ? match[2].trim() : ''
         const userId = await getUserId(
-          cast.author.fid,
-          cast.author.username || ''
+          cast.author.fid as number,
+          castAuthor as string
         )
 
         if (!responses.some((response) => response.user_id === userId)) {
@@ -113,7 +115,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
       const replyHashShorthand = hash.substring(0, 6)
       const replyToSurvey = formatReplyToSurvey(replyHashShorthand)
-      const { fid } = await farcasterClient.fetchCurrentUser()
+      const fid = Number(process.env.FARCASTER_FID)
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
       await addResponses(responses)

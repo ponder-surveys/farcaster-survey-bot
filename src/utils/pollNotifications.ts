@@ -1,7 +1,3 @@
-import {
-  NotificationCastMention,
-  NotificationCastReply,
-} from '@standard-crypto/farcaster-js'
 import { farcasterClient } from '../clients/farcaster'
 
 let lastPollTime = Date.now()
@@ -9,7 +5,7 @@ let polling = false
 
 const pollNotifications = async (
   handler: (
-    notification: NotificationCastMention | NotificationCastReply
+    notification: NeynarNotification
   ) => void
 ) => {
   if (polling) return
@@ -17,9 +13,10 @@ const pollNotifications = async (
 
   try {
     const notifications = []
+    const fid = Number(process.env.FARCASTER_FID)
 
-    for await (const notification of farcasterClient.fetchMentionAndReplyNotifications()) {
-      if (notification.content.cast?.timestamp > lastPollTime) {
+    for await (const notification of farcasterClient.v1.fetchMentionAndReplyNotifications(fid)) {
+      if (Number(notification.timestamp) > lastPollTime) {
         notifications.unshift(notification)
       } else {
         break
@@ -27,9 +24,9 @@ const pollNotifications = async (
     }
 
     if (notifications.length > 0) {
-      lastPollTime = notifications[0].content.cast?.timestamp
+      lastPollTime = Number(notifications[0].timestamp)
       for (const notification of notifications) {
-        handler(notification)
+        handler(notification as any)
       }
     }
   } catch (error) {
