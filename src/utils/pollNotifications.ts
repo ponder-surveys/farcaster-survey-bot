@@ -4,9 +4,7 @@ let lastPollTime = Date.now()
 let polling = false
 
 const pollNotifications = async (
-  handler: (
-    notification: NeynarNotification
-  ) => void
+  handler: (notification: NeynarNotification) => void
 ) => {
   if (polling) return
   polling = true
@@ -15,8 +13,11 @@ const pollNotifications = async (
     const notifications = []
     const fid = Number(process.env.FARCASTER_FID)
 
-    for await (const notification of farcasterClient.v1.fetchMentionAndReplyNotifications(fid)) {
-      if (Number(notification.timestamp) > lastPollTime) {
+    for await (const notification of farcasterClient.v1.fetchMentionAndReplyNotifications(
+      fid
+    )) {
+      const notificationTime = new Date(notification.timestamp).getTime()
+      if (notificationTime > lastPollTime) {
         notifications.unshift(notification)
       } else {
         break
@@ -24,7 +25,7 @@ const pollNotifications = async (
     }
 
     if (notifications.length > 0) {
-      lastPollTime = Number(notifications[0].timestamp)
+      lastPollTime = new Date(notifications[0].timestamp).getTime()
       for (const notification of notifications) {
         handler(notification as any)
       }
