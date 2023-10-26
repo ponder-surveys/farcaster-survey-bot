@@ -27,11 +27,12 @@ const getNextResults = async (
   return questions
 }
 
-const updateNextResult = async (questionId: number) => {
+const updateNextResult = async (questionId: number, resultImageUrl: string) => {
   const { error } = await supabaseClient
     .from('questions')
     .update({
       status: 'calculated',
+      result_image_url: resultImageUrl,
     })
     .eq('id', questionId)
 

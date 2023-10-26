@@ -115,7 +115,8 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
       await addResponses(responses)
-      await updateNextResult(result.id)
+      await updateNextResult(result.id, chartUrl)
+      await new Promise((resolve) => setTimeout(resolve, 250))
     } else {
       console.log(
         `${getDateTag()} Mock result cast${
