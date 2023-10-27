@@ -1,8 +1,8 @@
-import { Wallet } from 'ethers'
-import { MerkleAPIClient } from '@standard-crypto/farcaster-js'
+import { NeynarAPIClient } from '@standard-crypto/farcaster-js-neynar'
 
-const farcasterMnemonic = process.env.FARCASTER_MNEMONIC as string
-const wallet = Wallet.fromMnemonic(farcasterMnemonic)
-const farcasterClient = new MerkleAPIClient(wallet)
+const apiKey = process.env.NEYNAR_API_KEY as string
+const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
 
-export { farcasterClient }
+const farcasterClient = new NeynarAPIClient(apiKey)
+
+export { farcasterClient, signerUuid }

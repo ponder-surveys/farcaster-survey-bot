@@ -1,9 +1,9 @@
-import { farcasterClient } from '../clients/farcaster'
+import { farcasterClient, signerUuid } from '../clients/farcaster'
 import { getDateTag } from '../utils/getDateTag'
 import { CONTENT_FID } from '../utils/constants'
 
 const getCastsInThread = async (hash: string) => {
-  const castIterator = await farcasterClient.fetchCastsInThread({ hash })
+  const castIterator = await farcasterClient.v1.fetchCastsInThread(hash)
 
   if (!castIterator) {
     throw new Error(`${getDateTag()} Error retrieving cast replies`)
@@ -17,9 +17,11 @@ const publishCast = async (
   formattedCast: string,
   formattedReply?: string
 ) => {
-  const cast = await farcasterClient.publishCast(formattedCast)
+  const cast = await farcasterClient.v2.publishCast(signerUuid, formattedCast)
   if (formattedReply) {
-    await farcasterClient.publishCast(formattedReply, cast)
+    await farcasterClient.v2.publishCast(signerUuid, formattedReply, {
+      replyTo: cast.hash,
+    })
   }
   console.log(
     `${getDateTag()} Next ${type} published successfully: ${cast.hash}`
@@ -34,20 +36,21 @@ const publishReply = async (
   fid: number,
   formattedChainedReply?: string
 ) => {
-  const replyCast = await farcasterClient.publishCast(formattedReply, {
-    hash: castHash,
-    fid,
-  })
+  const replyCast = await farcasterClient.v2.publishCast(
+    signerUuid,
+    formattedReply,
+    { replyTo: castHash }
+  )
 
   if (formattedChainedReply) {
-    await farcasterClient.publishCast(formattedChainedReply, replyCast)
+    await farcasterClient.v2.publishCast(signerUuid, formattedChainedReply, {
+      replyTo: replyCast.hash,
+    })
   }
 
   if (fid === CONTENT_FID) {
     console.log(
-      `${getDateTag()} Next question published successfully: ${
-        replyCast.hash
-      }`
+      `${getDateTag()} Next question published successfully: ${replyCast.hash}`
     )
   } else {
     console.log(

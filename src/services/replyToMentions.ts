@@ -1,7 +1,3 @@
-import {
-  NotificationCastMention,
-  NotificationCastReply,
-} from '@standard-crypto/farcaster-js'
 import { farcasterClient } from '../clients/farcaster'
 import { publishReply } from '../api/casts'
 import { addBookmark } from '../api/bookmarks'
@@ -14,66 +10,59 @@ setInterval(() => {
   processedNotifications.clear()
 }, 10 * 60 * 1000) // Clear set every 10 minutes
 
-const startPolling = (
-  handler: (
-    notification: NotificationCastMention | NotificationCastReply
-  ) => void
-) => {
-  setInterval(() => pollNotifications(handler), 10 * 1000) // Poll casts every 10 seconds
+const startPolling = (handler: (notification: NeynarNotification) => void) => {
+  setInterval(() => pollNotifications(handler), 20 * 1000) // Poll casts every 20 seconds
 }
 
-const handleNotification = async (
-  notification: NotificationCastMention | NotificationCastReply
-) => {
-  // Check if mention
-  if (notification.type !== 'cast-mention') {
-    return
-  }
-
-  // Check if there's an actor
-  if (!notification.actor) {
-    return
-  }
-
-  const { username, fid: actorFid } = notification.actor
-
-  // Check if there's a username and it's not a self-notification
-  if (!username || username?.toLowerCase() === 'survey') {
-    return
-  }
-
-  const { text, hash, parentHash, parentAuthor } = notification.content.cast
-  const parentUsername = parentAuthor?.username
-
-  // Check if it has text, a hash, a parent hash, and a parent author that isn't a self-notification
+const handleNotification = async (notification: NeynarNotification) => {
+  // Check if the notification is a mention and specifically targets '@survey'
   if (
-    !text ||
-    !hash ||
-    !parentHash ||
-    !parentUsername ||
-    parentUsername.toLowerCase() === 'survey'
+    notification.type !== 'cast-reply' ||
+    !notification.text.includes('@survey')
   ) {
     return
   }
 
-  // Check if we haven't seen this notification
+  const {
+    author: { fid: actorFid, username },
+    text,
+    hash,
+    parentHash,
+    parentAuthor,
+  } = notification
+
+  // Avoid self-notification and ensure all necessary info is present
+  if (
+    !username ||
+    username.toLowerCase() === 'survey' ||
+    !text ||
+    !hash ||
+    !parentHash ||
+    !parentAuthor ||
+    parentAuthor.username.toLowerCase() === 'survey'
+  ) {
+    return
+  }
+
+  // Check if we haven't processed this notification
   if (processedNotifications.has(hash)) {
     return
   }
 
   processedNotifications.add(hash)
 
+  // Construct the reply message
   const reply = `🗳️ This cast has been tagged as a potential weekly survey! If viable, it will be voted on this Sunday, then launched on Monday. Follow me to see the results.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
 
   if (process.env.NODE_ENV === 'production') {
-    const parentCast = await farcasterClient.fetchCast(parentHash)
+    const parentCast = await farcasterClient.v2.fetchCast(parentHash)
 
     await addBookmark({
       comment: text.replace('@survey', '').trim(),
       cast_hash: parentHash,
       cast_text: parentCast?.text as string,
-      cast_author_username: parentUsername,
-      cast_author_fid: parentAuthor.fid,
+      cast_author_username: parentAuthor.username,
+      cast_author_fid: Number(parentAuthor.fid),
       referred_by_fid: actorFid,
     })
 
@@ -84,9 +73,8 @@ const handleNotification = async (
 }
 
 const replyToMentions = async () => {
-  startPolling(
-    (notification: NotificationCastMention | NotificationCastReply) =>
-      handleNotification(notification)
+  startPolling((notification: NeynarNotification) =>
+    handleNotification(notification)
   )
 }
 

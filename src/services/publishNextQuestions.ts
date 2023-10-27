@@ -1,6 +1,7 @@
 import { publishCast, publishReply } from '../api/casts'
 import { getNextQuestions, updateNextQuestion } from '../api/questions'
 import { getUsername } from '../api/users'
+import { farcasterClient } from '../clients/farcaster'
 import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE } from '../utils/constants'
@@ -44,9 +45,8 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
           formattedReply
         )
         hash = result.hash
-        const timestampInMilliseconds = result.timestamp
-        const date = new Date(timestampInMilliseconds)
-        createdAt = date.toISOString()
+        const resultCast = await farcasterClient.v2.fetchCast(hash)
+        createdAt = resultCast?.timestamp as string
       } else {
         const result = await publishCast(
           'question',
@@ -54,12 +54,12 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
           formattedReply
         )
         hash = result.hash
-        const timestampInMilliseconds = result.timestamp
-        const date = new Date(timestampInMilliseconds)
-        createdAt = date.toISOString()
+        const resultCast = await farcasterClient.v2.fetchCast(hash)
+        createdAt = resultCast?.timestamp as string
       }
 
       await updateNextQuestion(hash, question.id, createdAt)
+      await new Promise((resolve) => setTimeout(resolve, 250))
     } else {
       console.log(
         `${getDateTag()} Mock question cast${

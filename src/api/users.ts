@@ -21,7 +21,7 @@ const getUsername = async (userId?: number): Promise<string | null> => {
   return data?.username || null
 }
 
-const getUserId = async (fid: number, username: string): Promise<number> => {
+const getUserId = async (fid: number, user: NeynarUser): Promise<number> => {
   // Check if user exists
   const { data, error } = await supabaseClient
     .from('users')
@@ -43,45 +43,62 @@ const getUserId = async (fid: number, username: string): Promise<number> => {
   const address = process.env.NFT_COLLECTION_ADDRESS as string
   let walletWithNft: string | null = null
 
-  for await (const verification of farcasterClient.fetchUserVerifications({
-    fid,
-  })) {
-    const { tokenBalances } = await alchemyClient.core.getTokenBalances(
-      verification.address,
-      [address]
-    )
-    if (tokenBalances[0].tokenBalance) {
-      const balance = ethers.BigNumber.from(
-        tokenBalances[0].tokenBalance as `0x${string}`
-      ).toNumber()
-      if (balance > 0) {
-        walletWithNft = verification.address
-        break
+  try {
+    const verificationResponse =
+      await farcasterClient.v1.fetchUserVerifications(fid)
+
+    if (verificationResponse && verificationResponse.verifications) {
+      for (const verification of verificationResponse.verifications) {
+        const { tokenBalances } = await alchemyClient.core.getTokenBalances(
+          verification,
+          [address]
+        )
+
+        if (tokenBalances[0].tokenBalance) {
+          const balance = ethers.BigNumber.from(
+            tokenBalances[0].tokenBalance
+          ).toNumber()
+
+          if (balance > 0) {
+            walletWithNft = verification
+            break
+          }
+        }
       }
     }
+  } catch (verificationError) {
+    console.error('Error fetching verifications:', verificationError)
+    throw verificationError
   }
 
-  const userId = await addUser(fid, username, walletWithNft)
+  const userId = await addUser(user, walletWithNft)
   return userId
 }
 
 const addUser = async (
-  fid: number,
-  username: string,
+  user: NeynarUser,
   ethAddress: string | null
 ): Promise<number> => {
   const { data, error } = await supabaseClient
     .from('users')
-    .insert([{ fid, username, eth_address: ethAddress }])
+    .insert([
+      {
+        fid: user.fid,
+        username: user.username,
+        display_name: user.displayName,
+        profile_picture: user.pfp?.url,
+        eth_address: ethAddress,
+      },
+    ])
     .select('*')
 
   if (error) {
-    console.error(`Error inserting user with fid ${fid}:`, error)
+    console.error(`Error inserting user with fid ${user.fid}:`, error)
     throw error
   }
 
   if (!data) {
-    throw new Error(`No data returned when inserting user with fid ${fid}`)
+    throw new Error(`No data returned when inserting user with fid ${user.fid}`)
   }
 
   const insertedUsers = data as User[]
@@ -89,7 +106,7 @@ const addUser = async (
   if (insertedUsers.length > 0) {
     return insertedUsers[0].id
   } else {
-    throw new Error(`Failed to insert user with fid ${fid}`)
+    throw new Error(`Failed to insert user with fid ${user.fid}`)
   }
 }
 

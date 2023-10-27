@@ -2,7 +2,6 @@ import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
 import { getUserId, getUsername } from '../api/users'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
-import { farcasterClient } from '../clients/farcaster'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import {
@@ -37,13 +36,12 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     for await (const cast of castIterator) {
       const match = validateResponse(cast.text)
 
+      const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
+
       if (match) {
         const selected_option = Number(match[1])
         const comment = match[2] !== undefined ? match[2].trim() : ''
-        const userId = await getUserId(
-          cast.author.fid,
-          cast.author.username || ''
-        )
+        const userId = await getUserId(cast.author.fid as number, castAuthor)
 
         if (!responses.some((response) => response.user_id === userId)) {
           responses.push({
@@ -113,11 +111,12 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
       const replyHashShorthand = hash.substring(0, 6)
       const replyToSurvey = formatReplyToSurvey(replyHashShorthand)
-      const { fid } = await farcasterClient.fetchCurrentUser()
+      const fid = Number(process.env.FARCASTER_FID)
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
       await addResponses(responses)
-      await updateNextResult(result.id)
+      await updateNextResult(result.id, chartUrl)
+      await new Promise((resolve) => setTimeout(resolve, 250))
     } else {
       console.log(
         `${getDateTag()} Mock result cast${
