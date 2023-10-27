@@ -6,7 +6,7 @@ import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
-import { getChannelHash } from '../utils/getChannelHash'
+import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 
 const publishNextQuestions = async (type: 'general' | 'channel') => {
   const questions = await getNextQuestions(type)
@@ -37,10 +37,10 @@ const publishNextQuestions = async (type: 'general' | 'channel') => {
       let createdAt = ''
 
       if (type === 'channel' && question.channel) {
-        const channelHash = getChannelHash(question.channel.toLowerCase())
+        const parentUrl = await getChannelParentUrl(question.channel)
         const result = await publishReply(
           formattedQuestion,
-          channelHash,
+          parentUrl,
           CONTENT_FID,
           formattedReply
         )

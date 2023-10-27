@@ -1,4 +1,4 @@
-import { farcasterClient, signerUuid } from '../clients/farcaster'
+import { farcasterClient } from '../clients/farcaster'
 import { getDateTag } from '../utils/getDateTag'
 import { CONTENT_FID } from '../utils/constants'
 
@@ -17,6 +17,7 @@ const publishCast = async (
   formattedCast: string,
   formattedReply?: string
 ) => {
+  const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
   const cast = await farcasterClient.v2.publishCast(signerUuid, formattedCast)
   if (formattedReply) {
     await farcasterClient.v2.publishCast(signerUuid, formattedReply, {
@@ -36,6 +37,7 @@ const publishReply = async (
   fid: number,
   formattedChainedReply?: string
 ) => {
+  const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
   const replyCast = await farcasterClient.v2.publishCast(
     signerUuid,
     formattedReply,

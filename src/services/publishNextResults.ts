@@ -12,7 +12,7 @@ import {
 import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
-import { getChannelHash } from '../utils/getChannelHash'
+import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 
 const publishNextResults = async (type: 'general' | 'channel') => {
   const results = await getNextResults(type)
@@ -96,10 +96,10 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       let hash = ''
 
       if (type === 'channel' && result.channel) {
-        const channelHash = getChannelHash(result.channel.toLowerCase())
+        const parentUrl = await getChannelParentUrl(result.channel)
         const cast = await publishReply(
           response,
-          channelHash,
+          parentUrl,
           CONTENT_FID,
           formattedReply
         )

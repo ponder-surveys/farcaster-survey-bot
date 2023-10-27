@@ -39,6 +39,10 @@ const getUserId = async (fid: number, user: NeynarUser): Promise<number> => {
     return data[0].id
   }
 
+  if (process.env.NODE_ENV !== 'production') {
+    return 0
+  }
+
   // If user doesn't exist, insert a new user and return the new user_id
   const address = process.env.NFT_COLLECTION_ADDRESS as string
   let walletWithNft: string | null = null
