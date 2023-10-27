@@ -1,5 +1,6 @@
 import { farcasterClient } from '../clients/farcaster'
 import { publishReply } from '../api/casts'
+import { getUserId } from '../api/users'
 import { addBookmark } from '../api/bookmarks'
 import { getDateTag } from '../utils/getDateTag'
 import { pollNotifications } from '../utils/pollNotifications'
@@ -17,29 +18,22 @@ const startPolling = (handler: (notification: NeynarNotification) => void) => {
 const handleNotification = async (notification: NeynarNotification) => {
   // Check if the notification is a mention and specifically targets '@survey'
   if (
-    notification.type !== 'cast-reply' ||
+    notification.type !== 'cast-mention' ||
     !notification.text.includes('@survey')
   ) {
     return
   }
 
-  const {
-    author: { fid: actorFid, username },
-    text,
-    hash,
-    parentHash,
-    parentAuthor,
-  } = notification
+  const { author, text, hash, parentHash, parentAuthor } = notification
 
   // Avoid self-notification and ensure all necessary info is present
   if (
-    !username ||
-    username.toLowerCase() === 'survey' ||
-    !text ||
+    !author.username ||
+    author.fid === Number(process.env.FARCASTER_FID) ||
+    Number(parentAuthor.fid) === Number(process.env.FARCASTER_FID) ||
     !hash ||
     !parentHash ||
-    !parentAuthor ||
-    parentAuthor.username.toLowerCase() === 'survey'
+    !parentAuthor
   ) {
     return
   }
@@ -56,17 +50,23 @@ const handleNotification = async (notification: NeynarNotification) => {
 
   if (process.env.NODE_ENV === 'production') {
     const parentCast = await farcasterClient.v2.fetchCast(parentHash)
+    const parentAuthorObj = await farcasterClient.v1.lookupUserByFid(
+      Number(parentAuthor.fid)
+    )
+    const authorUserId = await getUserId(author)
+    const parentAuthorUserId = await getUserId(
+      parentAuthorObj as unknown as NeynarUser
+    )
 
     await addBookmark({
       comment: text.replace('@survey', '').trim(),
       cast_hash: parentHash,
       cast_text: parentCast?.text as string,
-      cast_author_username: parentAuthor.username,
-      cast_author_fid: Number(parentAuthor.fid),
-      referred_by_fid: actorFid,
+      author_user_id: parentAuthorUserId,
+      referred_by_user_id: authorUserId,
     })
 
-    await publishReply(reply, hash, actorFid)
+    await publishReply(reply, hash, author.fid)
   } else {
     console.log(`${getDateTag()} Mock reply:\n${reply}`)
   }

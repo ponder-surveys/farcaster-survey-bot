@@ -41,7 +41,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       if (match) {
         const selected_option = Number(match[1])
         const comment = match[2] !== undefined ? match[2].trim() : ''
-        const userId = await getUserId(cast.author.fid as number, castAuthor)
+        const userId = await getUserId(castAuthor)
 
         if (!responses.some((response) => response.user_id === userId)) {
           responses.push({

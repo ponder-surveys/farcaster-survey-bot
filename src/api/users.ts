@@ -21,16 +21,16 @@ const getUsername = async (userId?: number): Promise<string | null> => {
   return data?.username || null
 }
 
-const getUserId = async (fid: number, user: NeynarUser): Promise<number> => {
+const getUserId = async (user: NeynarUser): Promise<number> => {
   // Check if user exists
   const { data, error } = await supabaseClient
     .from('users')
     .select('id')
-    .eq('fid', fid)
+    .eq('fid', user.fid)
     .limit(1)
 
   if (error) {
-    console.error(`Error fetching user with fid ${fid}:`, error)
+    console.error(`Error fetching user with fid ${user.fid}:`, error)
     throw error
   }
 
@@ -49,7 +49,7 @@ const getUserId = async (fid: number, user: NeynarUser): Promise<number> => {
 
   try {
     const verificationResponse =
-      await farcasterClient.v1.fetchUserVerifications(fid)
+      await farcasterClient.v1.fetchUserVerifications(user.fid)
 
     if (verificationResponse && verificationResponse.verifications) {
       for (const verification of verificationResponse.verifications) {

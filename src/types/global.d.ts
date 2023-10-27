@@ -35,9 +35,8 @@ interface Bookmark {
   comment?: string
   cast_hash: string
   cast_text: string
-  cast_author_username: string
-  cast_author_fid: number
-  referred_by_fid: number
+  author_user_id: number
+  referred_by_user_id: number
 }
 
 interface User {
@@ -49,7 +48,7 @@ interface User {
 
 interface NeynarUser {
   fid: number
-  custodyAddress: string
+  custodyAddress?: string
   username: string
   displayName: string
   pfp: { url: string }
