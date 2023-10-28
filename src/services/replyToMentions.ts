@@ -46,7 +46,7 @@ const handleNotification = async (notification: NeynarNotification) => {
   processedNotifications.add(hash)
 
   // Construct the reply message
-  const reply = `🗳️ This cast has been tagged as a potential weekly survey! If viable, it will be voted on this Sunday, then launched on Monday. Follow me to see the results.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
+  const reply = `🗳️ This cast has been tagged as a potential survey topic! If approved, a new survey will be crafted and delivered shortly.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
 
   if (process.env.NODE_ENV === 'production') {
     const parentCast = await farcasterClient.v2.fetchCast(parentHash)
