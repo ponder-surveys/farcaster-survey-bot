@@ -37,6 +37,7 @@ interface Bookmark {
   cast_text: string
   author_user_id: number
   referred_by_user_id: number
+  username?: string
 }
 
 interface User {

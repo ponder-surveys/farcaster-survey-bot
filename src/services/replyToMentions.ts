@@ -64,6 +64,7 @@ const handleNotification = async (notification: NeynarNotification) => {
       cast_text: parentCast?.text as string,
       author_user_id: parentAuthorUserId,
       referred_by_user_id: authorUserId,
+      username: parentAuthorObj?.username,
     })
 
     await publishReply(reply, hash, author.fid)
