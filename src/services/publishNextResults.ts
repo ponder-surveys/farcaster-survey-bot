@@ -42,7 +42,8 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
       if (
         castAuthor.fid === Number(process.env.FARCASTER_FID) ||
-        responses.some((response) => response.user_id === userId)
+        responses.some((response) => response.user_id === userId) ||
+        cast.parentHash !== result.cast_hash
       ) {
         continue
       }
@@ -78,12 +79,19 @@ const publishNextResults = async (type: 'general' | 'channel') => {
           continue
         }
 
-        const optionMatch = gptResult.content.match(/Option: (\d|No)\./)
-        if (!optionMatch || optionMatch[1] === 'No') {
+        const lines = gptResult.content.split('\n')
+        const optionLine = lines.find((line) => line.startsWith('Option:'))
+        let option
+
+        if (optionLine) {
+          option = optionLine.split(':')[1].trim().split(' ')[0]
+        }
+
+        if (!option || option === 'No') {
           continue
         }
 
-        const selected_option = Number(optionMatch[1])
+        const selected_option = Number(option)
         const comment = cast.text.trim()
 
         responses.push({
