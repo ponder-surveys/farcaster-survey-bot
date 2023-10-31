@@ -13,6 +13,7 @@ import { calculateByteSize } from '../utils/byteSize'
 import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { getChannelParentUrl } from '../utils/getChannelParentUrl'
+import { categorizeResponseWithGPT } from '../utils/categorizeResponseWithGPT'
 
 const publishNextResults = async (type: 'general' | 'channel') => {
   const results = await getNextResults(type)
@@ -37,22 +38,70 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       const match = validateResponse(cast.text)
 
       const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
+      const userId = await getUserId(castAuthor)
+
+      if (
+        castAuthor.fid === Number(process.env.FARCASTER_FID) ||
+        responses.some((response) => response.user_id === userId) ||
+        cast.parentHash !== result.cast_hash
+      ) {
+        continue
+      }
 
       if (match) {
         const selected_option = Number(match[1])
         const comment = match[2] !== undefined ? match[2].trim() : ''
-        const userId = await getUserId(castAuthor)
 
-        if (!responses.some((response) => response.user_id === userId)) {
-          responses.push({
-            question_id: result.id,
-            selected_option,
-            comment,
-            user_id: userId,
-            cast_hash: cast.hash,
-          })
-          optionCounts[selected_option]++
+        responses.push({
+          question_id: result.id,
+          selected_option,
+          comment,
+          user_id: userId,
+          cast_hash: cast.hash,
+        })
+        optionCounts[selected_option]++
+      } else {
+        const options = []
+        for (let i = 1; i <= 5; i++) {
+          const option = result[`option_${i}` as keyof Question]
+          if (option) {
+            options.push(option)
+          }
         }
+
+        const gptResult = await categorizeResponseWithGPT(
+          result.title,
+          options as string[],
+          cast.text
+        )
+
+        if (!gptResult.content) {
+          continue
+        }
+
+        const lines = gptResult.content.split('\n')
+        const optionLine = lines.find((line) => line.startsWith('Option:'))
+        let option
+
+        if (optionLine) {
+          option = optionLine.split(':')[1].trim().split(' ')[0]
+        }
+
+        if (!option || option === 'No') {
+          continue
+        }
+
+        const selected_option = Number(option)
+        const comment = cast.text.trim()
+
+        responses.push({
+          question_id: result.id,
+          selected_option,
+          comment,
+          user_id: userId,
+          cast_hash: cast.hash,
+        })
+        optionCounts[selected_option]++
       }
     }
 
