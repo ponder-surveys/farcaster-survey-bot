@@ -22,6 +22,15 @@ interface QuestionResponse {
   cast_hash?: string
 }
 
+interface Reaction {
+  id?: number
+  user_id: number
+  question_id: number
+  response_id: number | null
+  type: 'like' | 'recast'
+  created_at: string
+}
+
 interface OptionCounts {
   [key: number]: number
 }
@@ -64,7 +73,7 @@ interface NeynarNotification {
   hash: string
   parentHash: string
   parentUrl: null | string
-  parentAuthor: { fid: string, username: string }
+  parentAuthor: { fid: string; username: string }
   author: NeynarUser
   text: string
   timestamp: string
@@ -77,4 +86,8 @@ interface NeynarNotification {
   viewerContext: { liked: boolean; recasted: boolean }
   replies: { count: number }
   threadHash: null | string
+}
+
+interface NeynarReaction {
+  fid: number
 }
