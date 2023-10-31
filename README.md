@@ -68,6 +68,11 @@ NFT_ALCHEMY_KEY="API key to retrieve NFT collection"
 NFT_COLLECTION_ADDRESS="Address of NFT collection"
 ```
 
+OpenAI
+```commandline
+OPENAI_API_KEY="API key used to interact with GPT"
+```
+
 Survey questions
 ```commandline
 NEXT_GENERAL_QUESTION_CRON="Task scheduler (UTC) in cron syntax for general questions"
