@@ -1,5 +1,6 @@
 import { getNextResults, updateNextResult } from '../api/results'
 import { getResponses, addResponses } from '../api/responses'
+import { addResultReactions } from '../api/reactions'
 import { getUserId, getUsername } from '../api/users'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
 import { validateResponse } from '../utils/validateResponse'
@@ -163,7 +164,9 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       const fid = Number(process.env.FARCASTER_FID)
       await publishReply(replyToSurvey, result.cast_hash as string, fid)
 
-      await addResponses(responses)
+      const addedResponses = await addResponses(responses)
+      await addResultReactions(result, addedResponses)
+
       await updateNextResult(result.id, chartUrl)
       await new Promise((resolve) => setTimeout(resolve, 250))
     } else {

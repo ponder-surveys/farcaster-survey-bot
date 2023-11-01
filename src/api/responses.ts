@@ -16,7 +16,10 @@ const getResponses = async (question_id: number) => {
 }
 
 const addResponses = async (responses: QuestionResponse[]) => {
-  const { error } = await supabaseClient.from('responses').upsert(responses)
+  const { data, error } = await supabaseClient
+    .from('responses')
+    .upsert(responses, { onConflict: 'id' })
+    .select('*')
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)
@@ -24,6 +27,8 @@ const addResponses = async (responses: QuestionResponse[]) => {
   }
 
   console.log(`${getDateTag()} Responses successfully uploaded on db`)
+
+  return data as QuestionResponse[]
 }
 
 export { getResponses, addResponses }
