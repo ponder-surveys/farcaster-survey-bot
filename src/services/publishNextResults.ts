@@ -19,7 +19,7 @@ import { categorizeResponseWithGPT } from '../utils/categorizeResponseWithGPT'
 const publishNextResults = async (type: 'general' | 'channel') => {
   const results = await getNextResults(type)
 
-  for (const result of results) {
+  for await (const result of results) {
     const username = await getUsername(result.user_id)
     const resultHash = result.cast_hash as string
     const castIterator = await getCastsInThread(resultHash)

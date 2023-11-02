@@ -11,7 +11,7 @@ import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 const publishNextQuestions = async (type: 'general' | 'channel') => {
   const questions = await getNextQuestions(type)
 
-  for (const question of questions) {
+  for await (const question of questions) {
     const username = await getUsername(question.user_id)
     const formattedQuestion = formatQuestion(question, username)
     const formattedReply = formatReply()
