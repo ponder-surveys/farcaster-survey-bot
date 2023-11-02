@@ -7,7 +7,7 @@ import {
   schedulePublishNextResult,
 } from './services/cron'
 import { replyToMentions } from './services/replyToMentions'
-import { getCronTimeMinus24Hours } from './utils/cronTime'
+import { getCronTimeMinus1Hour } from './utils/cronTime'
 import { getDateTag } from './utils/getDateTag'
 
 console.log(`${getDateTag()} Surveying the casters...`)
@@ -19,11 +19,11 @@ const nextChannelQuestionsTime = process.env
 const nextGeneralResultTime = process.env.NEXT_GENERAL_RESULT_CRON as string
 const nextChannelResultsTime = process.env.NEXT_CHANNEL_RESULTS_CRON as string
 
-// Warn 24 hours in advance if the next questions are estimated to be invalid
-const nextGeneralQuestionValidateTime = getCronTimeMinus24Hours(
+// Warn 1 hour in advance if the next questions are estimated to be invalid
+const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
   nextGeneralQuestionTime
 )
-const nextChannelQuestionsValidateTime = getCronTimeMinus24Hours(
+const nextChannelQuestionsValidateTime = getCronTimeMinus1Hour(
   nextChannelQuestionsTime
 )
 scheduleValidateNextQuestion(nextGeneralQuestionValidateTime, 'general')

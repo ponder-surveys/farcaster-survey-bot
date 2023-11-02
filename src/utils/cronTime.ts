@@ -34,14 +34,14 @@ const getQuestionAndResultTime = (
   console.log(questionTime, resultTime)
 }
 
-const getCronTimeMinus24Hours = (cronTime: string) => {
+const getCronTimeMinus1Hour = (cronTime: string) => {
   const next = parser.parseExpression(cronTime, { tz: 'UTC' }).next()
-  const minus24Hours = new Date(next.getTime() - 24 * 60 * 60 * 1000)
-  const minus24HoursCronTime = `${minus24Hours.getUTCMinutes()} ${minus24Hours.getUTCHours()} ${minus24Hours.getUTCDate()} ${
-    minus24Hours.getUTCMonth() + 1
+  const minus1Hour = new Date(next.getTime() - 1 * 60 * 60 * 1000)
+  const minus1HourCronTime = `${minus1Hour.getUTCMinutes()} ${minus1Hour.getUTCHours()} ${minus1Hour.getUTCDate()} ${
+    minus1Hour.getUTCMonth() + 1
   } *`
 
-  return minus24HoursCronTime
+  return minus1HourCronTime
 }
 
-export { getQuestionAndResultTime, getCronTimeMinus24Hours }
+export { getQuestionAndResultTime, getCronTimeMinus1Hour }
