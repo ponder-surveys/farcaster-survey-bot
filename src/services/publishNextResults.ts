@@ -11,7 +11,7 @@ import {
   formatReplyToSurvey,
 } from '../utils/formatResult'
 import { calculateByteSize } from '../utils/byteSize'
-import { CONTENT_FID, MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
+import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 import { categorizeResponseWithGPT } from '../utils/categorizeResponseWithGPT'
@@ -148,9 +148,9 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       if (type === 'channel' && result.channel) {
         const parentUrl = await getChannelParentUrl(result.channel)
         const cast = await publishReply(
-          response,
+          'result',
           parentUrl,
-          CONTENT_FID,
+          response,
           formattedReply
         )
         hash = cast.hash
@@ -161,8 +161,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
 
       const replyHashShorthand = hash.substring(0, 6)
       const replyToSurvey = formatReplyToSurvey(replyHashShorthand)
-      const fid = Number(process.env.FARCASTER_FID)
-      await publishReply(replyToSurvey, result.cast_hash as string, fid)
+      await publishReply('question reply', result.cast_hash as string, replyToSurvey)
 
       const addedResponses = await addResponses(responses)
       await addResultReactions(result, addedResponses)
@@ -171,7 +170,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
       await new Promise((resolve) => setTimeout(resolve, 250))
     } else {
       console.log(
-        `${getDateTag()} Mock result cast${
+        `${getDateTag()} Mock result${
           result.channel ? ` in ${result.channel} channel` : ''
         }:\n\n${response}`
       )

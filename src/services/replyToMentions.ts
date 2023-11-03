@@ -67,7 +67,7 @@ const handleNotification = async (notification: NeynarNotification) => {
       username: parentAuthorObj?.username,
     })
 
-    await publishReply(reply, hash, author.fid)
+    await publishReply('bookmark reply', hash, reply)
   } else {
     console.log(`${getDateTag()} Mock reply:\n${reply}`)
   }

@@ -14,7 +14,7 @@ const validateQuestionAndResultByteSize = async (question: Question, username: s
 
   if (formattedQuestionSize >= MAX_BYTE_SIZE) {
     console.warn(
-      `Warning: Question cast may be too large (${formattedQuestionSize}/${MAX_BYTE_SIZE} bytes).\nPlease consider modifying the question in the next 24 hours.`
+      `Warning: Question cast may be too large (${formattedQuestionSize}/${MAX_BYTE_SIZE} bytes).\nPlease consider modifying the question.`
     )
   }
 
@@ -33,7 +33,7 @@ const validateQuestionAndResultByteSize = async (question: Question, username: s
 
   if (responseSize >= MAX_BYTE_SIZE) {
     console.warn(
-      `Warning: Result cast may be too large (${responseSize}/${MAX_BYTE_SIZE} bytes).\nPlease consider modifying the question in the next 24 hours.`
+      `Warning: Result cast may be too large (${responseSize}/${MAX_BYTE_SIZE} bytes).\nPlease consider modifying the question.`
     )
     return
   }

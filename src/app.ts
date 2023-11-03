@@ -13,8 +13,8 @@ import { getDateTag } from './utils/getDateTag'
 console.log(`${getDateTag()} Surveying the casters...`)
 
 const nextGeneralQuestionTime = process.env.NEXT_GENERAL_QUESTION_CRON as string
-const nextChannelQuestionsTime = process.env
-  .NEXT_CHANNEL_QUESTIONS_CRON as string
+const nextChannelQuestionTime = process.env
+  .NEXT_CHANNEL_QUESTION_CRON as string
 
 const nextGeneralResultTime = process.env.NEXT_GENERAL_RESULT_CRON as string
 const nextChannelResultsTime = process.env.NEXT_CHANNEL_RESULTS_CRON as string
@@ -23,15 +23,15 @@ const nextChannelResultsTime = process.env.NEXT_CHANNEL_RESULTS_CRON as string
 const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
   nextGeneralQuestionTime
 )
-const nextChannelQuestionsValidateTime = getCronTimeMinus1Hour(
-  nextChannelQuestionsTime
+const nextChannelQuestionValidateTime = getCronTimeMinus1Hour(
+  nextChannelQuestionTime
 )
 scheduleValidateNextQuestion(nextGeneralQuestionValidateTime, 'general')
-scheduleValidateNextQuestion(nextChannelQuestionsValidateTime, 'channel')
+scheduleValidateNextQuestion(nextChannelQuestionValidateTime, 'channel')
 
 // Schedule next questions
 schedulePublishNextQuestion(nextGeneralQuestionTime, 'general')
-schedulePublishNextQuestion(nextChannelQuestionsTime, 'channel')
+schedulePublishNextQuestion(nextChannelQuestionTime, 'channel')
 
 // Schedule next results
 schedulePublishNextResult(nextGeneralResultTime, 'general')
