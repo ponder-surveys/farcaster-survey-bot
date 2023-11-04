@@ -1,22 +1,19 @@
 import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
-const getNextResults = async (
-  type: 'general' | 'channel'
-): Promise<Question[]> => {
-  let query = supabaseClient
+const getNextResults = async (): Promise<Question[]> => {
+  const timeInterval = Number(process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48) // Default to 48 hours if not set
+  const currentTime = new Date()
+  const cutoffTime = new Date(
+    currentTime.getTime() - timeInterval * 60 * 60 * 1000
+  )
+
+  const { data, error } = await supabaseClient
     .from('questions')
     .select('*')
     .eq('status', 'posted')
+    .lte('created_at', cutoffTime.toISOString())
     .order('id', { ascending: true })
-
-  if (type === 'general') {
-    query = query.is('channel', null)
-  } else {
-    query = query.not('channel', 'eq', null)
-  }
-
-  const { data, error } = await query
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)

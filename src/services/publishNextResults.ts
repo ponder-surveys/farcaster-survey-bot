@@ -16,8 +16,8 @@ import { getDateTag } from '../utils/getDateTag'
 import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 import { categorizeResponseWithGPT } from '../utils/categorizeResponseWithGPT'
 
-const publishNextResults = async (type: 'general' | 'channel') => {
-  const results = await getNextResults(type)
+const publishNextResults = async () => {
+  const results = await getNextResults()
 
   for await (const result of results) {
     const username = await getUsername(result.user_id)
@@ -145,7 +145,7 @@ const publishNextResults = async (type: 'general' | 'channel') => {
     if (process.env.NODE_ENV === 'production') {
       let hash = ''
 
-      if (type === 'channel' && result.channel) {
+      if (result.channel) {
         const parentUrl = await getChannelParentUrl(result.channel)
         const cast = await publishReply(
           'result',

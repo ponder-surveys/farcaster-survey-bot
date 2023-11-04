@@ -19,16 +19,13 @@ const schedulePublishNextQuestion = (
     timezone: 'UTC',
   })
 
-const schedulePublishNextResult = (
-  cronTime: string,
-  type: 'general' | 'channel'
-) =>
-  cron.schedule(cronTime, () => publishNextResults(type), {
+const schedulePollResults = (cronTime: string) =>
+  cron.schedule(cronTime, () => publishNextResults(), {
     timezone: 'UTC',
   })
 
 export {
   scheduleValidateNextQuestion,
   schedulePublishNextQuestion,
-  schedulePublishNextResult,
+  schedulePollResults,
 }
