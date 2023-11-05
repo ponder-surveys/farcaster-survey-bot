@@ -13,23 +13,28 @@ import { getDateTag } from './utils/getDateTag'
 console.log(`${getDateTag()} Surveying the casters...`)
 
 const nextGeneralQuestionTime = process.env.NEXT_GENERAL_QUESTION_CRON as string
-const nextChannelQuestionTime = process.env
-  .NEXT_CHANNEL_QUESTION_CRON as string
+const nextCommunityQuestionTime = process.env
+  .NEXT_COMMUNITY_QUESTION_CRON as string
+const nextExpeditedQuestionTime = process.env
+  .NEXT_EXPEDITED_QUESTION_CRON as string
+
 const nextPollResultsTime = process.env.NEXT_POLL_RESULTS_CRON as string
 
 // Warn 1 hour in advance if the next questions are estimated to be invalid
 const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
   nextGeneralQuestionTime
 )
-const nextChannelQuestionValidateTime = getCronTimeMinus1Hour(
-  nextChannelQuestionTime
+const nextCommunityQuestionValidateTime = getCronTimeMinus1Hour(
+  nextCommunityQuestionTime
 )
 scheduleValidateNextQuestion(nextGeneralQuestionValidateTime, 'general')
-scheduleValidateNextQuestion(nextChannelQuestionValidateTime, 'channel')
+scheduleValidateNextQuestion(nextCommunityQuestionValidateTime, 'community')
+// Expedited questions are not validated due to high polling frequency
 
 // Schedule next questions
 schedulePublishNextQuestion(nextGeneralQuestionTime, 'general')
-schedulePublishNextQuestion(nextChannelQuestionTime, 'channel')
+schedulePublishNextQuestion(nextCommunityQuestionTime, 'community')
+schedulePublishNextQuestion(nextExpeditedQuestionTime, 'expedited')
 
 // Poll for results
 schedulePollResults(nextPollResultsTime)

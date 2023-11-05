@@ -8,11 +8,12 @@ import { MAX_BYTE_SIZE } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 
-const publishNextQuestion = async (type: 'general' | 'channel') => {
+const publishNextQuestion = async (type: QuestionType) => {
   const question = await getNextQuestion(type)
 
   if (!question) {
-    console.log(`${getDateTag()} No questions to publish.`)
+    type !== 'expedited' &&
+      console.log(`${getDateTag()} No ${type} questions to publish.`) // Expedited questions not logged due to high polling frequency
     return
   }
 
@@ -34,7 +35,7 @@ const publishNextQuestion = async (type: 'general' | 'channel') => {
     let hash = ''
     let createdAt = ''
 
-    if (type === 'channel' && question.channel) {
+    if (question.channel) {
       const parentUrl = await getChannelParentUrl(question.channel)
       const result = await publishReply(
         'question',

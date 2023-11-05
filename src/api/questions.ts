@@ -2,20 +2,31 @@ import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
 const getNextQuestion = async (
-  type: 'general' | 'channel'
+  type: QuestionType
 ): Promise<Question | null> => {
   let query = supabaseClient
     .from('questions')
     .select('*')
     .eq('status', 'pending')
-    .eq('expedited', false)
     .order('id', { ascending: true })
     .limit(1)
 
-  if (type === 'general') {
-    query = query.is('channel', null)
-  } else {
-    query = query.not('channel', 'eq', null)
+  const COMMUNITY_USER_ID = parseInt(process.env.COMMUNITY_USER_ID as string)
+
+  switch (type) {
+    case 'general':
+      query = query
+        .neq('user_id', COMMUNITY_USER_ID)
+        .eq('expedited', false)
+      break
+    case 'community':
+      query = query
+        .eq('user_id', COMMUNITY_USER_ID)
+        .eq('expedited', false)
+      break
+    case 'expedited':
+      query = query.eq('expedited', true)
+      break
   }
 
   const { data, error } = await query

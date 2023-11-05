@@ -13,6 +13,8 @@ interface Question {
   inspired_by: boolean
 }
 
+type QuestionType = 'general' | 'community' | 'expedited'
+
 interface QuestionResponse {
   id?: number
   question_id: number

@@ -3,7 +3,7 @@ import { getUsername } from '../api/users'
 import { validateQuestionAndResultByteSize } from './byteSize'
 import { getDateTag } from './getDateTag'
 
-const validateQuestion = async (type: 'general' | 'channel') => {
+const validateQuestion = async (type: QuestionType) => {
   const question = await getNextQuestion(type)
 
   if (question) {
