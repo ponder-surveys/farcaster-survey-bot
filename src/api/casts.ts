@@ -1,6 +1,5 @@
 import { farcasterClient } from '../clients/farcaster'
 import { getDateTag } from '../utils/getDateTag'
-import { CONTENT_FID } from '../utils/constants'
 
 const getCastsInThread = async (hash: string) => {
   const castIterator = await farcasterClient.v1.fetchCastsInThread(hash)
@@ -32,9 +31,9 @@ const publishCast = async (
 }
 
 const publishReply = async (
-  formattedReply: string,
+  type: string,
   castHash: string,
-  fid: number,
+  formattedReply: string,
   formattedChainedReply?: string
 ) => {
   const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
@@ -50,15 +49,9 @@ const publishReply = async (
     })
   }
 
-  if (fid === CONTENT_FID) {
-    console.log(
-      `${getDateTag()} Next question published successfully: ${replyCast.hash}`
-    )
-  } else {
-    console.log(
-      `${getDateTag()} Reply published successfully: ${replyCast.hash}`
-    )
-  }
+  console.log(
+    `${getDateTag()} Next ${type} published successfully: ${replyCast.hash}`
+  )
 
   return replyCast
 }
