@@ -14,18 +14,11 @@ const getNextQuestion = async (
   const COMMUNITY_USER_ID = parseInt(process.env.COMMUNITY_USER_ID as string)
 
   switch (type) {
-    case 'general':
-      query = query
-        .neq('user_id', COMMUNITY_USER_ID)
-        .eq('expedited', false)
-      break
-    case 'community':
-      query = query
-        .eq('user_id', COMMUNITY_USER_ID)
-        .eq('expedited', false)
-      break
     case 'expedited':
       query = query.eq('expedited', true)
+      break
+    case 'community':
+      query = query.eq('user_id', COMMUNITY_USER_ID)
       break
   }
 
