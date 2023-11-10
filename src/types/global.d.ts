@@ -55,7 +55,8 @@ interface User {
   id: number
   fid: number
   username: string
-  eth_address?: string | null
+  holder_address?: string | null
+  connected_addresses?: string[]
 }
 
 interface NeynarUser {

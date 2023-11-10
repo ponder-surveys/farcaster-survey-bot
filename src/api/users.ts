@@ -46,13 +46,15 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
   // If user doesn't exist, insert a new user and return the new user_id
   const address = process.env.NFT_COLLECTION_ADDRESS as string
   let walletWithNft: string | null = null
+  let verifications: string[] | undefined = []
 
   try {
     const verificationResponse =
       await farcasterClient.v1.fetchUserVerifications(user.fid)
 
     if (verificationResponse && verificationResponse.verifications) {
-      for (const verification of verificationResponse.verifications) {
+      verifications = verificationResponse.verifications
+      for await (const verification of verificationResponse.verifications) {
         const { tokenBalances } = await alchemyClient.core.getTokenBalances(
           verification,
           [address]
@@ -75,13 +77,14 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
     throw verificationError
   }
 
-  const userId = await addUser(user, walletWithNft)
+  const userId = await addUser(user, walletWithNft, verifications)
   return userId
 }
 
 const addUser = async (
   user: NeynarUser,
-  ethAddress: string | null
+  ethAddress: string | null,
+  verifications: string[] | undefined
 ): Promise<number> => {
   const { data, error } = await supabaseClient
     .from('users')
@@ -91,7 +94,8 @@ const addUser = async (
         username: user.username,
         display_name: user.displayName,
         profile_picture: user.pfp?.url,
-        eth_address: ethAddress,
+        holder_address: ethAddress,
+        connected_addresses: verifications,
       },
     ])
     .select('*')
