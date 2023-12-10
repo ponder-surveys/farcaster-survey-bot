@@ -85,10 +85,14 @@ const publishNextResults = async () => {
         let option
 
         if (optionLine) {
-          option = optionLine.split(':')[1].trim().split(' ')[0]
+          option = optionLine
+            .split(':')[1]
+            .trim()
+            .split(' ')[0]
+            .replaceAll('[-+.^:,]', '')
         }
 
-        if (!option || option === 'No') {
+        if (!option || option === 'No' || isNaN(Number(option))) {
           continue
         }
 
