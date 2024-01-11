@@ -1,4 +1,4 @@
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 import { publishReply } from '../api/casts'
 import { getUserId } from '../api/users'
 import { addBookmark } from '../api/bookmarks'
@@ -49,14 +49,14 @@ const handleNotification = async (notification: NeynarNotification) => {
   const reply = `🗳️ This cast has been tagged as a potential survey topic! If approved, a new survey will be crafted and delivered shortly.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
 
   if (process.env.NODE_ENV === 'production') {
-    const parentCast = await farcasterClient.v2.fetchCast(parentHash)
-    const parentAuthorObj = await farcasterClient.v1.lookupUserByFid(
+    const { cast: parentCast } =
+      await neynarClient.lookUpCastByHashOrWarpcastUrl(parentHash, 'hash')
+    const userData = await neynarClient.lookupUserByFid(
       Number(parentAuthor.fid)
     )
+    const parentAuthorObj = userData.result.user
     const authorUserId = await getUserId(author)
-    const parentAuthorUserId = await getUserId(
-      parentAuthorObj as unknown as NeynarUser
-    )
+    const parentAuthorUserId = await getUserId(parentAuthorObj)
 
     await addBookmark({
       comment: text.replace('@survey', '').trim(),

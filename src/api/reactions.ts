@@ -1,5 +1,5 @@
 import { supabaseClient } from '../clients/supabase'
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 import { getUserId } from './users'
 import { getDateTag } from '../utils/getDateTag'
 
@@ -62,8 +62,9 @@ const addReactionsByFids = async ({
 }) => {
   // Add likes
   likes.forEach(async (like) => {
-    const reactor = await farcasterClient.v1.lookupUserByFid(Number(like.fid))
-    const reactorUserId = await getUserId(reactor as unknown as NeynarUser)
+    const data = await neynarClient.lookupUserByFid(Number(like.fid))
+    const reactor = data.result.user
+    const reactorUserId = await getUserId(reactor)
     await addReaction({
       userId: reactorUserId,
       questionId: questionId,
@@ -76,8 +77,9 @@ const addReactionsByFids = async ({
 
   // Add recasts
   recasts.forEach(async (recast) => {
-    const reactor = await farcasterClient.v1.lookupUserByFid(Number(recast.fid))
-    const reactorUserId = await getUserId(reactor as unknown as NeynarUser)
+    const data = await neynarClient.lookupUserByFid(Number(recast.fid))
+    const reactor = data.result.user
+    const reactorUserId = await getUserId(reactor)
     await addReaction({
       userId: reactorUserId,
       questionId: questionId,
@@ -94,10 +96,11 @@ const addResultReactions = async (
   responses: QuestionResponse[]
 ) => {
   // Add question reactions
-  const questionCast = (await farcasterClient.v2.fetchCast(
-    question.cast_hash as string
-  )) as any // Temporary fix for farcaster-js-neynar Cast not having reactions or recasts
-
+  const { cast: questionCast } =
+    await neynarClient.lookUpCastByHashOrWarpcastUrl(
+      question.cast_hash as string,
+      'hash'
+    )
   const questionLikes = questionCast.reactions.likes
   const questionRecasts = questionCast.reactions.recasts
 
@@ -110,10 +113,11 @@ const addResultReactions = async (
 
   // Add response reactions
   for (const response of responses) {
-    const responseCast = (await farcasterClient.v2.fetchCast(
-      response.cast_hash as string
-    )) as any // Temporary fix for farcaster-js-neynar Cast not having reactions or recasts
-
+    const { cast: responseCast } =
+      await neynarClient.lookUpCastByHashOrWarpcastUrl(
+        response.cast_hash as string,
+        'hash'
+      )
     const responseLikes = responseCast.reactions.likes
     const responseRecasts = responseCast.reactions.recasts
 
