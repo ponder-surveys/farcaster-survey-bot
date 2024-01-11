@@ -1,14 +1,14 @@
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
 
 const getCastsInThread = async (hash: string) => {
-  const castIterator = await farcasterClient.v1.fetchCastsInThread(hash)
-
-  if (!castIterator) {
+  try {
+    const data = await neynarClient.fetchAllCastsInThread(hash)
+    const casts = data.result.casts
+    return casts
+  } catch (e) {
     throw new Error(`${getDateTag()} Error retrieving cast replies`)
   }
-
-  return castIterator
 }
 
 const publishCast = async (
@@ -17,9 +17,9 @@ const publishCast = async (
   formattedReply?: string
 ) => {
   const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
-  const cast = await farcasterClient.v2.publishCast(signerUuid, formattedCast)
+  const cast = await neynarClient.publishCast(signerUuid, formattedCast)
   if (formattedReply) {
-    await farcasterClient.v2.publishCast(signerUuid, formattedReply, {
+    await neynarClient.publishCast(signerUuid, formattedReply, {
       replyTo: cast.hash,
     })
   }
@@ -37,14 +37,12 @@ const publishReply = async (
   formattedChainedReply?: string
 ) => {
   const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
-  const replyCast = await farcasterClient.v2.publishCast(
-    signerUuid,
-    formattedReply,
-    { replyTo: castHash }
-  )
+  const replyCast = await neynarClient.publishCast(signerUuid, formattedReply, {
+    replyTo: castHash,
+  })
 
   if (formattedChainedReply) {
-    await farcasterClient.v2.publishCast(signerUuid, formattedChainedReply, {
+    await neynarClient.publishCast(signerUuid, formattedChainedReply, {
       replyTo: replyCast.hash,
     })
   }

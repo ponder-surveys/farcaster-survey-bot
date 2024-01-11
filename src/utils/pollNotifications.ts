@@ -1,4 +1,4 @@
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 
 let lastPollTime = Date.now()
 let polling = false
@@ -12,10 +12,10 @@ const pollNotifications = async (
   try {
     const notifications = []
     const fid = Number(process.env.FARCASTER_FID)
+    const data = await neynarClient.fetchMentionAndReplyNotifications(fid)
+    const notifs = data.result.notifications
 
-    for await (const notification of farcasterClient.v1.fetchMentionAndReplyNotifications(
-      fid
-    )) {
+    for (const notification of notifs) {
       const notificationTime = new Date(notification.timestamp).getTime()
       if (notificationTime > lastPollTime) {
         notifications.unshift(notification)

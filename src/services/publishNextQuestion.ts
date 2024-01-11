@@ -1,7 +1,7 @@
 import { publishCast, publishReply } from '../api/casts'
 import { getNextQuestion, updateNextQuestion } from '../api/questions'
 import { getUsername } from '../api/users'
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { MAX_BYTE_SIZE } from '../utils/constants'
@@ -44,7 +44,8 @@ const publishNextQuestion = async (type: QuestionType) => {
         formattedReply
       )
       hash = result.hash
-      const resultCast = await farcasterClient.v2.fetchCast(hash)
+      const { cast: resultCast } =
+        await neynarClient.lookUpCastByHashOrWarpcastUrl(hash, 'hash')
       createdAt = resultCast?.timestamp as string
     } else {
       const result = await publishCast(
@@ -53,7 +54,8 @@ const publishNextQuestion = async (type: QuestionType) => {
         formattedReply
       )
       hash = result.hash
-      const resultCast = await farcasterClient.v2.fetchCast(hash)
+      const { cast: resultCast } =
+        await neynarClient.lookUpCastByHashOrWarpcastUrl(hash, 'hash')
       createdAt = resultCast?.timestamp as string
     }
 

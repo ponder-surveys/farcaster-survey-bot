@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import { farcasterClient } from '../clients/farcaster'
+import { neynarClient } from '../clients/neynar'
 import { supabaseClient } from '../clients/supabase'
 import { alchemyClient } from '../clients/alchemy'
 import { getDateTag } from '../utils/getDateTag'
@@ -49,8 +49,8 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
   let verifications: string[] | undefined = []
 
   try {
-    const verificationResponse =
-      await farcasterClient.v1.fetchUserVerifications(user.fid)
+    const { result: verificationResponse } =
+      await neynarClient.fetchUserVerifications(user.fid)
 
     if (verificationResponse && verificationResponse.verifications) {
       verifications = verificationResponse.verifications
