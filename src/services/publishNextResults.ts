@@ -3,6 +3,7 @@ import { getResponses, addResponses } from '../api/responses'
 import { addResultReactions } from '../api/reactions'
 import { getUserId, getUsername } from '../api/users'
 import { getCastsInThread, publishCast, publishReply } from '../api/casts'
+import { neynarClient } from '../clients/neynar'
 import { validateResponse } from '../utils/validateResponse'
 import { createChart } from '../utils/createChart'
 import {
@@ -13,7 +14,6 @@ import {
 import { calculateByteSize } from '../utils/byteSize'
 import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
-import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 import { categorizeResponseWithGPT } from '../utils/categorizeResponseWithGPT'
 
 const publishNextResults = async () => {
@@ -150,10 +150,10 @@ const publishNextResults = async () => {
       let hash = ''
 
       if (result.channel) {
-        const parentUrl = await getChannelParentUrl(result.channel)
+        const { channel } = await neynarClient.lookupChannel(result.channel)
         const cast = await publishReply(
           'result',
-          parentUrl,
+          channel.url,
           response,
           formattedReply
         )
@@ -165,7 +165,11 @@ const publishNextResults = async () => {
 
       const replyHashShorthand = hash.substring(0, 6)
       const replyToSurvey = formatReplyToSurvey(replyHashShorthand)
-      await publishReply('question reply', result.cast_hash as string, replyToSurvey)
+      await publishReply(
+        'question reply',
+        result.cast_hash as string,
+        replyToSurvey
+      )
 
       const addedResponses = await addResponses(responses)
       await addResultReactions(result, addedResponses)

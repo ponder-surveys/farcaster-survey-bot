@@ -6,7 +6,6 @@ import { formatQuestion, formatReply } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
 import { MAX_BYTE_SIZE } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
-import { getChannelParentUrl } from '../utils/getChannelParentUrl'
 
 const publishNextQuestion = async (type: QuestionType) => {
   const question = await getNextQuestion(type)
@@ -36,10 +35,10 @@ const publishNextQuestion = async (type: QuestionType) => {
     let createdAt = ''
 
     if (question.channel) {
-      const parentUrl = await getChannelParentUrl(question.channel)
+      const { channel } = await neynarClient.lookupChannel(question.channel)
       const result = await publishReply(
         'question',
-        parentUrl,
+        channel.url,
         formattedQuestion,
         formattedReply
       )
