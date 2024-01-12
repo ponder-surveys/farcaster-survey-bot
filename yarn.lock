@@ -570,14 +570,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@neynar/nodejs-sdk@npm:^1.6.0":
-  version: 1.6.0
-  resolution: "@neynar/nodejs-sdk@npm:1.6.0"
+"@neynar/nodejs-sdk@npm:^1.6.1":
+  version: 1.6.1
+  resolution: "@neynar/nodejs-sdk@npm:1.6.1"
   dependencies:
     "@openapitools/openapi-generator-cli": ^2.7.0
     axios: ^1.6.2
     viem: ^1.19.9
-  checksum: a41654367a6a10375a796032425b0efc48248a22b3890ae915b34ca61571b60e036b6eab74a5ec22873e4e0adf835df192a94f90cbe3a3db100b466e7c88ba50
+  checksum: f2d121e61469ada0471df73b13edc69fd4637a344f542c222744df66b1f7062ab4974f9c74b2816ed1c5a3ff018fc989c18343b01602fa01146d532c2816458f
   languageName: node
   linkType: hard
 
@@ -2362,7 +2362,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "farcaster-survey-bot@workspace:."
   dependencies:
-    "@neynar/nodejs-sdk": ^1.6.0
+    "@neynar/nodejs-sdk": ^1.6.1
     "@supabase/supabase-js": ^2.8.0
     "@types/jsdom": ^21.1.0
     "@types/node": ^18.11.18
