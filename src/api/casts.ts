@@ -1,4 +1,4 @@
-import { neynarClient } from '../clients/neynar'
+import { neynarClient, neynarSigner } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
 
 const getCastsInThread = async (hash: string) => {
@@ -16,10 +16,9 @@ const publishCast = async (
   formattedCast: string,
   formattedReply?: string
 ) => {
-  const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
-  const cast = await neynarClient.publishCast(signerUuid, formattedCast)
+  const cast = await neynarClient.publishCast(neynarSigner, formattedCast)
   if (formattedReply) {
-    await neynarClient.publishCast(signerUuid, formattedReply, {
+    await neynarClient.publishCast(neynarSigner, formattedReply, {
       replyTo: cast.hash,
     })
   }
@@ -36,13 +35,16 @@ const publishReply = async (
   formattedReply: string,
   formattedChainedReply?: string
 ) => {
-  const signerUuid = process.env.NEYNAR_SIGNER_UUID as string
-  const replyCast = await neynarClient.publishCast(signerUuid, formattedReply, {
-    replyTo: castHash,
-  })
+  const replyCast = await neynarClient.publishCast(
+    neynarSigner,
+    formattedReply,
+    {
+      replyTo: castHash,
+    }
+  )
 
   if (formattedChainedReply) {
-    await neynarClient.publishCast(signerUuid, formattedChainedReply, {
+    await neynarClient.publishCast(neynarSigner, formattedChainedReply, {
       replyTo: replyCast.hash,
     })
   }
