@@ -40,6 +40,7 @@ const publishNextQuestion = async (type: QuestionType) => {
         'question',
         channel.url,
         formattedQuestion,
+        question.image_url,
         formattedReply
       )
       hash = result.hash
@@ -50,6 +51,7 @@ const publishNextQuestion = async (type: QuestionType) => {
       const result = await publishCast(
         'question',
         formattedQuestion,
+        question.image_url,
         formattedReply
       )
       hash = result.hash
@@ -63,7 +65,7 @@ const publishNextQuestion = async (type: QuestionType) => {
     console.log(
       `${getDateTag()} Mock question${
         question.channel ? ` in ${question.channel} channel` : ''
-      }:\n\n${formattedQuestion}`
+      }:\n\n${formattedQuestion}\n\n${question.image_url}`
     )
     console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
   }

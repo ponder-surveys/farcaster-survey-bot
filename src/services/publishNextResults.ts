@@ -136,9 +136,7 @@ const publishNextResults = async () => {
         ? await createChart(result.id, optionCounts, totalResponses)
         : MOCK_IMGUR_URL
 
-    const response = `${formattedResult}\n${chartUrl}`
-
-    const resultByteSize = calculateByteSize(response)
+    const resultByteSize = calculateByteSize(formattedResult)
     if (resultByteSize >= MAX_BYTE_SIZE) {
       console.error(
         `${getDateTag()} Error: Result is too large to publish.\nSize: ${resultByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
@@ -154,12 +152,18 @@ const publishNextResults = async () => {
         const cast = await publishReply(
           'result',
           channel.url,
-          response,
+          formattedResult,
+          chartUrl,
           formattedReply
         )
         hash = cast.hash
       } else {
-        const cast = await publishCast('result', response, formattedReply)
+        const cast = await publishCast(
+          'result',
+          formattedResult,
+          chartUrl,
+          formattedReply
+        )
         hash = cast.hash
       }
 
@@ -180,7 +184,7 @@ const publishNextResults = async () => {
       console.log(
         `${getDateTag()} Mock result${
           result.channel ? ` in ${result.channel} channel` : ''
-        }:\n\n${response}`
+        }:\n\n${formattedResult}\n\n${chartUrl}`
       )
       console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
     }

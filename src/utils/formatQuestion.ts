@@ -6,7 +6,6 @@ const formatQuestion = (question: Question, username: string | null) => {
     option_3,
     option_4,
     option_5,
-    image_url,
     inspired_by,
   } = question
 
@@ -27,9 +26,7 @@ const formatQuestion = (question: Question, username: string | null) => {
     ? `\n\n${inspired_by ? 'Inspired' : 'Question'} by @${username}`
     : ''
 
-  const image = `\n${image_url}` || ''
-
-  return `${title}\n\n${options}${by}${image}`
+  return `${title}\n\n${options}${by}`
 }
 
 const formatReply = () => {
