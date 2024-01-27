@@ -33,6 +33,20 @@ interface Reaction {
   created_at: string
 }
 
+interface DirectQuestion {
+  id: number
+  question: string
+  bounty_value: number
+  bounty_type: string
+  author_id?: number
+  recipient_id?: number
+  status: string
+  channel?: string
+  image_url?: string
+  cast_hash?: string
+  anonymous: boolean
+}
+
 interface OptionCounts {
   [key: number]: number
 }

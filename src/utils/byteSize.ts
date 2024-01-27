@@ -1,4 +1,4 @@
-import { MAX_BYTE_SIZE, MOCK_IMGUR_URL } from './constants'
+import { MAX_BYTE_SIZE } from './constants'
 import { formatQuestion } from './formatQuestion'
 import { formatResult } from './formatResult'
 
@@ -7,7 +7,10 @@ const calculateByteSize = (text: string) => {
   return buffer.byteLength
 }
 
-const validateQuestionAndResultByteSize = async (question: Question, username: string | null) => {
+const validateQuestionAndResultByteSize = async (
+  question: Question,
+  username: string | null
+) => {
   // Validate question (estimate)
   const formattedQuestion = formatQuestion(question, username)
   const formattedQuestionSize = calculateByteSize(formattedQuestion)
@@ -27,9 +30,7 @@ const validateQuestionAndResultByteSize = async (question: Question, username: s
     5: 10,
   }
   const formattedResult = formatResult(question, username, mockOptionCounts, 55) // Using magic numbers for option counts
-  const mockChartUrl = MOCK_IMGUR_URL
-  const response = `${formattedResult}\n${mockChartUrl}`
-  const responseSize = calculateByteSize(response)
+  const responseSize = calculateByteSize(formattedResult)
 
   if (responseSize >= MAX_BYTE_SIZE) {
     console.warn(
