@@ -1,5 +1,6 @@
 import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
+import { getUserFid } from './users'
 
 const getNextDirectQuestion = async (): Promise<DirectQuestion | null> => {
   const { data, error } = await supabaseClient
@@ -16,6 +17,28 @@ const getNextDirectQuestion = async (): Promise<DirectQuestion | null> => {
 
   const directQuestion = data ? (data[0] as DirectQuestion) : null
   return directQuestion
+}
+
+const isDirectSurveyReply = async (
+  notification: NeynarNotification
+): Promise<boolean> => {
+  const { data, error } = await supabaseClient
+    .from('direct_questions')
+    .select('*')
+    .eq('cast_hash', notification.parentHash)
+    .eq('status', 'POSTED')
+    .single()
+
+  if (error) {
+    console.error(`${getDateTag()} ${error}`)
+    return false
+  }
+
+  const recipientFid = await getUserFid(data.recipient_id)
+
+  return (
+    !!data && !!recipientFid && notification.author.fid === Number(recipientFid)
+  )
 }
 
 const updateNextDirectQuestion = async (
@@ -42,4 +65,4 @@ const updateNextDirectQuestion = async (
   )
 }
 
-export { getNextDirectQuestion, updateNextDirectQuestion }
+export { getNextDirectQuestion, isDirectSurveyReply, updateNextDirectQuestion }
