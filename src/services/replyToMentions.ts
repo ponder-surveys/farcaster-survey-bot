@@ -4,7 +4,6 @@ import { getUserId } from '../api/users'
 import { addBookmark } from '../api/bookmarks'
 import { getDateTag } from '../utils/getDateTag'
 import { pollNotifications } from '../utils/pollNotifications'
-import { isDirectSurveyReply } from 'api/direct-questions'
 
 const processedNotifications = new Set<string>()
 
@@ -16,7 +15,7 @@ const startPolling = (handler: (notification: NeynarNotification) => void) => {
   setInterval(() => pollNotifications(handler), 20 * 1000) // Poll casts every 20 seconds
 }
 
-const handleBookmarkNotification = async (notification: NeynarNotification) => {
+const handleNotification = async (notification: NeynarNotification) => {
   // Check if the notification is a mention and specifically targets '@survey'
   if (
     notification.type !== 'cast-mention' ||
@@ -74,24 +73,10 @@ const handleBookmarkNotification = async (notification: NeynarNotification) => {
   }
 }
 
-const handleDirectSurveyNotification = async (
-  notification: NeynarNotification
-) => {
-  // Check if the notification is a direct survey reply and the user is the recipient
-  // notification.parentHash === (check backend for POSTED survey cast_hash)
-  // notification.author === (check backend for POSTED survey recipient_id)
-
-  const isValidReply = isDirectSurveyReply(notification)
-  if (!isValidReply) {
-    return
-  }
-}
-
 const replyToMentions = async () => {
-  startPolling((notification: NeynarNotification) => {
-    handleBookmarkNotification(notification)
-    handleDirectSurveyNotification(notification)
-  })
+  startPolling((notification: NeynarNotification) =>
+    handleNotification(notification)
+  )
 }
 
 export { replyToMentions }
