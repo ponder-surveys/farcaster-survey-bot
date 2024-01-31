@@ -778,6 +778,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@thirdweb-dev/chains@npm:^0.1.67":
+  version: 0.1.67
+  resolution: "@thirdweb-dev/chains@npm:0.1.67"
+  checksum: 0e60a637d5da0f310daf0e4dc46a13139f2cf97fb06470703f8fa780fcdef6ce906c37eade87642153c11d85f37cf7befbfbbd43ec103235e2202421b2ad6121
+  languageName: node
+  linkType: hard
+
+"@thirdweb-dev/engine@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "@thirdweb-dev/engine@npm:0.0.4"
+  checksum: 9b19a64db1ea26d6887eee60ccca8440f66bf9e083370249c67954902342b4a61d78ee4dea5abc832f06ceb7629737faa0b40f175ac0f6ee343412774feac104
+  languageName: node
+  linkType: hard
+
 "@tootallnate/once@npm:2":
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
@@ -2364,6 +2378,8 @@ __metadata:
   dependencies:
     "@neynar/nodejs-sdk": ^1.6.1
     "@supabase/supabase-js": ^2.8.0
+    "@thirdweb-dev/chains": ^0.1.67
+    "@thirdweb-dev/engine": ^0.0.4
     "@types/jsdom": ^21.1.0
     "@types/node": ^18.11.18
     "@types/node-cron": ^3.0.7

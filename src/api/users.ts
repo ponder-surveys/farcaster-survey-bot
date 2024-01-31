@@ -21,6 +21,23 @@ const getUsername = async (userId?: number): Promise<string | null> => {
   return data?.username || null
 }
 
+const getUserFid = async (userId?: number): Promise<string | null> => {
+  if (!userId) return null
+
+  const { data, error } = await supabaseClient
+    .from('users')
+    .select('fid')
+    .eq('id', userId)
+    .single()
+
+  if (error) {
+    console.error(`${getDateTag()} ${error}`)
+    throw new Error(error.message)
+  }
+
+  return data?.fid || null
+}
+
 const getUserId = async (user: NeynarUser): Promise<number> => {
   // Check if user exists
   const { data, error } = await supabaseClient
@@ -118,4 +135,4 @@ const addUser = async (
   }
 }
 
-export { getUsername, getUserId, addUser }
+export { getUsername, getUserFid, getUserId, addUser }
