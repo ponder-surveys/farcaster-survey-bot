@@ -5,11 +5,11 @@ const formatDirectQuestion = (
 ) => {
   const { question, bounty_value, bounty_type } = directQuestion
 
-  const forUser = `For @${recipientUsername}`
-  const reward = `Reward ${bounty_value} ${bounty_type}`
-  const by = `${authorUsername ? ` by @${authorUsername}` : ''}`
+  const forUser = `💭 Question for @${recipientUsername}`
+  const reward = `🎁 Reward ${bounty_value} ${bounty_type}`
+  const by = `🎯 By ${authorUsername ? `@${authorUsername}` : 'anon'}`
 
-  return `${question}\n\n${forUser}\n${reward}${by}`
+  return `${forUser}\n\n${question}\n\n${reward}\n${by}`
 }
 
 const formatDirectReply = () => {

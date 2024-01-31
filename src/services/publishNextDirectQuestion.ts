@@ -5,13 +5,15 @@ import {
 } from '../api/direct-questions'
 import { getUsername } from '../api/users'
 import { neynarClient } from '../clients/neynar'
+import { web3Engine } from '../clients/web3Engine'
 import { calculateByteSize } from '../utils/byteSize'
-import { MAX_BYTE_SIZE } from '../utils/constants'
+import { MAX_BYTE_SIZE, FRAME_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import {
   formatDirectQuestion,
   formatDirectReply,
 } from '../utils/formatDirectQuestion'
+import { Base } from '@thirdweb-dev/chains'
 
 const publishNextDirectQuestion = async () => {
   const directQuestion = await getNextDirectQuestion()
@@ -45,6 +47,23 @@ const publishNextDirectQuestion = async () => {
     let hash = ''
     let updatedAt = ''
 
+    const chain = Base.chainId.toString()
+    const directSurveyAddress = process.env
+      .DIRECT_SURVEY_CONTRACT_ADDRESS as string
+    const transactionAddress = process.env.TRANSACTION_ADDRESS as string
+    const directSurveyId =
+      directQuestion.smart_contract_id?.toString() as string
+
+    await web3Engine.contract.write(
+      chain,
+      directSurveyAddress,
+      transactionAddress,
+      {
+        functionName: 'startSurvey',
+        args: [directSurveyId],
+      }
+    )
+
     if (directQuestion.channel) {
       const { channel } = await neynarClient.lookupChannel(
         directQuestion.channel
@@ -53,7 +72,7 @@ const publishNextDirectQuestion = async () => {
         'direct question',
         channel.url,
         formattedQuestion,
-        directQuestion.image_url,
+        FRAME_URL,
         formattedReply
       )
       hash = result.hash
@@ -64,7 +83,7 @@ const publishNextDirectQuestion = async () => {
       const result = await publishCast(
         'direct question',
         formattedQuestion,
-        directQuestion.image_url,
+        FRAME_URL,
         formattedReply
       )
       hash = result.hash
@@ -78,9 +97,7 @@ const publishNextDirectQuestion = async () => {
     console.log(
       `${getDateTag()} Mock direct question${
         directQuestion.channel ? ` in ${directQuestion.channel} channel` : ''
-      }:\n\n${formattedQuestion}${
-        directQuestion.image_url ? `\n\n${directQuestion.image_url}` : ''
-      }`
+      }:\n\n${formattedQuestion}\n\n${FRAME_URL}`
     )
     console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
   }

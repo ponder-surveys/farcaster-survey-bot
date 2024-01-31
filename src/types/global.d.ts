@@ -45,6 +45,7 @@ interface DirectQuestion {
   image_url?: string
   cast_hash?: string
   anonymous: boolean
+  smart_contract_id?: number
 }
 
 interface OptionCounts {
