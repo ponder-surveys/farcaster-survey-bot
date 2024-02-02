@@ -1,7 +1,9 @@
 import * as echarts from 'echarts'
-import { createCanvas } from 'canvas'
+import { registerFont, createCanvas } from 'canvas'
 import { imgurClient } from '../clients/imgur'
 import { getDateTag } from './getDateTag'
+
+registerFont('src/fonts/Urbanist.ttf', { family: 'Urbanist' })
 
 const uploadChart = async (id: number, canvas: Buffer) => {
   const response = await imgurClient.upload({
@@ -25,7 +27,10 @@ const createChart = async (
   const chart = echarts.init(canvas)
 
   chart.setOption({
-    backgroundColor: '#110518',
+    backgroundColor: '#0C1B29',
+    textStyle: {
+      fontFamily: 'Urbanist',
+    },
     xAxis: {
       type: 'category',
       data: Object.keys(optionCounts).map(Number),
@@ -53,11 +58,11 @@ const createChart = async (
             colorStops: [
               {
                 offset: 0,
-                color: '#9c2be2',
+                color: '#C61B6E',
               },
               {
                 offset: 1,
-                color: '#1f092d',
+                color: '#4f0a2c',
               },
             ],
           },
@@ -71,6 +76,7 @@ const createChart = async (
       style: {
         text: `Total Votes: ${total}`,
         fontSize: 16,
+        fontFamily: 'Urbanist',
         fill: 'white',
       },
     },
