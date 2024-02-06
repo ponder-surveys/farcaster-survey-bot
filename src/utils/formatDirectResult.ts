@@ -7,10 +7,12 @@ const formatDirectResult = (authorUsername: string | null) => {
   return `${top}\n\n${bottom}`
 }
 
-const formatDirectReply = () =>
-  '🌟 Got it! Your response was recorded and the reward will be delivered shortly.'
+const formatDirectQuestionFailed = (authorUsername: string | null) => {
+  const top = `⌛️ Time's up! Unfortunately the question ${
+    authorUsername ? `by ${authorUsername} ` : ''
+  }was not answered in time.`
+  const bottom = `The full bounty amount has been returned to the author.`
+  return `${top}\n\n${bottom}`
+}
 
-const formatDirectError = () =>
-  '⚠️ Something went wrong! Please reach our to @ba or @cojo.eth for help.'
-
-export { formatDirectResult, formatDirectReply, formatDirectError }
+export { formatDirectResult, formatDirectQuestionFailed }
