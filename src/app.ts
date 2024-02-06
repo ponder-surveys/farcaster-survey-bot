@@ -4,8 +4,9 @@ dotenv.config()
 import {
   scheduleValidateNextQuestion,
   schedulePublishNextQuestion,
-  schedulePollResults,
   schedulePublishNextDirectQuestion,
+  schedulePollResults,
+  schedulePollDirectResults,
 } from './services/cron'
 import { replyToMentions } from './services/replyToMentions'
 import { getCronTimeMinus1Hour } from './utils/cronTime'
@@ -21,6 +22,8 @@ const nextExpeditedQuestionTime = process.env
 const nextDirectQuestionTime = process.env.NEXT_DIRECT_QUESTION_CRON as string
 
 const nextPollResultsTime = process.env.NEXT_POLL_RESULTS_CRON as string
+const nextPollDirectResultsTime = process.env
+  .NEXT_POLL_DIRECT_RESULTS_CRON as string
 
 // Warn 1 hour in advance if the next questions are estimated to be invalid
 const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
@@ -41,6 +44,7 @@ schedulePublishNextDirectQuestion(nextDirectQuestionTime)
 
 // Poll for results
 schedulePollResults(nextPollResultsTime)
+schedulePollDirectResults(nextPollDirectResultsTime)
 
 // Poll for '@' mentions
 replyToMentions()

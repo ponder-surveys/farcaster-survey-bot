@@ -43,7 +43,7 @@ const isDirectSurveyReply = async (
 
 const updateNextDirectQuestion = async (
   hash: string,
-  questionId: number,
+  questionId: string,
   updatedAt: string
 ) => {
   const { error } = await supabaseClient

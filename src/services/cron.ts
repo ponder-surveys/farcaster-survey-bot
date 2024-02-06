@@ -3,6 +3,7 @@ import { validateQuestion } from '../utils/validateQuestion'
 import { publishNextQuestion } from './publishNextQuestion'
 import { publishNextDirectQuestion } from './publishNextDirectQuestion'
 import { publishNextResults } from './publishNextResults'
+import { publishNextDirectResults } from './publishNextDirectResults'
 
 const scheduleValidateNextQuestion = (cronTime: string, type: QuestionType) =>
   cron.schedule(cronTime, () => validateQuestion(type), {
@@ -24,9 +25,15 @@ const schedulePollResults = (cronTime: string) =>
     timezone: 'UTC',
   })
 
+const schedulePollDirectResults = (cronTime: string) =>
+  cron.schedule(cronTime, () => publishNextDirectResults(), {
+    timezone: 'UTC',
+  })
+
 export {
   scheduleValidateNextQuestion,
   schedulePublishNextQuestion,
   schedulePublishNextDirectQuestion,
   schedulePollResults,
+  schedulePollDirectResults,
 }
