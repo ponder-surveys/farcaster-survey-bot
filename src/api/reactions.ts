@@ -113,21 +113,23 @@ const addResultReactions = async (
 
   // Add response reactions
   for (const response of responses) {
-    const { cast: responseCast } =
-      await neynarClient.lookUpCastByHashOrWarpcastUrl(
-        response.cast_hash as string,
-        'hash'
-      )
-    const responseLikes = responseCast.reactions.likes
-    const responseRecasts = responseCast.reactions.recasts
+    if (response.cast_hash !== question.cast_hash) {
+      const { cast: responseCast } =
+        await neynarClient.lookUpCastByHashOrWarpcastUrl(
+          response.cast_hash as string,
+          'hash'
+        )
+      const responseLikes = responseCast.reactions.likes
+      const responseRecasts = responseCast.reactions.recasts
 
-    await addReactionsByFids({
-      questionId: question.id,
-      responseId: response.id,
-      likes: responseLikes,
-      recasts: responseRecasts,
-      timestamp: responseCast.timestamp,
-    })
+      await addReactionsByFids({
+        questionId: question.id,
+        responseId: response.id,
+        likes: responseLikes,
+        recasts: responseRecasts,
+        timestamp: responseCast.timestamp,
+      })
+    }
   }
 }
 
