@@ -19,35 +19,42 @@ const publishNextResults = async () => {
     console.log(`${getDateTag()} Publishing result ${result.id}...`)
 
     if (process.env.NODE_ENV === 'production') {
-      // Populate missing comments
-      for await (const cast of castIterator) {
-        const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
-        const userId = await getUserId(castAuthor)
+      try {
+        // Populate missing comments
+        for await (const cast of castIterator) {
+          const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
+          const userId = await getUserId(castAuthor)
 
-        const foundResponse = responses.find(
-          (response) => response.user_id === userId
-        )
+          const foundResponse = responses.find(
+            (response) => response.user_id === userId
+          )
 
-        if (foundResponse && !foundResponse.comment) {
-          await updateResponse(userId, result.id, cast.text, cast.hash)
+          if (foundResponse && !foundResponse.comment) {
+            await updateResponse(userId, result.id, cast.text, cast.hash)
+          }
+          await new Promise((resolve) => setTimeout(resolve, 250))
         }
+
+        // Get updated responses
+        responses = await getResponses(result.id)
+
+        await addResultReactions(result, responses)
+        await updateNextResult(result.id)
+        // await publishReply(
+        //   'question reply',
+        //   result.cast_hash as string,
+        //   replyToSurvey
+        // )
+      } catch (error) {
+        console.error(
+          `${getDateTag()} Error publishing result ${result.id}:`,
+          error
+        )
       }
-
-      // Get updated responses
-      responses = await getResponses(result.id)
-
-      await addResultReactions(result, responses)
-      await updateNextResult(result.id)
-      await publishReply(
-        'question reply',
-        result.cast_hash as string,
-        replyToSurvey
-      )
-
-      await new Promise((resolve) => setTimeout(resolve, 250))
     } else {
-      console.log(`${getDateTag()} Mock survey reply:\n\n${replyToSurvey}`)
+      console.log(`${getDateTag()} Mock survey reply:\n${replyToSurvey}`)
     }
+    await new Promise((resolve) => setTimeout(resolve, 500))
   }
 }
 
