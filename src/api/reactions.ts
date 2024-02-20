@@ -61,7 +61,7 @@ const addReactionsByFids = async ({
   timestamp: string
 }) => {
   // Add likes
-  likes.forEach(async (like) => {
+  for await (const like of likes) {
     const data = await neynarClient.lookupUserByFid(Number(like.fid))
     const reactor = data.result.user
     const reactorUserId = await getUserId(reactor)
@@ -72,11 +72,11 @@ const addReactionsByFids = async ({
       type: 'like',
       createdAt: timestamp,
     })
-    await new Promise((resolve) => setTimeout(resolve, 250))
-  })
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
 
   // Add recasts
-  recasts.forEach(async (recast) => {
+  for await (const recast of recasts) {
     const data = await neynarClient.lookupUserByFid(Number(recast.fid))
     const reactor = data.result.user
     const reactorUserId = await getUserId(reactor)
@@ -87,8 +87,8 @@ const addReactionsByFids = async ({
       type: 'recast',
       createdAt: timestamp,
     })
-    await new Promise((resolve) => setTimeout(resolve, 250))
-  })
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
 }
 
 const addResultReactions = async (
@@ -101,6 +101,14 @@ const addResultReactions = async (
       question.cast_hash as string,
       'hash'
     )
+
+  if (!questionCast) {
+    console.warn(
+      `${getDateTag()} Could not find cast for question ${question.id}`
+    )
+    return
+  }
+
   const questionLikes = questionCast.reactions.likes
   const questionRecasts = questionCast.reactions.recasts
 
@@ -113,21 +121,31 @@ const addResultReactions = async (
 
   // Add response reactions
   for (const response of responses) {
-    const { cast: responseCast } =
-      await neynarClient.lookUpCastByHashOrWarpcastUrl(
-        response.cast_hash as string,
-        'hash'
-      )
-    const responseLikes = responseCast.reactions.likes
-    const responseRecasts = responseCast.reactions.recasts
+    if (response.cast_hash !== question.cast_hash && response.comment) {
+      const { cast: responseCast } =
+        await neynarClient.lookUpCastByHashOrWarpcastUrl(
+          response.cast_hash as string,
+          'hash'
+        )
 
-    await addReactionsByFids({
-      questionId: question.id,
-      responseId: response.id,
-      likes: responseLikes,
-      recasts: responseRecasts,
-      timestamp: responseCast.timestamp,
-    })
+      if (!responseCast) {
+        console.warn(
+          `${getDateTag()} Could not find cast for response ${response.id}`
+        )
+        continue
+      }
+
+      const responseLikes = responseCast.reactions.likes
+      const responseRecasts = responseCast.reactions.recasts
+
+      await addReactionsByFids({
+        questionId: question.id,
+        responseId: response.id,
+        likes: responseLikes,
+        recasts: responseRecasts,
+        timestamp: responseCast.timestamp,
+      })
+    }
   }
 }
 

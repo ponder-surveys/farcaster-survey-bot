@@ -2,9 +2,9 @@ import { publishCast, publishReply } from '../api/casts'
 import { getNextQuestion, updateNextQuestion } from '../api/questions'
 import { getUsername } from '../api/users'
 import { neynarClient } from '../clients/neynar'
-import { formatQuestion, formatReply } from '../utils/formatQuestion'
+import { formatQuestion } from '../utils/formatQuestion'
 import { calculateByteSize } from '../utils/byteSize'
-import { MAX_BYTE_SIZE } from '../utils/constants'
+import { MAX_BYTE_SIZE, SURVEY_FRAME_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 
 const publishNextQuestion = async (type: QuestionType) => {
@@ -18,14 +18,12 @@ const publishNextQuestion = async (type: QuestionType) => {
 
   const username = await getUsername(question.user_id)
   const formattedQuestion = formatQuestion(question, username)
-  const formattedReply = formatReply()
 
   const questionByteSize = calculateByteSize(formattedQuestion)
-  const replyByteSize = calculateByteSize(formattedReply)
 
-  if (questionByteSize >= MAX_BYTE_SIZE || replyByteSize >= MAX_BYTE_SIZE) {
+  if (questionByteSize >= MAX_BYTE_SIZE) {
     console.error(
-      `${getDateTag()} Error: Question or Reply is too large to publish.\nQuestion Size: ${questionByteSize} bytes. Reply Size: ${replyByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
+      `${getDateTag()} Error: Question is too large to publish.\nQuestion Size: ${questionByteSize} bytes. Max size: ${MAX_BYTE_SIZE} bytes.\n`
     )
     return
   }
@@ -40,9 +38,9 @@ const publishNextQuestion = async (type: QuestionType) => {
         'question',
         channel.url,
         formattedQuestion,
-        question.image_url,
-        formattedReply
+        `${SURVEY_FRAME_URL}/${question.id}`
       )
+
       hash = result.hash
       const { cast: resultCast } =
         await neynarClient.lookUpCastByHashOrWarpcastUrl(hash, 'hash')
@@ -51,9 +49,9 @@ const publishNextQuestion = async (type: QuestionType) => {
       const result = await publishCast(
         'question',
         formattedQuestion,
-        question.image_url,
-        formattedReply
+        `${SURVEY_FRAME_URL}/${question.id}`
       )
+
       hash = result.hash
       const { cast: resultCast } =
         await neynarClient.lookUpCastByHashOrWarpcastUrl(hash, 'hash')
@@ -65,9 +63,8 @@ const publishNextQuestion = async (type: QuestionType) => {
     console.log(
       `${getDateTag()} Mock question${
         question.channel ? ` in ${question.channel} channel` : ''
-      }:\n\n${formattedQuestion}\n\n${question.image_url}`
+      }:\n\n${formattedQuestion}\n\n${SURVEY_FRAME_URL}/${question.id}`
     )
-    console.log(`${getDateTag()} Mock reply:\n\n${formattedReply}`)
   }
 }
 

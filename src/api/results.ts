@@ -2,7 +2,9 @@ import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
 const getNextResults = async (): Promise<Question[]> => {
-  const timeInterval = Number(process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48) // Default to 48 hours if not set
+  const timeInterval = Number(
+    process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48
+  ) // Default to 48 hours if not set
   const currentTime = new Date()
   const cutoffTime = new Date(
     currentTime.getTime() - timeInterval * 60 * 60 * 1000
@@ -24,12 +26,11 @@ const getNextResults = async (): Promise<Question[]> => {
   return questions
 }
 
-const updateNextResult = async (questionId: number, resultImageUrl: string) => {
+const updateNextResult = async (questionId: number) => {
   const { error } = await supabaseClient
     .from('questions')
     .update({
       status: 'calculated',
-      result_image_url: resultImageUrl,
     })
     .eq('id', questionId)
 

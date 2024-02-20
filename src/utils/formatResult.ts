@@ -37,11 +37,14 @@ const formatReply = (hash: string) => {
   return `${title}\n\n${process.env.RESULTS_CALL_TO_ACTION}`
 }
 
-const formatReplyToSurvey = (hash: string) => {
-  const title = 'The survey results are in!'
-  const subtitle = `https://warpcast.com/survey/${hash}`
+const formatReplyToSurvey = (totalVotes: number) => {
+  const timeInterval = Number(
+    process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48
+  )
 
-  return `${title}\n${subtitle}`
+  const title = `Survey has ended after ${timeInterval} hours and received ${totalVotes} votes.`
+
+  return `${title}`
 }
 
 export { formatResult, formatReply, formatReplyToSurvey }

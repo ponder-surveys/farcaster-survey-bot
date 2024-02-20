@@ -15,6 +15,26 @@ const getResponses = async (question_id: number) => {
   return data as QuestionResponse[]
 }
 
+const updateResponse = async (
+  userId: number,
+  questionId: number,
+  comment: string,
+  castHash: string
+) => {
+  const { error } = await supabaseClient
+    .from('responses')
+    .update({
+      comment: comment,
+      cast_hash: castHash,
+    })
+    .match({ user_id: userId, question_id: questionId })
+
+  if (error) {
+    console.error(`${getDateTag()} ${error}`)
+    throw new Error(error.message)
+  }
+}
+
 const addResponses = async (responses: QuestionResponse[]) => {
   const { data, error } = await supabaseClient
     .from('responses')
@@ -31,4 +51,4 @@ const addResponses = async (responses: QuestionResponse[]) => {
   return data as QuestionResponse[]
 }
 
-export { getResponses, addResponses }
+export { getResponses, updateResponse, addResponses }
