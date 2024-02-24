@@ -11,7 +11,7 @@ const publishNextResults = async () => {
 
   for await (const result of results) {
     const resultHash = result.cast_hash as string
-    const castIterator = await getCastsInThread(resultHash)
+    const castIterator = resultHash ? await getCastsInThread(resultHash) : []
 
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
