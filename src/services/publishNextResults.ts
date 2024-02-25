@@ -40,11 +40,9 @@ const publishNextResults = async () => {
 
         await addResultReactions(result, responses)
         await updateNextResult(result.id)
-        await publishReply(
-          'question reply',
-          result.cast_hash as string,
-          replyToSurvey
-        )
+        if (resultHash) {
+          await publishReply('question reply', resultHash, replyToSurvey)
+        }
       } catch (error) {
         console.error(
           `${getDateTag()} Error publishing result ${result.id}:`,
