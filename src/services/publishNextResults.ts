@@ -10,39 +10,39 @@ const publishNextResults = async () => {
   const results = await getNextResults()
 
   for await (const result of results) {
-    const resultHash = result.cast_hash as string
-    const castIterator = resultHash ? await getCastsInThread(resultHash) : []
-
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
 
     console.log(`${getDateTag()} Publishing result ${result.id}...`)
 
     if (process.env.NODE_ENV === 'production') {
+      const resultHash = result.cast_hash as string
+
       try {
-        // Populate missing comments
-        for await (const cast of castIterator) {
-          const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
-          const userId = await getUserId(castAuthor)
-
-          const foundResponse = responses.find(
-            (response) => response.user_id === userId
-          )
-
-          if (foundResponse && !foundResponse.comment) {
-            await updateResponse(userId, result.id, cast.text, cast.hash)
-          }
-          await new Promise((resolve) => setTimeout(resolve, 250))
-        }
-
-        // Get updated responses
-        responses = await getResponses(result.id)
-
-        await addResultReactions(result, responses)
-        await updateNextResult(result.id)
         if (resultHash) {
+          // Populate missing comments
+          const castIterator = await getCastsInThread(resultHash)
+          for await (const cast of castIterator) {
+            const castAuthor = cast.author as unknown as NeynarUser // Temporary fix for farcaster-js-neynar CastAuthorOneOf only having fid
+            const userId = await getUserId(castAuthor)
+
+            const foundResponse = responses.find(
+              (response) => response.user_id === userId
+            )
+
+            if (foundResponse && !foundResponse.comment) {
+              await updateResponse(userId, result.id, cast.text, cast.hash)
+            }
+            await new Promise((resolve) => setTimeout(resolve, 250))
+          }
+
+          // Get updated responses and add reactions
+          responses = await getResponses(result.id)
+          await addResultReactions(result, responses)
+
           await publishReply('question reply', resultHash, replyToSurvey)
         }
+        await updateNextResult(result.id)
       } catch (error) {
         console.error(
           `${getDateTag()} Error publishing result ${result.id}:`,
