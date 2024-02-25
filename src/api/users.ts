@@ -1,8 +1,10 @@
 import { ethers } from 'ethers'
+import { ThirdwebSDK } from '@thirdweb-dev/sdk'
 import { neynarClient } from '../clients/neynar'
 import { supabaseClient } from '../clients/supabase'
-import { alchemyClient } from '../clients/alchemy'
 import { getDateTag } from '../utils/getDateTag'
+
+const sdk = new ThirdwebSDK('base')
 
 const getUsername = async (userId?: number): Promise<string | null> => {
   if (!userId) return null
@@ -62,6 +64,7 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
 
   // If user doesn't exist, insert a new user and return the new user_id
   const address = process.env.NFT_COLLECTION_ADDRESS as string
+  const contract = await sdk.getContract(address)
   let walletWithNft: string | null = null
   let verifications: string[] | undefined = []
 
@@ -72,17 +75,11 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
     if (verificationResponse && verificationResponse.verifications) {
       verifications = verificationResponse.verifications
       for await (const verification of verificationResponse.verifications) {
-        const { tokenBalances } = await alchemyClient.core.getTokenBalances(
-          verification,
-          [address]
-        )
+        if (ethers.utils.isAddress(verification)) {
+          const ownedPasses = await contract.erc721.getOwned(verification)
+          const ownedPassesCount = ownedPasses.length
 
-        if (tokenBalances[0].tokenBalance) {
-          const balance = ethers.BigNumber.from(
-            tokenBalances[0].tokenBalance
-          ).toNumber()
-
-          if (balance > 0) {
+          if (ownedPassesCount > 0) {
             walletWithNft = verification
             break
           }
