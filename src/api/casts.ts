@@ -52,8 +52,12 @@ const publishReply = async (
   castHash: string,
   formattedReply: string,
   imageUrl?: string,
-  formattedChainedReply?: string
+  formattedChainedReply?: string,
+  signer?: string
 ) => {
+  if (!signer) {
+    signer = neynarSigner
+  }
   const options = { replyTo: castHash } as EmbedOptions
 
   if (imageUrl) {
@@ -61,13 +65,13 @@ const publishReply = async (
   }
 
   const replyCast = await neynarClient.publishCast(
-    neynarSigner,
+    signer,
     formattedReply,
     options
   )
 
   if (formattedChainedReply) {
-    await neynarClient.publishCast(neynarSigner, formattedChainedReply, {
+    await neynarClient.publishCast(signer, formattedChainedReply, {
       replyTo: replyCast.hash,
     })
   }

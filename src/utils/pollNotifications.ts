@@ -4,6 +4,7 @@ let lastPollTime = Date.now()
 let polling = false
 
 const pollNotifications = async (
+  fid: number,
   handler: (notification: NeynarNotification) => void
 ) => {
   if (polling) return
@@ -11,7 +12,6 @@ const pollNotifications = async (
 
   try {
     const notifications = []
-    const fid = Number(process.env.FARCASTER_FID)
     const data = await neynarClient.fetchMentionAndReplyNotifications(fid)
     const notifs = data.result.notifications
 

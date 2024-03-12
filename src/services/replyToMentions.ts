@@ -1,7 +1,5 @@
-import { neynarClient } from '../clients/neynar'
 import { publishReply } from '../api/casts'
-import { getUserId } from '../api/users'
-import { addBookmark } from '../api/bookmarks'
+import { CREATE_SURVEY_FRAME_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { pollNotifications } from '../utils/pollNotifications'
 
@@ -11,26 +9,34 @@ setInterval(() => {
   processedNotifications.clear()
 }, 10 * 60 * 1000) // Clear set every 10 minutes
 
-const startPolling = (handler: (notification: NeynarNotification) => void) => {
-  setInterval(() => pollNotifications(handler), 20 * 1000) // Poll casts every 20 seconds
+const startPolling = (
+  fid: number,
+  handler: (notification: NeynarNotification) => void
+) => {
+  setInterval(() => pollNotifications(fid, handler), 20 * 1000) // Poll casts every 20 seconds
 }
 
-const handleNotification = async (notification: NeynarNotification) => {
-  // Check if the notification is a mention and specifically targets '@survey'
+const handleNotification = async (
+  fid: number,
+  username: string,
+  signer: string,
+  notification: NeynarNotification
+) => {
+  // Check if the notification is a mention and specifically targets username
   if (
     notification.type !== 'cast-mention' ||
-    !notification.text.includes('@survey')
+    !notification.text.includes(`@${username}`)
   ) {
     return
   }
 
-  const { author, text, hash, parentHash, parentAuthor } = notification
+  const { author, hash, parentHash, parentAuthor } = notification
 
   // Avoid self-notification and ensure all necessary info is present
   if (
     !author.username ||
-    author.fid === Number(process.env.FARCASTER_FID) ||
-    Number(parentAuthor.fid) === Number(process.env.FARCASTER_FID) ||
+    author.fid === fid ||
+    Number(parentAuthor.fid) === fid ||
     !hash ||
     !parentHash ||
     !parentAuthor
@@ -46,36 +52,29 @@ const handleNotification = async (notification: NeynarNotification) => {
   processedNotifications.add(hash)
 
   // Construct the reply message
-  const reply = `🗳️ This cast has been tagged as a potential survey topic! If approved, a new survey will be crafted and delivered shortly.\n\nWant to help decide? Come vote with us: https://t.me/+QdtIIDi8uzZlNTcx`
+  const reply = `🗳️ Time for a Quick Poll? Start by entering your question below.`
 
   if (process.env.NODE_ENV === 'production') {
-    const { cast: parentCast } =
-      await neynarClient.lookUpCastByHashOrWarpcastUrl(parentHash, 'hash')
-    const userData = await neynarClient.lookupUserByFid(
-      Number(parentAuthor.fid)
+    await publishReply(
+      `build-a-poll reply from @${username}`,
+      hash,
+      reply,
+      CREATE_SURVEY_FRAME_URL,
+      undefined,
+      signer
     )
-    const parentAuthorObj = userData.result.user
-    const authorUserId = await getUserId(author)
-    const parentAuthorUserId = await getUserId(parentAuthorObj)
-
-    await addBookmark({
-      comment: text.replace('@survey', '').trim(),
-      cast_hash: parentHash,
-      cast_text: parentCast?.text as string,
-      author_user_id: parentAuthorUserId,
-      referred_by_user_id: authorUserId,
-      username: parentAuthorObj?.username,
-    })
-
-    await publishReply('bookmark reply', hash, reply)
   } else {
     console.log(`${getDateTag()} Mock reply:\n${reply}`)
   }
 }
 
-const replyToMentions = async () => {
-  startPolling((notification: NeynarNotification) =>
-    handleNotification(notification)
+const replyToMentions = async (
+  fid: number,
+  username: string,
+  signer: string
+) => {
+  startPolling(fid, (notification: NeynarNotification) =>
+    handleNotification(fid, username, signer, notification)
   )
 }
 
