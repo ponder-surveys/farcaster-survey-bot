@@ -27,9 +27,13 @@ const nextPollDirectResultsTime = process.env
 
 const surveyFid = Number(process.env.FARCASTER_FID)
 const surveySigner = process.env.NEYNAR_SIGNER_UUID as string
+const surveyLastPollingTime: number = Date.now()
+const surveyPollingState = false
 
 const pollFid = Number(process.env.POLL_FID)
 const pollSigner = process.env.NEYNAR_POLL_SIGNER_UUID as string
+const pollLastPollingTime: number = Date.now()
+const pollPollingState = false
 
 // Warn 1 hour in advance if the next questions are estimated to be invalid
 const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
@@ -53,7 +57,19 @@ schedulePollResults(nextPollResultsTime)
 schedulePollDirectResults(nextPollDirectResultsTime)
 
 // Handle '@survey' mentions
-replyToMentions(surveyFid, 'survey', surveySigner)
+replyToMentions(
+  surveyFid,
+  'survey',
+  surveySigner,
+  surveyLastPollingTime,
+  surveyPollingState
+)
 
 // Handle '@poll' mentions
-replyToMentions(pollFid, 'poll', pollSigner)
+replyToMentions(
+  pollFid,
+  'poll',
+  pollSigner,
+  pollLastPollingTime,
+  pollPollingState
+)

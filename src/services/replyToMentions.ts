@@ -3,7 +3,7 @@ import { CREATE_SURVEY_FRAME_URL } from '../utils/constants'
 import { getDateTag } from '../utils/getDateTag'
 import { pollNotifications } from '../utils/pollNotifications'
 
-const processedNotifications = new Set<string>()
+const processedNotifications = new Map<number, Set<string>>()
 
 setInterval(() => {
   processedNotifications.clear()
@@ -11,9 +11,18 @@ setInterval(() => {
 
 const startPolling = (
   fid: number,
-  handler: (notification: NeynarNotification) => void
+  handler: (notification: NeynarNotification) => void,
+  lastPollTime: number,
+  polling: boolean
 ) => {
-  setInterval(() => pollNotifications(fid, handler), 20 * 1000) // Poll casts every 20 seconds
+  setInterval(async () => {
+    const result = await pollNotifications(fid, handler, lastPollTime, polling)
+    if (result) {
+      const { newLastPollTime, newPolling } = result
+      lastPollTime = newLastPollTime
+      polling = newPolling
+    }
+  }, 20 * 1000) // Poll casts every 20 seconds
 }
 
 const handleNotification = async (
@@ -45,11 +54,13 @@ const handleNotification = async (
   }
 
   // Check if we haven't processed this notification
-  if (processedNotifications.has(hash)) {
+  const processedSet = processedNotifications.get(fid) || new Set<string>()
+  if (processedSet.has(hash)) {
     return
   }
 
-  processedNotifications.add(hash)
+  processedSet.add(hash)
+  processedNotifications.set(fid, processedSet)
 
   // Construct the reply message
   const reply = `🗳️ Time for a Quick Poll? Start by entering your question below.`
@@ -71,10 +82,16 @@ const handleNotification = async (
 const replyToMentions = async (
   fid: number,
   username: string,
-  signer: string
+  signer: string,
+  lastPollTime: number,
+  polling: boolean
 ) => {
-  startPolling(fid, (notification: NeynarNotification) =>
-    handleNotification(fid, username, signer, notification)
+  startPolling(
+    fid,
+    (notification: NeynarNotification) =>
+      handleNotification(fid, username, signer, notification),
+    lastPollTime,
+    polling
   )
 }
 

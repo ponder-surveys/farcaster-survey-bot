@@ -1,14 +1,14 @@
 import { neynarClient } from '../clients/neynar'
 
-let lastPollTime = Date.now()
-let polling = false
-
 const pollNotifications = async (
   fid: number,
-  handler: (notification: NeynarNotification) => void
+  handler: (notification: NeynarNotification) => void,
+  lastPollTime: number,
+  polling: boolean
 ) => {
   if (polling) return
-  polling = true
+  let newLastPollTime = lastPollTime
+  let newPolling = true
 
   try {
     const notifications = []
@@ -25,7 +25,7 @@ const pollNotifications = async (
     }
 
     if (notifications.length > 0) {
-      lastPollTime = new Date(notifications[0].timestamp).getTime()
+      newLastPollTime = new Date(notifications[0].timestamp).getTime()
       for (const notification of notifications) {
         handler(notification as any)
       }
@@ -33,7 +33,10 @@ const pollNotifications = async (
   } catch (error) {
     console.error(error)
   } finally {
-    polling = false
+    newPolling = false
   }
+
+  return { newLastPollTime, newPolling }
 }
+
 export { pollNotifications }
