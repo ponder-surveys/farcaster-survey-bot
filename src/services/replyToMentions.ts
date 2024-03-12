@@ -63,7 +63,7 @@ const handleNotification = async (
   processedNotifications.set(fid, processedSet)
 
   // Construct the reply message
-  const reply = `🗳️ Time for a Quick Poll? Start by entering your question below.`
+  const reply = `🗳️ Time for a quick poll? Start by entering your question below.`
 
   if (process.env.NODE_ENV === 'production') {
     await publishReply(
