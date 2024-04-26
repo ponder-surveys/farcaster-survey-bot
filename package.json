@@ -15,8 +15,6 @@
   "dependencies": {
     "@neynar/nodejs-sdk": "^1.6.1",
     "@supabase/supabase-js": "^2.8.0",
-    "@thirdweb-dev/chains": "^0.1.67",
-    "@thirdweb-dev/engine": "^0.0.4",
     "@thirdweb-dev/sdk": "^4.0.36",
     "alchemy-sdk": "^2.10.0",
     "axios": "^1.6.0",

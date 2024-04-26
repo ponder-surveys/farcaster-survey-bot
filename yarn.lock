@@ -876,13 +876,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@thirdweb-dev/chains@npm:^0.1.67":
-  version: 0.1.67
-  resolution: "@thirdweb-dev/chains@npm:0.1.67"
-  checksum: 0e60a637d5da0f310daf0e4dc46a13139f2cf97fb06470703f8fa780fcdef6ce906c37eade87642153c11d85f37cf7befbfbbd43ec103235e2202421b2ad6121
-  languageName: node
-  linkType: hard
-
 "@thirdweb-dev/contracts-js@npm:1.3.16":
   version: 1.3.16
   resolution: "@thirdweb-dev/contracts-js@npm:1.3.16"
@@ -921,13 +914,6 @@ __metadata:
   version: 1.2.5
   resolution: "@thirdweb-dev/dynamic-contracts@npm:1.2.5"
   checksum: 115ea128f0ca8ea4b3ae3f823903fd96e77ada89e79150b6d35bda56c91d7cb17639b61d65b98a296a572e4ea7c232859196836fe472f34d5959752d446a010f
-  languageName: node
-  linkType: hard
-
-"@thirdweb-dev/engine@npm:^0.0.4":
-  version: 0.0.4
-  resolution: "@thirdweb-dev/engine@npm:0.0.4"
-  checksum: 9b19a64db1ea26d6887eee60ccca8440f66bf9e083370249c67954902342b4a61d78ee4dea5abc832f06ceb7629737faa0b40f175ac0f6ee343412774feac104
   languageName: node
   linkType: hard
 
@@ -2730,8 +2716,6 @@ __metadata:
   dependencies:
     "@neynar/nodejs-sdk": ^1.6.1
     "@supabase/supabase-js": ^2.8.0
-    "@thirdweb-dev/chains": ^0.1.67
-    "@thirdweb-dev/engine": ^0.0.4
     "@thirdweb-dev/sdk": ^4.0.36
     "@types/jsdom": ^21.1.0
     "@types/node": ^18.11.18
