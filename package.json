@@ -23,9 +23,7 @@
     "dotenv": "^16.0.3",
     "echarts": "^5.4.1",
     "ethers": "^5",
-    "imgur": "^2.2.0",
-    "node-cron": "^3.0.2",
-    "openai": "^4.14.2"
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.0",
