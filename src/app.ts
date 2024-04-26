@@ -4,9 +4,7 @@ dotenv.config()
 import {
   scheduleValidateNextQuestion,
   schedulePublishNextQuestion,
-  schedulePublishNextDirectQuestion,
   schedulePollResults,
-  schedulePollDirectResults,
 } from './services/cron'
 import { replyToMentions } from './services/replyToMentions'
 import { getCronTimeMinus1Hour } from './utils/cronTime'
@@ -19,11 +17,8 @@ const nextCommunityQuestionTime = process.env
   .NEXT_COMMUNITY_QUESTION_CRON as string
 const nextExpeditedQuestionTime = process.env
   .NEXT_EXPEDITED_QUESTION_CRON as string
-const nextDirectQuestionTime = process.env.NEXT_DIRECT_QUESTION_CRON as string
 
 const nextPollResultsTime = process.env.NEXT_POLL_RESULTS_CRON as string
-const nextPollDirectResultsTime = process.env
-  .NEXT_POLL_DIRECT_RESULTS_CRON as string
 
 const surveyFid = Number(process.env.FARCASTER_FID)
 const surveySigner = process.env.NEYNAR_SIGNER_UUID as string
@@ -50,11 +45,9 @@ scheduleValidateNextQuestion(nextCommunityQuestionValidateTime, 'community')
 schedulePublishNextQuestion(nextGeneralQuestionTime, 'general')
 schedulePublishNextQuestion(nextCommunityQuestionTime, 'community')
 schedulePublishNextQuestion(nextExpeditedQuestionTime, 'expedited')
-schedulePublishNextDirectQuestion(nextDirectQuestionTime)
 
 // Poll for results
 schedulePollResults(nextPollResultsTime)
-schedulePollDirectResults(nextPollDirectResultsTime)
 
 // Handle '@survey' mentions
 replyToMentions(

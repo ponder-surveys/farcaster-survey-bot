@@ -33,39 +33,6 @@ interface Reaction {
   created_at: string
 }
 
-interface DirectQuestion {
-  id: string
-  question: string
-  bounty_value: number
-  bounty_type: string
-  author_id?: number
-  recipient_id?: number
-  status: string
-  channel?: string
-  image_url?: string
-  cast_hash?: string
-  anonymous: boolean
-  smart_contract_id?: number
-}
-
-interface DirectQuestionResponse {
-  id?: string
-  direct_question_id: string
-  recipient_id: number
-  answer: string
-  cast_hash: string
-}
-
-interface DirectQuestionReaction {
-  id?: string
-  reactor_id: number
-  direct_question_id: string
-  direct_question_response_id: string | null
-  type: 'LIKE' | 'RECAST'
-  created_at: string
-  updated_at?: string
-}
-
 interface OptionCounts {
   [key: number]: number
 }
