@@ -41,16 +41,6 @@ interface HashPairs {
   [key: string]: string
 }
 
-interface Bookmark {
-  id?: number
-  comment?: string
-  cast_hash: string
-  cast_text: string
-  author_user_id: number
-  referred_by_user_id: number
-  username?: string
-}
-
 interface User {
   id: number
   fid: number
