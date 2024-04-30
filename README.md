@@ -56,6 +56,12 @@ SUPABASE_KEY="API key with read & write access to the project"
 SUPABASE_JWT_SECRET="Used to generate secure tokens"
 ```
 
+Thirdweb
+
+```commandline
+NFT_COLLECTION_ADDRESS="NFT collection used to check for holder status"
+```
+
 Survey questions
 
 ```commandline
