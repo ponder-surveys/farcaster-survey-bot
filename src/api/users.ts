@@ -4,7 +4,9 @@ import { neynarClient } from '../clients/neynar'
 import { supabaseClient } from '../clients/supabase'
 import { getDateTag } from '../utils/getDateTag'
 
-const sdk = new ThirdwebSDK('base')
+const sdk = new ThirdwebSDK('base', {
+  secretKey: process.env.THIRDWEB_SECRET_KEY,
+})
 
 const getUsername = async (userId?: number): Promise<string | null> => {
   if (!userId) return null

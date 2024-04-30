@@ -60,6 +60,7 @@ Thirdweb
 
 ```commandline
 NFT_COLLECTION_ADDRESS="NFT collection used to check for holder status"
+THIRDWEB_SECRET_KEY="Secret API key used to interact with Thirdweb SDK"
 ```
 
 Survey questions
