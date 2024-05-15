@@ -37,16 +37,31 @@ const publishNextResults = async () => {
           }
 
           // Get updated responses and add reactions
-          responses = await getResponses(result.id)
-          await addResultReactions(result, responses)
+          try {
+            responses = await getResponses(result.id)
+            await addResultReactions(result, responses)
+          } catch (reactionError) {
+            console.error(
+              `${getDateTag()} Error adding reactions for result ${result.id}:`,
+              reactionError
+            )
+          }
 
           await publishReply('question reply', resultHash, replyToSurvey)
         }
-        await updateNextResult(result.id)
       } catch (error) {
         console.error(
           `${getDateTag()} Error publishing result ${result.id}:`,
           error
+        )
+      }
+      try {
+        await updateNextResult(result.id)
+        console.log(`${getDateTag()} Result status updated for ${result.id}.`)
+      } catch (updateError) {
+        console.error(
+          `${getDateTag()} Error updating result status for ${result.id}:`,
+          updateError
         )
       }
     } else {
