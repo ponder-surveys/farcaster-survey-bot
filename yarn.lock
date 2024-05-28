@@ -607,14 +607,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@neynar/nodejs-sdk@npm:^1.6.1":
-  version: 1.6.1
-  resolution: "@neynar/nodejs-sdk@npm:1.6.1"
+"@neynar/nodejs-sdk@npm:^1.20.1":
+  version: 1.27.0
+  resolution: "@neynar/nodejs-sdk@npm:1.27.0"
   dependencies:
     "@openapitools/openapi-generator-cli": ^2.7.0
     axios: ^1.6.2
+    semver: ^7.6.0
     viem: ^1.19.9
-  checksum: f2d121e61469ada0471df73b13edc69fd4637a344f542c222744df66b1f7062ab4974f9c74b2816ed1c5a3ff018fc989c18343b01602fa01146d532c2816458f
+  checksum: 62094eafce636088caed4ce1514ca360e4f466b392b9a17292ad0892126a8d67cb98f15a3f966ecc09a7821acd402b4a0e3da1b1a104b1923b03240cac276328
   languageName: node
   linkType: hard
 
@@ -2550,7 +2551,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "farcaster-survey-bot@workspace:."
   dependencies:
-    "@neynar/nodejs-sdk": ^1.6.1
+    "@neynar/nodejs-sdk": ^1.20.1
     "@supabase/supabase-js": ^2.8.0
     "@thirdweb-dev/sdk": ^4.0.36
     "@types/jsdom": ^21.1.0
@@ -4448,6 +4449,15 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: ba9c7cbbf2b7884696523450a61fee1a09930d888b7a8d7579025ad93d459b2d1949ee5bbfeb188b2be5f4ac163544c5e98491ad6152df34154feebc2cc337c1
+  languageName: node
+  linkType: hard
+
+"semver@npm:^7.6.0":
+  version: 7.6.2
+  resolution: "semver@npm:7.6.2"
+  bin:
+    semver: bin/semver.js
+  checksum: 40f6a95101e8d854357a644da1b8dd9d93ce786d5c6a77227bc69dbb17bea83d0d1d1d7c4cd5920a6df909f48e8bd8a5909869535007f90278289f2451d0292d
   languageName: node
   linkType: hard
 

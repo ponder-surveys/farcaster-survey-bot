@@ -84,3 +84,18 @@ interface NeynarNotification {
 interface NeynarReaction {
   fid: number
 }
+
+type PonderReaction = {
+  id: string
+  reactor_id: number
+  question_id?: string
+  answer_id?: string | null
+  cast_type?: 'QUESTION' | 'ANSWER'
+  cast_hash?: string
+  reaction_type: 'LIKE' | 'RECAST'
+  reaction_timestamp: string
+  username?: string
+  profile_picture?: string
+  display_name?: string
+  connected_addresses?: string[]
+}

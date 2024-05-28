@@ -1,3 +1,8 @@
+import { ReactionsType } from '@neynar/nodejs-sdk'
+import {
+  ReactionForCast,
+  ReactionsCastResponse,
+} from '@neynar/nodejs-sdk/build/neynar-api/v2'
 import { supabaseClient } from '../clients/supabase'
 import { neynarClient } from '../clients/neynar'
 import { getUserId } from './users'
@@ -52,42 +57,80 @@ const addReactionsByFids = async ({
   responseId = null,
   likes,
   recasts,
-  timestamp,
 }: {
   questionId: number
   responseId?: number | null
-  likes: NeynarReaction[]
-  recasts: NeynarReaction[]
-  timestamp: string
+  likes: ReactionForCast[]
+  recasts: ReactionForCast[]
 }) => {
   // Add likes
   for await (const like of likes) {
-    const data = await neynarClient.lookupUserByFid(Number(like.fid))
-    const reactor = data.result.user
-    const reactorUserId = await getUserId(reactor)
+    const reactor = like.user
+    const user = {
+      fid: reactor.fid,
+      username: reactor.username,
+      displayName: reactor.display_name,
+      pfp: { url: reactor.pfp_url },
+      verifications: reactor.verifications,
+      activeStatus: reactor.active_status,
+    } as NeynarUser
+    const reactorUserId = await getUserId(user)
+
     await addReaction({
       userId: reactorUserId,
       questionId: questionId,
       responseId: responseId,
       type: 'like',
-      createdAt: timestamp,
+      createdAt: like.reaction_timestamp,
     })
     await new Promise((resolve) => setTimeout(resolve, 100))
   }
 
   // Add recasts
   for await (const recast of recasts) {
-    const data = await neynarClient.lookupUserByFid(Number(recast.fid))
-    const reactor = data.result.user
-    const reactorUserId = await getUserId(reactor)
+    const reactor = recast.user
+    const user = {
+      fid: reactor.fid,
+      username: reactor.username,
+      displayName: reactor.display_name,
+      pfp: { url: reactor.pfp_url },
+      verifications: reactor.verifications,
+      activeStatus: reactor.active_status,
+    } as NeynarUser
+    const reactorUserId = await getUserId(user)
+
     await addReaction({
       userId: reactorUserId,
       questionId: questionId,
       responseId: responseId,
       type: 'recast',
-      createdAt: timestamp,
+      createdAt: recast.reaction_timestamp,
     })
     await new Promise((resolve) => setTimeout(resolve, 100))
+  }
+}
+
+const fetchReactions = async (
+  castHash: string,
+  cursor?: string,
+  reactions: ReactionForCast[] = []
+): Promise<ReactionForCast[]> => {
+  const neynarReactions: ReactionsCastResponse =
+    await neynarClient.fetchReactionsForCast(castHash, ReactionsType.All, {
+      limit: 100,
+      cursor,
+    })
+
+  // NOTE: This is a temporary workaround to avoid rate limiting
+  await new Promise((r) => setTimeout(r, 1000))
+
+  // Accumulate the raw reactions
+  reactions.push(...neynarReactions.reactions)
+
+  if (neynarReactions.next?.cursor) {
+    return fetchReactions(castHash, neynarReactions.next.cursor, reactions)
+  } else {
+    return reactions
   }
 }
 
@@ -95,57 +138,62 @@ const addResultReactions = async (
   question: Question,
   responses: QuestionResponse[]
 ) => {
-  // Add question reactions
-  const { cast: questionCast } =
-    await neynarClient.lookUpCastByHashOrWarpcastUrl(
-      question.cast_hash as string,
-      'hash'
+  try {
+    // Add question reactions
+    const reactionData: ReactionForCast[] = await fetchReactions(
+      question.cast_hash as string
     )
 
-  if (!questionCast) {
-    console.warn(
-      `${getDateTag()} Could not find cast for question ${question.id}`
+    const likes = reactionData.filter(
+      (reaction) => reaction.reaction_type === 'like'
     )
-    return
-  }
+    const recasts = reactionData.filter(
+      (reaction) => reaction.reaction_type === 'recast'
+    )
 
-  const questionLikes = questionCast.reactions.likes
-  const questionRecasts = questionCast.reactions.recasts
+    await addReactionsByFids({
+      questionId: question.id,
+      likes: likes,
+      recasts: recasts,
+    })
 
-  await addReactionsByFids({
-    questionId: question.id,
-    likes: questionLikes,
-    recasts: questionRecasts,
-    timestamp: questionCast.timestamp,
-  })
+    // Add response reactions
+    for (const response of responses) {
+      if (response.cast_hash !== question.cast_hash && response.comment) {
+        try {
+          const reactionData: ReactionForCast[] = await fetchReactions(
+            response.cast_hash as string
+          )
 
-  // Add response reactions
-  for (const response of responses) {
-    if (response.cast_hash !== question.cast_hash && response.comment) {
-      const { cast: responseCast } =
-        await neynarClient.lookUpCastByHashOrWarpcastUrl(
-          response.cast_hash as string,
-          'hash'
-        )
+          const likes = reactionData.filter(
+            (reaction) => reaction.reaction_type === 'like'
+          )
+          const recasts = reactionData.filter(
+            (reaction) => reaction.reaction_type === 'recast'
+          )
 
-      if (!responseCast) {
-        console.warn(
-          `${getDateTag()} Could not find cast for response ${response.id}`
-        )
-        continue
+          await addReactionsByFids({
+            questionId: question.id,
+            responseId: response.id,
+            likes: likes,
+            recasts: recasts,
+          })
+        } catch (error) {
+          console.error(
+            `${getDateTag()} Error fetching reactions for response ${
+              response.id
+            }: `,
+            error
+          )
+          continue
+        }
       }
-
-      const responseLikes = responseCast.reactions.likes
-      const responseRecasts = responseCast.reactions.recasts
-
-      await addReactionsByFids({
-        questionId: question.id,
-        responseId: response.id,
-        likes: responseLikes,
-        recasts: responseRecasts,
-        timestamp: responseCast.timestamp,
-      })
     }
+  } catch (error) {
+    console.error(
+      `${getDateTag()} Error fetching reactions for question ${question.id}: `,
+      error
+    )
   }
 }
 

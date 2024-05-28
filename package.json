@@ -13,7 +13,7 @@
     "lint": "yarn prettier && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@neynar/nodejs-sdk": "^1.6.1",
+    "@neynar/nodejs-sdk": "^1.20.1",
     "@supabase/supabase-js": "^2.8.0",
     "@thirdweb-dev/sdk": "^4.0.36",
     "axios": "^1.6.0",
