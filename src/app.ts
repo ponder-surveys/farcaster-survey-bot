@@ -6,7 +6,7 @@ import {
   schedulePublishNextQuestion,
   schedulePollResults,
 } from './services/cron'
-import { replyToMentions } from './services/replyToMentions'
+// import { replyToMentions } from './services/replyToMentions'
 import { getCronTimeMinus1Hour } from './utils/cronTime'
 import { getDateTag } from './utils/getDateTag'
 
@@ -20,15 +20,15 @@ const nextExpeditedQuestionTime = process.env
 
 const nextPollResultsTime = process.env.NEXT_POLL_RESULTS_CRON as string
 
-const surveyFid = Number(process.env.FARCASTER_FID)
-const surveySigner = process.env.NEYNAR_SIGNER_UUID as string
-const surveyLastPollingTime: number = Date.now()
-const surveyPollingState = false
+// const surveyFid = Number(process.env.FARCASTER_FID)
+// const surveySigner = process.env.NEYNAR_SIGNER_UUID as string
+// const surveyLastPollingTime: number = Date.now()
+// const surveyPollingState = false
 
-const pollFid = Number(process.env.POLL_FID)
-const pollSigner = process.env.NEYNAR_POLL_SIGNER_UUID as string
-const pollLastPollingTime: number = Date.now()
-const pollPollingState = false
+// const pollFid = Number(process.env.POLL_FID)
+// const pollSigner = process.env.NEYNAR_POLL_SIGNER_UUID as string
+// const pollLastPollingTime: number = Date.now()
+// const pollPollingState = false
 
 // Warn 1 hour in advance if the next questions are estimated to be invalid
 const nextGeneralQuestionValidateTime = getCronTimeMinus1Hour(
@@ -50,19 +50,19 @@ schedulePublishNextQuestion(nextExpeditedQuestionTime, 'expedited')
 schedulePollResults(nextPollResultsTime)
 
 // Handle '@survey' mentions
-replyToMentions(
-  surveyFid,
-  'survey',
-  surveySigner,
-  surveyLastPollingTime,
-  surveyPollingState
-)
+// replyToMentions(
+//   surveyFid,
+//   'survey',
+//   surveySigner,
+//   surveyLastPollingTime,
+//   surveyPollingState
+// )
 
 // Handle '@poll' mentions
-replyToMentions(
-  pollFid,
-  'poll',
-  pollSigner,
-  pollLastPollingTime,
-  pollPollingState
-)
+// replyToMentions(
+//   pollFid,
+//   'poll',
+//   pollSigner,
+//   pollLastPollingTime,
+//   pollPollingState
+// )
