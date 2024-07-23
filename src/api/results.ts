@@ -38,7 +38,7 @@ const updateNextResult = async (questionId: number) => {
       status: 'calculated',
     })
     .eq('id', questionId)
-    .select('*')
+    .select()
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)
