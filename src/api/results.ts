@@ -1,9 +1,9 @@
+import { supabaseClient } from '../clients/supabase'
 import {
   EDGE_FUNCTIONS_SECRET_TOKEN,
   EDGE_FUNCTIONS_SERVER_URL,
-} from 'utils/constants'
-import getErrorMessage from 'utils/getErrorMessage'
-import { supabaseClient } from '../clients/supabase'
+} from '../utils/constants'
+import getErrorMessage from '../utils/getErrorMessage'
 import { getDateTag } from '../utils/getDateTag'
 
 const getNextResults = async (): Promise<Question[]> => {
