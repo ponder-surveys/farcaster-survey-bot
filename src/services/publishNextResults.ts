@@ -5,6 +5,7 @@ import { getUserId } from '../api/users'
 import { getCastsInThread, publishReply } from '../api/casts'
 import { formatReplyToSurvey } from '../utils/formatResult'
 import { getDateTag } from '../utils/getDateTag'
+import { SURVEY_FRAME_URL } from '../utils/constants'
 
 const publishNextResults = async () => {
   const results = await getNextResults()
@@ -47,7 +48,12 @@ const publishNextResults = async () => {
             )
           }
 
-          await publishReply('question reply', resultHash, replyToSurvey)
+          await publishReply(
+            'question reply',
+            resultHash,
+            replyToSurvey,
+            `${SURVEY_FRAME_URL}/${result.id}`
+          )
         }
       } catch (error) {
         console.error(
@@ -65,7 +71,11 @@ const publishNextResults = async () => {
         )
       }
     } else {
-      console.log(`${getDateTag()} Mock survey reply:\n${replyToSurvey}`)
+      console.log(
+        `${getDateTag()} Mock survey reply:\n${replyToSurvey}\n${SURVEY_FRAME_URL}/${
+          result.id
+        }`
+      )
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }

@@ -42,7 +42,7 @@ const formatReplyToSurvey = (totalVotes: number) => {
     process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48
   )
 
-  const title = `Survey has ended after ${timeInterval} hours and received ${totalVotes} votes.`
+  const title = `💭 Poll has ended after ${timeInterval} hours and received ${totalVotes} votes. View the results here:`
 
   return `${title}`
 }

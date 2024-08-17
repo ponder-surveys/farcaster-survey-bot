@@ -13,6 +13,21 @@ interface Question {
   inspired_by: boolean
 }
 
+interface QuestionQual {
+  id: string
+  channel: string
+  text: string
+  cast_hash: string
+  archived: boolean
+  likes_count: number
+  recasts_count: number
+  featured: boolean
+  author: User
+  created_at: string
+  updated_at: string
+  is_anonymous: boolean
+}
+
 type QuestionType = 'general' | 'community' | 'expedited'
 
 interface QuestionResponse {

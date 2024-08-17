@@ -1,0 +1,58 @@
+import {
+  getNextQuestionsQual,
+  updateNextQuestionQual,
+} from '../api/questionsQual'
+import { publishReply } from '../api/casts'
+import { getDateTag } from '../utils/getDateTag'
+import { getAnswersCount } from '../api/answersQual'
+import { QUESTION_FRAME_URL } from '../utils/constants'
+import { formatReplyToQuestionQual } from '../utils/formatQuestionQual'
+
+const publishNextQuestionsQualUpdate = async () => {
+  const questionsQual = await getNextQuestionsQual()
+
+  for await (const questionQual of questionsQual) {
+    const responseCount = await getAnswersCount(questionQual.id)
+    const updateMessage = formatReplyToQuestionQual(responseCount)
+
+    console.log(
+      `${getDateTag()} Publishing update for Q&A question ${questionQual.id}...`
+    )
+
+    if (process.env.NODE_ENV === 'production') {
+      const questionQualHash = questionQual.cast_hash as string
+
+      try {
+        if (questionQualHash && responseCount > 0) {
+          await publishReply(
+            'question reply',
+            questionQualHash,
+            updateMessage,
+            `${QUESTION_FRAME_URL}/${questionQual.id}`
+          )
+
+          await updateNextQuestionQual(questionQual.id)
+          console.log(
+            `${getDateTag()} Update status updated for ${questionQual.id}.`
+          )
+        }
+      } catch (error) {
+        console.error(
+          `${getDateTag()} Error publishing update for question ${
+            questionQual.id
+          }:`,
+          error
+        )
+      }
+    } else {
+      console.log(
+        `${getDateTag()} Mock question update:\n${updateMessage}\n${QUESTION_FRAME_URL}/${
+          questionQual.id
+        }`
+      )
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500))
+  }
+}
+
+export { publishNextQuestionsQualUpdate }
