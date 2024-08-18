@@ -14,8 +14,6 @@ const publishNextResults = async () => {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
 
-    console.log(`${getDateTag()} Publishing result ${result.id}...`)
-
     if (process.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string
 
@@ -79,6 +77,8 @@ const publishNextResults = async () => {
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
+
+  console.log(`${getDateTag()} Published poll results.`)
 }
 
 export { publishNextResults }

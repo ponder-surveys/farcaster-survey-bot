@@ -13,9 +13,9 @@ const getNextQuestionsQual = async (): Promise<QuestionQual[]> => {
 
   const { data, error } = await supabaseClient
     .from('questions_qual')
-    .select('id, cast_hash, created_at, updated_at')
+    .select('id, cast_hash, created_at, updated_at, is_updated')
     .lte('created_at', cutoffTime.toISOString())
-    .eq('created_at', 'updated_at')
+    .eq('is_updated', false)
     .order('created_at', { ascending: true })
 
   if (error) {
@@ -28,8 +28,9 @@ const getNextQuestionsQual = async (): Promise<QuestionQual[]> => {
 
 const updateNextQuestionQual = async (questionId: string) => {
   const { error } = await supabaseClient
-    .from('questions')
+    .from('questions_qual')
     .update({
+      is_updated: true,
       updated_at: new Date().toISOString(),
     })
     .eq('id', questionId)

@@ -12,16 +12,11 @@ const publishNextQuestionsQualUpdate = async () => {
   const questionsQual = await getNextQuestionsQual()
 
   for await (const questionQual of questionsQual) {
+    const questionQualHash = questionQual.cast_hash as string
     const responseCount = await getAnswersCount(questionQual.id)
     const updateMessage = formatReplyToQuestionQual(responseCount)
 
-    console.log(
-      `${getDateTag()} Publishing update for Q&A question ${questionQual.id}...`
-    )
-
     if (process.env.NODE_ENV === 'production') {
-      const questionQualHash = questionQual.cast_hash as string
-
       try {
         if (questionQualHash && responseCount > 0) {
           await publishReply(
@@ -45,14 +40,18 @@ const publishNextQuestionsQualUpdate = async () => {
         )
       }
     } else {
-      console.log(
-        `${getDateTag()} Mock question update:\n${updateMessage}\n${QUESTION_FRAME_URL}/${
-          questionQual.id
-        }`
-      )
+      if (questionQualHash && responseCount > 0) {
+        console.log(
+          `${getDateTag()} Mock question update:\n${updateMessage}\n${QUESTION_FRAME_URL}/${
+            questionQual.id
+          }`
+        )
+      }
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
+
+  console.log(`${getDateTag()} Published Q&A updates.`)
 }
 
 export { publishNextQuestionsQualUpdate }
