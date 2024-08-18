@@ -13,7 +13,8 @@ const getNextQuestionsQual = async (): Promise<QuestionQual[]> => {
 
   const { data, error } = await supabaseClient
     .from('questions_qual')
-    .select('id, cast_hash, created_at, updated_at, is_updated')
+    .select('id, cast_hash, created_at, is_updated')
+    .eq('source', 'form')
     .lte('created_at', cutoffTime.toISOString())
     .eq('is_updated', false)
     .order('created_at', { ascending: true })
