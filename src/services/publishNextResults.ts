@@ -5,7 +5,7 @@ import { getUserId } from '../api/users'
 import { getCastsInThread, publishReply } from '../api/casts'
 import { formatReplyToSurvey } from '../utils/formatResult'
 import { getDateTag } from '../utils/getDateTag'
-import { APP_URL } from '../utils/constants'
+import { SURVEY_FRAME_URL } from '../utils/constants'
 
 const publishNextResults = async () => {
   const results = await getNextResults()
@@ -13,7 +13,6 @@ const publishNextResults = async () => {
   for await (const result of results) {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
-    const resultUrl = `${APP_URL}/dashboard/results/${result.id}`
 
     if (process.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string
@@ -51,7 +50,7 @@ const publishNextResults = async () => {
             'question reply',
             resultHash,
             replyToSurvey,
-            resultUrl
+            `${SURVEY_FRAME_URL}/${result.id}`
           )
         }
       } catch (error) {
@@ -71,7 +70,9 @@ const publishNextResults = async () => {
       }
     } else {
       console.log(
-        `${getDateTag()} Mock survey reply:\n${replyToSurvey}\n${resultUrl}`
+        `${getDateTag()} Mock survey reply:\n${replyToSurvey}\n${SURVEY_FRAME_URL}/${
+          result.id
+        }`
       )
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
