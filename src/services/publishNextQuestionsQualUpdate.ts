@@ -18,9 +18,12 @@ const publishNextQuestionsQualUpdate = async () => {
 
     const bountyAmount = await getQuestionBountyAmount(questionQual.id)
 
+    const numBounties =
+      bountyAmount.amount[0] === 0 ? 0 : bountyAmount.amount[0] / 3
+
     const updateMessage = formatReplyToQuestionQual(
       responseCount,
-      bountyAmount.amount[0] / 3,
+      numBounties,
       questionQual.id
     )
 
