@@ -47,4 +47,23 @@ const updateNextQuestionQual = async (questionId: string) => {
   )
 }
 
-export { getNextQuestionsQual, updateNextQuestionQual }
+const getQuestionBountyAmount = async (questionId: string) => {
+  const { data, error } = await supabaseClient
+    .from('questions_qual_bounties')
+    .select('bounty_amount:questions_qual_bounty_rewards(amount)')
+    .eq('question_id', questionId)
+    .single()
+
+  if (error) {
+    console.error(`${getDateTag()} ${error}`)
+    throw new Error(error.message)
+  }
+
+  return data.bounty_amount as BountyAmount
+}
+
+export { getNextQuestionsQual, updateNextQuestionQual, getQuestionBountyAmount }
+
+interface BountyAmount {
+  amount: number[]
+}
