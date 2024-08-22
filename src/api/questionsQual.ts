@@ -47,6 +47,10 @@ const updateNextQuestionQual = async (questionId: string) => {
   )
 }
 
+interface BountyReward {
+  amount: number
+}
+
 const getQuestionBountyAmount = async (questionId: string) => {
   const { data, error } = await supabaseClient
     .from('questions_qual_bounties')
@@ -67,14 +71,16 @@ const getQuestionBountyAmount = async (questionId: string) => {
 
     if (Array.isArray(bounty.questions_qual_bounty_rewards)) {
       totalRewards = bounty.questions_qual_bounty_rewards.reduce(
-        (sum, reward) => sum + (reward.amount || 0),
+        (sum, reward: BountyReward) => sum + (reward.amount || 0),
         0
       )
     } else if (
       bounty.questions_qual_bounty_rewards &&
+      typeof bounty.questions_qual_bounty_rewards === 'object' &&
       'amount' in bounty.questions_qual_bounty_rewards
     ) {
-      totalRewards = bounty.questions_qual_bounty_rewards.amount || 0
+      totalRewards =
+        (bounty.questions_qual_bounty_rewards as BountyReward).amount || 0
     }
 
     const amount = bounty.token_amount - totalRewards
