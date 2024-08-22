@@ -1,11 +1,12 @@
 import {
   getNextQuestionsQual,
+  getQuestionBountyAmount,
   updateNextQuestionQual,
 } from '../api/questionsQual'
 import { publishReply } from '../api/casts'
 import { getDateTag } from '../utils/getDateTag'
 import { getAnswersCount } from '../api/answersQual'
-import { QUESTION_FRAME_URL } from '../utils/constants'
+import { APP_URL } from '../utils/constants'
 import { formatReplyToQuestionQual } from '../utils/formatQuestionQual'
 
 const publishNextQuestionsQualUpdate = async () => {
@@ -14,7 +15,14 @@ const publishNextQuestionsQualUpdate = async () => {
   for await (const questionQual of questionsQual) {
     const questionQualHash = questionQual.cast_hash as string
     const responseCount = await getAnswersCount(questionQual.id)
-    const updateMessage = formatReplyToQuestionQual(responseCount)
+
+    const { amount, tokenName } = await getQuestionBountyAmount(questionQual.id)
+
+    const updateMessage = formatReplyToQuestionQual(
+      responseCount,
+      amount,
+      tokenName
+    )
 
     if (process.env.NODE_ENV === 'production') {
       try {
@@ -23,7 +31,7 @@ const publishNextQuestionsQualUpdate = async () => {
             'question reply',
             questionQualHash,
             updateMessage,
-            `${QUESTION_FRAME_URL}/${questionQual.id}`
+            `${APP_URL}/questions/${questionQual.id}`
           )
 
           await updateNextQuestionQual(questionQual.id)
@@ -42,7 +50,7 @@ const publishNextQuestionsQualUpdate = async () => {
     } else {
       if (questionQualHash && responseCount > 0) {
         console.log(
-          `${getDateTag()} Mock question update:\n${updateMessage}\n${QUESTION_FRAME_URL}/${
+          `${getDateTag()} Mock question update:\n${updateMessage}\n${APP_URL}/questions/${
             questionQual.id
           }`
         )
