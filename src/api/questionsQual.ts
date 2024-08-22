@@ -50,20 +50,38 @@ const updateNextQuestionQual = async (questionId: string) => {
 const getQuestionBountyAmount = async (questionId: string) => {
   const { data, error } = await supabaseClient
     .from('questions_qual_bounties')
-    .select('bounty_amount:questions_qual_bounty_rewards(amount)')
+    .select(
+      'id, token_amount, token_name, questions_qual_bounty_rewards(amount)'
+    )
     .eq('question_id', questionId)
-    .single()
+    .limit(1)
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)
     throw new Error(error.message)
   }
 
-  return data.bounty_amount as BountyAmount
+  if (data && data.length > 0) {
+    const bounty = data[0]
+    let totalRewards = 0
+
+    if (Array.isArray(bounty.questions_qual_bounty_rewards)) {
+      totalRewards = bounty.questions_qual_bounty_rewards.reduce(
+        (sum, reward) => sum + (reward.amount || 0),
+        0
+      )
+    } else if (
+      bounty.questions_qual_bounty_rewards &&
+      'amount' in bounty.questions_qual_bounty_rewards
+    ) {
+      totalRewards = bounty.questions_qual_bounty_rewards.amount || 0
+    }
+
+    const amount = bounty.token_amount - totalRewards
+    return { amount, tokenName: bounty.token_name }
+  }
+
+  return { amount: 0, tokenName: '' }
 }
 
 export { getNextQuestionsQual, updateNextQuestionQual, getQuestionBountyAmount }
-
-interface BountyAmount {
-  amount: number[]
-}

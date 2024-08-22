@@ -10,4 +10,4 @@ export const EDGE_FUNCTIONS_SERVER_URL =
 export const EDGE_FUNCTIONS_SECRET_TOKEN =
   process.env.EDGE_FUNCTIONS_SECRET_TOKEN
 
-export const APP_URL = process.env.APP_URL || 'https://weponder.io'
+export const APP_URL = process.env.APP_URL || 'https://www.weponder.io'

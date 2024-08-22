@@ -16,15 +16,12 @@ const publishNextQuestionsQualUpdate = async () => {
     const questionQualHash = questionQual.cast_hash as string
     const responseCount = await getAnswersCount(questionQual.id)
 
-    const bountyAmount = await getQuestionBountyAmount(questionQual.id)
-
-    const numBounties =
-      bountyAmount.amount[0] === 0 ? 0 : bountyAmount.amount[0] / 3
+    const { amount, tokenName } = await getQuestionBountyAmount(questionQual.id)
 
     const updateMessage = formatReplyToQuestionQual(
       responseCount,
-      numBounties,
-      questionQual.id
+      amount,
+      tokenName
     )
 
     if (process.env.NODE_ENV === 'production') {
