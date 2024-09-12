@@ -67,7 +67,7 @@ export const endPoll = async (poll: any, bounty: any) => {
         chain.SMART_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
-          functionName: 'completeSurvey(uint256)',
+          functionName: 'endPoll(uint256)',
           args: [String(smartContractId)],
         }
       )
@@ -78,7 +78,7 @@ export const endPoll = async (poll: any, bounty: any) => {
 
       // Update response in database
       if (status === 'mined' && transactionHash) {
-        logger.info('completeSurvey transaction mined successfully')
+        logger.info('endPoll transaction mined successfully')
 
         await closeBounty(String(smartContractId), 'survey')
       } else {
@@ -88,16 +88,9 @@ export const endPoll = async (poll: any, bounty: any) => {
       }
     }
 
-    logger.info('complete-survey - Succeeded')
-    return new Response('ok', {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return
   } catch (error) {
     logger.error(error)
     Sentry.captureException(error)
-    return new Response(JSON.stringify(error), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 500,
-    })
   }
 }

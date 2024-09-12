@@ -1,5 +1,6 @@
 type BountyStatus = 'active' | 'completed'
 
+// TODO: Remember to update 'survey' to 'poll' here as well as on the database
 export type BountyContent = 'survey' | 'q&a' | 'ama'
 
 export interface Bounty {
