@@ -10,4 +10,59 @@ export const EDGE_FUNCTIONS_SERVER_URL =
 export const EDGE_FUNCTIONS_SECRET_TOKEN =
   process.env.EDGE_FUNCTIONS_SECRET_TOKEN
 
+export const FRAME_API_URL =
+  process.env.FRAME_API_URL || 'contracts.weponder.io'
+
 export const APP_URL = process.env.APP_URL || 'https://www.weponder.io'
+
+// Sentry
+export const SENTRY_DSN = process.env.SENTRY_DSN
+export const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT
+
+// ThirdWeb
+export const POLL_INTERVAL = 1000 // Poll every 1 second
+export const POLL_TIMEOUT = 60000 // Stop after 60 seconds
+export const WEB3_ENGINE_URL = process.env.WEB3_ENGINE_URL
+export const WEB3_ACCESS_TOKEN = process.env.WEB3_ACCESS_TOKEN
+
+export const TRANSACTION_ADDRESS = process.env.TRANSACTION_ADDRESS
+
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
+
+export const CHAINS = new Map<
+  string,
+  { CHAIN_ID: number; PROVIDER_URL: string; SMART_CONTRACT_ADDRESS: string }
+>([
+  [
+    'base',
+    {
+      CHAIN_ID: 8453,
+      PROVIDER_URL: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      SMART_CONTRACT_ADDRESS: '',
+    },
+  ],
+  [
+    'base-sepolia',
+    {
+      CHAIN_ID: 84532,
+      PROVIDER_URL: `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      SMART_CONTRACT_ADDRESS: '',
+    },
+  ],
+  [
+    'optimism',
+    {
+      CHAIN_ID: 10,
+      PROVIDER_URL: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      SMART_CONTRACT_ADDRESS: '',
+    },
+  ],
+  [
+    'optimism-sepolia',
+    {
+      CHAIN_ID: 11155420,
+      PROVIDER_URL: `https://opt-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+      SMART_CONTRACT_ADDRESS: '',
+    },
+  ],
+])
