@@ -26,28 +26,34 @@ const web3Engine = new Engine({
 export const pollTransactionStatus = async (
   queueId: string,
   elapsedTime = 0
-): Promise<TransactionStatus> => {
-  return new Promise(async (resolve, reject) => {
+): Promise<{
+  status: 'queued' | 'sent' | 'mined' | 'errored' | 'cancelled'
+  transactionHash?: string | null
+  functionArgs?: string | null
+  errorMessage?: string | null
+}> => {
+  return new Promise((resolve, reject) => {
     try {
-      const { result } = await web3Engine.transaction.status(queueId)
-      const { status, transactionHash, functionArgs, errorMessage } = result
+      web3Engine.transaction.status(queueId).then(({ result }) => {
+        const { status, transactionHash, functionArgs, errorMessage } = result
 
-      if (status === 'mined') {
-        resolve({ status, transactionHash, functionArgs })
-      } else if (status === 'errored') {
-        resolve({
-          status,
-          errorMessage,
-        })
-      } else if (elapsedTime < POLL_TIMEOUT) {
-        setTimeout(async () => {
-          resolve(
-            await pollTransactionStatus(queueId, elapsedTime + POLL_INTERVAL)
-          )
-        }, POLL_INTERVAL)
-      } else {
-        reject(new Error('Transaction timed out'))
-      }
+        if (status === 'mined') {
+          resolve({ status, transactionHash, functionArgs })
+        } else if (status === 'errored') {
+          resolve({
+            status,
+            errorMessage,
+          })
+        } else if (elapsedTime < POLL_TIMEOUT) {
+          setTimeout(async () => {
+            resolve(
+              await pollTransactionStatus(queueId, elapsedTime + POLL_INTERVAL)
+            )
+          }, POLL_INTERVAL)
+        } else {
+          reject(new Error('Transaction timed out'))
+        }
+      })
     } catch (error) {
       Sentry.captureException(error)
       reject(error)
