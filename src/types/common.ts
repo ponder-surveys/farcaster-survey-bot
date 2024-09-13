@@ -17,4 +17,6 @@ export interface Bounty {
   is_sponsored: boolean
   created_at: string
   updated_at: string
+  user: any
+  token: any
 }

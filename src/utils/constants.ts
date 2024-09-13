@@ -31,14 +31,20 @@ const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
 
 export const CHAINS = new Map<
   string,
-  { CHAIN_ID: number; PROVIDER_URL: string; SMART_CONTRACT_ADDRESS: string }
+  {
+    CHAIN_ID: number
+    PROVIDER_URL: string
+    POLL_CONTRACT_ADDRESS: string
+    QUESTION_CONTRACT_ADDRESS: string
+  }
 >([
   [
     'base',
     {
       CHAIN_ID: 8453,
       PROVIDER_URL: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      SMART_CONTRACT_ADDRESS: '',
+      POLL_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS: '',
     },
   ],
   [
@@ -46,7 +52,8 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 84532,
       PROVIDER_URL: `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      SMART_CONTRACT_ADDRESS: '',
+      POLL_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS: '',
     },
   ],
   [
@@ -54,7 +61,8 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 10,
       PROVIDER_URL: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      SMART_CONTRACT_ADDRESS: '',
+      POLL_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS: '',
     },
   ],
   [
@@ -62,7 +70,8 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 11155420,
       PROVIDER_URL: `https://opt-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      SMART_CONTRACT_ADDRESS: '',
+      POLL_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS: '',
     },
   ],
 ])

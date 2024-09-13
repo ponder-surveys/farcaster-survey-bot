@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/node'
-import { nodeProfilingIntegration } from '@sentry/profiling-node'
 import { Engine } from '@thirdweb-dev/engine'
 import logger from '../utils/logger'
 import {
@@ -13,12 +12,12 @@ import { pollTransactionStatus } from '../clients/thirdweb'
 import { closeBounty } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
+import { Bounty } from '../types/common'
+import getErrorMessage from 'utils/getErrorMessage'
 
 Sentry.init({
   dsn: SENTRY_DSN,
   environment: SENTRY_ENVIRONMENT,
-  // Performance Monitoring
-  integrations: [nodeProfilingIntegration()],
   // Tracing
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
 
@@ -35,7 +34,7 @@ const web3Engine = new Engine({
   accessToken: WEB3_ACCESS_TOKEN,
 })
 
-export const endPoll = async (poll: any, bounty: any) => {
+export const endPoll = async (poll: Poll, bounty: Bounty) => {
   // Check here so we prevent a non-null assertion later
   if (!TRANSACTION_ADDRESS) {
     throw new Error('Transaction address not found')
@@ -44,7 +43,7 @@ export const endPoll = async (poll: any, bounty: any) => {
   try {
     logger.debug(poll)
 
-    const { bounty_id: bountyId, status } = poll
+    const { status } = poll
 
     const { smart_contract_id: smartContractId } = bounty
 
@@ -54,17 +53,17 @@ export const endPoll = async (poll: any, bounty: any) => {
       bounty.status === 'active' &&
       smartContractId !== undefined
     ) {
-      const chain = await getChainDetails(bountyId)
+      const chain = await getChainDetails(bounty)
 
       if (!chain) {
-        const msg = `Could not fetch chain details for bounty ${bountyId}`
+        const msg = `Could not fetch chain details for bounty ${bounty.id}`
         Sentry.captureMessage(msg)
         throw new Error(msg)
       }
 
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
-        chain.SMART_CONTRACT_ADDRESS,
+        chain.POLL_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
           functionName: 'endPoll(uint256)',
@@ -83,8 +82,8 @@ export const endPoll = async (poll: any, bounty: any) => {
         await closeBounty(String(smartContractId), 'survey')
       } else {
         // Handle case where the transaction did not mine successfully
-        logger.error(errorMessage)
-        Sentry.captureMessage(errorMessage)
+        logger.error(getErrorMessage(errorMessage))
+        Sentry.captureMessage(getErrorMessage(errorMessage))
       }
     }
 
