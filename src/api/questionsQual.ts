@@ -47,44 +47,57 @@ const updateNextQuestionQual = async (questionId: string) => {
   )
 }
 
-interface BountyReward {
-  amount: number
-}
-
 const getQuestionBountyAmount = async (questionId: string) => {
   const { data, error } = await supabaseClient
-    .from('questions_qual_bounties')
+    .from('questions_qual')
     .select(
-      'id, token_amount, token_name, questions_qual_bounty_rewards(amount)'
+      `
+      id,
+      bounty:bounties!questions_qual_bounty_id_fkey (
+        id,
+        token_amount,
+        token:tokens (
+          name
+        ),
+        bounty_rewards (
+          amount
+        )
+      )
+    `
     )
-    .eq('question_id', questionId)
+    .eq('id', questionId)
     .limit(1)
+    .single()
 
   if (error) {
     console.error(`${getDateTag()} ${error}`)
     throw new Error(error.message)
   }
 
-  if (data && data.length > 0) {
-    const bounty = data[0]
+  if (data && data.bounty) {
+    const bounty = Array.isArray(data.bounty)
+      ? data.bounty[0]
+      : (data.bounty as {
+          id: string
+          token_amount: number
+          token: { name: string }[] | { name: string } | null
+          bounty_rewards: { amount: number }[] | null
+        })
+
     let totalRewards = 0
 
-    if (Array.isArray(bounty.questions_qual_bounty_rewards)) {
-      totalRewards = bounty.questions_qual_bounty_rewards.reduce(
-        (sum, reward: BountyReward) => sum + (reward.amount || 0),
+    if (Array.isArray(bounty.bounty_rewards)) {
+      totalRewards = bounty.bounty_rewards.reduce(
+        (sum: number, reward: { amount: number }) => sum + (reward.amount || 0),
         0
       )
-    } else if (
-      bounty.questions_qual_bounty_rewards &&
-      typeof bounty.questions_qual_bounty_rewards === 'object' &&
-      'amount' in bounty.questions_qual_bounty_rewards
-    ) {
-      totalRewards =
-        (bounty.questions_qual_bounty_rewards as BountyReward).amount || 0
     }
 
     const amount = bounty.token_amount - totalRewards
-    return { amount, tokenName: bounty.token_name }
+    const tokenName = Array.isArray(bounty.token)
+      ? bounty.token[0]?.name || ''
+      : bounty.token?.name || ''
+    return { amount, tokenName }
   }
 
   return { amount: 0, tokenName: '' }
