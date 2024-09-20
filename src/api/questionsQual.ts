@@ -87,8 +87,8 @@ const getQuestionBountyAmount = async (questionId: string) => {
     let totalRewards = 0
 
     if (Array.isArray(bounty.bounty_rewards)) {
-      totalRewards = bounty.bounty_rewards.reduce(
-        (sum: number, reward: { amount: number }) => sum + (reward.amount || 0),
+      totalRewards = bounty.bounty_rewards.reduce<number>(
+        (sum, reward) => sum + (reward.amount || 0),
         0
       )
     }
