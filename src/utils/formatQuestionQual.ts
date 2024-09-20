@@ -7,7 +7,9 @@ const formatReplyToQuestionQual = (
     process.env.NEXT_QUESTION_QUAL_UPDATE_INTERVAL_HOURS || 24
   ) // Default to 24 hours if not set
 
-  const msg = `💭 Your question got ${responseCount} responses${
+  const msg = `💭 Your question got ${responseCount} response${
+    responseCount > 1 ? 's' : ''
+  }${
     numBounties
       ? ` and you still have ${numBounties} ${tokenName} in bounties to award`
       : ''
