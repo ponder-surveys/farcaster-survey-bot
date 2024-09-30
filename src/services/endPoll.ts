@@ -13,7 +13,7 @@ import { closeBounty } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
 import { Bounty } from '../types/common'
-import getErrorMessage from 'utils/getErrorMessage'
+import getErrorMessage from '../utils/getErrorMessage'
 
 Sentry.init({
   dsn: SENTRY_DSN,
