@@ -43,8 +43,9 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 8453,
       PROVIDER_URL: `https://base-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      POLL_CONTRACT_ADDRESS: '',
-      QUESTION_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS:
+        process.env.BASE_QUESTION_CONTRACT_ADDRESS || '',
+      POLL_CONTRACT_ADDRESS: process.env.BASE_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -52,8 +53,10 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 84532,
       PROVIDER_URL: `https://base-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      POLL_CONTRACT_ADDRESS: '',
-      QUESTION_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS:
+        process.env.BASE_SEPOLIA_QUESTION_CONTRACT_ADDRESS || '',
+      POLL_CONTRACT_ADDRESS:
+        process.env.BASE_SEPOLIA_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -61,8 +64,8 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 10,
       PROVIDER_URL: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      POLL_CONTRACT_ADDRESS: '',
-      QUESTION_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS: process.env.OP_QUESTION_CONTRACT_ADDRESS || '',
+      POLL_CONTRACT_ADDRESS: process.env.OP_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -70,8 +73,9 @@ export const CHAINS = new Map<
     {
       CHAIN_ID: 11155420,
       PROVIDER_URL: `https://opt-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
-      POLL_CONTRACT_ADDRESS: '',
-      QUESTION_CONTRACT_ADDRESS: '',
+      QUESTION_CONTRACT_ADDRESS:
+        process.env.OP_SEPOLIA_QUESTION_CONTRACT_ADDRESS || '',
+      POLL_CONTRACT_ADDRESS: process.env.OP_SEPOLIA_POLL_CONTRACT_ADDRESS || '',
     },
   ],
 ])
