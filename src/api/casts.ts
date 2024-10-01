@@ -1,4 +1,7 @@
-import { EmbeddedCast } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import {
+  EmbeddedCast,
+  CastParamType,
+} from '@neynar/nodejs-sdk/build/neynar-api/v2'
 import { neynarClient, neynarSigner } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
 
@@ -10,8 +13,12 @@ interface EmbedOptions {
 
 const getCastsInThread = async (hash: string) => {
   try {
-    const data = await neynarClient.fetchAllCastsInThread(hash)
-    const casts = data.result.casts
+    const data = await neynarClient.lookupCastConversation(
+      hash,
+      CastParamType.Hash,
+      { replyDepth: 1 }
+    )
+    const casts = data?.conversation?.cast?.direct_replies || []
     return casts
   } catch (e) {
     throw new Error(`${getDateTag()} Error retrieving cast replies`)
