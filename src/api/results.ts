@@ -44,13 +44,20 @@ const updateNextResult = async (questionId: number) => {
     throw new Error(error.message)
   }
 
-  const bounty = await fetchBounty(poll.bounty_id)
+  const bountyId = poll.bounty_id
+  if (bountyId) {
+    const bounty = await fetchBounty(poll.bounty_id)
 
-  if (bounty.id && poll.status === 'calculated' && bounty.status === 'active') {
-    try {
-      await endPoll(poll, bounty)
-    } catch (error) {
-      throw new Error(getErrorMessage(error))
+    if (
+      bounty.id &&
+      poll.status === 'calculated' &&
+      bounty.status === 'active'
+    ) {
+      try {
+        await endPoll(poll, bounty)
+      } catch (error) {
+        throw new Error(getErrorMessage(error))
+      }
     }
   }
 
