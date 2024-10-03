@@ -5,19 +5,13 @@ import { endPoll } from '../services/endPoll'
 import { fetchBounty } from '../services/supabase'
 
 const getNextResults = async (): Promise<Question[]> => {
-  const timeInterval = Number(
-    process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48
-  ) // Default to 48 hours if not set
   const currentTime = new Date()
-  const cutoffTime = new Date(
-    currentTime.getTime() - timeInterval * 60 * 60 * 1000
-  )
 
   const { data, error } = await supabaseClient
     .from('questions')
     .select('*')
     .eq('status', 'posted')
-    .lte('created_at', cutoffTime.toISOString())
+    .lte('expires_at', currentTime.toISOString())
     .order('id', { ascending: true })
 
   if (error) {
