@@ -15,6 +15,7 @@ import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
 import { Bounty, User } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
+import sendDirectCastForPredictivePolls from 'utils/sendDirectCast'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -35,7 +36,11 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
   const { status } = poll
 
-  const { smart_contract_id: smartContractId } = bounty
+  const {
+    smart_contract_id: smartContractId,
+    token,
+    user: bountyCreator,
+  } = bounty
 
   if (
     bounty &&
@@ -85,6 +90,22 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
       if (status === 'mined' && transactionHash) {
         logger.info('distributeRewards transaction mined successfully')
+
+        // TODO: Get the logs from the RewardsDistributed event so you can get the bountyPerRecipient.
+        // We'll have to convert the amount from wei to another magnitude.
+        // Then take this amount and send a direct cast to each awardee.
+        const bountyPerRecipient = 123
+
+        for (const recipient of rewardRecipients) {
+          await sendDirectCastForPredictivePolls(
+            poll,
+            recipient.fid,
+            bountyCreator.username,
+            bountyPerRecipient,
+            token.name,
+            transactionHash
+          )
+        }
       } else {
         // Handle case where the transaction did not mine successfully
         logger.error(getErrorMessage(errorMessage))

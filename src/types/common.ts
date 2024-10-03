@@ -17,15 +17,15 @@ export interface Bounty {
   is_sponsored: boolean
   created_at: string
   updated_at: string
-  user: any
-  token: any
+  user: User
+  token: Token
 }
 
 export interface User {
   id: number
   created_at: string
-  fid: number | null
-  username: string | null
+  fid: number
+  username: string
   holder_address: string | null
   rhid: number | null
   display_name: string | null
@@ -38,4 +38,15 @@ export interface User {
   amount: number
   sponsored_count: number
   sponsored_count_predictive_poll: number
+}
+
+interface Token {
+  id: string
+  name: string
+  standard: string
+  chain: string
+  address: string
+  created_at: string
+  updated_at: string
+  image_path: string
 }

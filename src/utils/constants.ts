@@ -15,6 +15,8 @@ export const FRAME_API_URL =
 
 export const APP_URL = process.env.APP_URL || 'https://www.weponder.io'
 
+export const WARPCAST_API_KEY = process.env.WARPCAST_API_KEY || ''
+
 // Sentry
 export const SENTRY_DSN = process.env.SENTRY_DSN
 export const SENTRY_ENVIRONMENT = process.env.SENTRY_ENVIRONMENT
