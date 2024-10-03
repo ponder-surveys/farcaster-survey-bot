@@ -1,7 +1,7 @@
 type BountyStatus = 'active' | 'completed'
 
 // TODO: Remember to update 'survey' to 'poll' here as well as on the database
-export type BountyContent = 'survey' | 'q&a' | 'ama'
+export type BountyContent = 'survey' | 'q&a' | 'ama' | 'predictive_poll'
 
 export interface Bounty {
   id: string
@@ -19,4 +19,23 @@ export interface Bounty {
   updated_at: string
   user: any
   token: any
+}
+
+export interface User {
+  id: number
+  created_at: string
+  fid: number | null
+  username: string | null
+  holder_address: string | null
+  rhid: number | null
+  display_name: string | null
+  profile_picture: string | null
+  connected_addresses: any
+  follower_count: number
+  power_badge: boolean
+  uuid: string
+  score: number | null
+  amount: number
+  sponsored_count: number
+  sponsored_count_predictive_poll: number
 }

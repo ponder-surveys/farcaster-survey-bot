@@ -34,8 +34,9 @@ export const CHAINS = new Map<
   {
     CHAIN_ID: number
     PROVIDER_URL: string
-    POLL_CONTRACT_ADDRESS: string
     QUESTION_CONTRACT_ADDRESS: string
+    POLL_CONTRACT_ADDRESS: string
+    PREDICTIVE_POLL_CONTRACT_ADDRESS: string
   }
 >([
   [
@@ -46,6 +47,8 @@ export const CHAINS = new Map<
       QUESTION_CONTRACT_ADDRESS:
         process.env.BASE_QUESTION_CONTRACT_ADDRESS || '',
       POLL_CONTRACT_ADDRESS: process.env.BASE_POLL_CONTRACT_ADDRESS || '',
+      PREDICTIVE_POLL_CONTRACT_ADDRESS:
+        process.env.BASE_PREDICTIVE_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -57,6 +60,8 @@ export const CHAINS = new Map<
         process.env.BASE_SEPOLIA_QUESTION_CONTRACT_ADDRESS || '',
       POLL_CONTRACT_ADDRESS:
         process.env.BASE_SEPOLIA_POLL_CONTRACT_ADDRESS || '',
+      PREDICTIVE_POLL_CONTRACT_ADDRESS:
+        process.env.BASE_SEPOLIA_PREDICTIVE_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -66,6 +71,8 @@ export const CHAINS = new Map<
       PROVIDER_URL: `https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
       QUESTION_CONTRACT_ADDRESS: process.env.OP_QUESTION_CONTRACT_ADDRESS || '',
       POLL_CONTRACT_ADDRESS: process.env.OP_POLL_CONTRACT_ADDRESS || '',
+      PREDICTIVE_POLL_CONTRACT_ADDRESS:
+        process.env.OP_PREDICTIVE_POLL_CONTRACT_ADDRESS || '',
     },
   ],
   [
@@ -76,6 +83,8 @@ export const CHAINS = new Map<
       QUESTION_CONTRACT_ADDRESS:
         process.env.OP_SEPOLIA_QUESTION_CONTRACT_ADDRESS || '',
       POLL_CONTRACT_ADDRESS: process.env.OP_SEPOLIA_POLL_CONTRACT_ADDRESS || '',
+      PREDICTIVE_POLL_CONTRACT_ADDRESS:
+        process.env.OP_SEPOLIA_PREDICTIVE_POLL_CONTRACT_ADDRESS || '',
     },
   ],
 ])

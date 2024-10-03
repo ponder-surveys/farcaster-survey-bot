@@ -1,6 +1,7 @@
-import * as Sentry from '@sentry/node'
+import { Sentry } from '../clients/sentry'
 import { supabaseClient } from '../clients/supabase'
 import { BountyContent } from '../types/common'
+import { User } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
 
@@ -42,4 +43,22 @@ export async function closeBounty(
     Sentry.captureException(error)
     throw new Error(getErrorMessage(error))
   }
+}
+
+export async function fetchUsersForMostSelectedOption(
+  questionId: number
+): Promise<User[]> {
+  const { data, error } = await supabaseClient.rpc(
+    'get_users_for_most_selected_option',
+    { q_id: questionId }
+  )
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(
+      `Error fetching users for most selected option: ${getErrorMessage(error)}`
+    )
+  }
+
+  return data
 }
