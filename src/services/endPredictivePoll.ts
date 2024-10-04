@@ -9,13 +9,16 @@ import {
 import { pollTransactionStatus } from '../clients/thirdweb'
 import {
   closeBounty,
+  fetchResponse,
   fetchUsersForMostSelectedOption,
+  insertBountyClaim,
 } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
-import { Bounty, User } from '../types/common'
+import { Bounty, BountyClaim, UserWithSelectedOption } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import sendDirectCastForPredictivePolls from 'utils/sendDirectCast'
+import { supabaseClient } from 'clients/supabase'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -57,9 +60,8 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     }
 
     try {
-      const rewardRecipients: User[] = await fetchUsersForMostSelectedOption(
-        poll.id
-      )
+      const rewardRecipients: UserWithSelectedOption[] =
+        await fetchUsersForMostSelectedOption(poll.id)
 
       const rewardRecipientAddresses = rewardRecipients.map((user) => {
         const userAddress =
@@ -97,6 +99,17 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         const bountyPerRecipient = 123
 
         for (const recipient of rewardRecipients) {
+          const { id: responseId } = await fetchResponse(poll.id, recipient.id)
+
+          const bountyClaim: BountyClaim = {
+            bounty_id: bounty.id,
+            response_id: responseId,
+            amount: bountyPerRecipient,
+          }
+
+          await insertBountyClaim(bountyClaim)
+
+          // TODO: The implementation needs to be updated once we have the frame url
           await sendDirectCastForPredictivePolls(
             poll,
             recipient.fid,

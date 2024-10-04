@@ -21,6 +21,15 @@ export interface Bounty {
   token: Token
 }
 
+export interface BountyClaim {
+  id?: string
+  bounty_id: string
+  response_id: number
+  amount: number
+  created_at?: string
+  updated_at?: string
+}
+
 export interface User {
   id: number
   created_at: string
@@ -38,6 +47,10 @@ export interface User {
   amount: number
   sponsored_count: number
   sponsored_count_predictive_poll: number
+}
+
+export type UserWithSelectedOption = User & {
+  selected_option: number
 }
 
 interface Token {
