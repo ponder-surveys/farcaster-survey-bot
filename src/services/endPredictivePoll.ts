@@ -125,6 +125,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
               amount: bountyPerRecipient,
             }
 
+            // Not actually a true bounty claim, but is being used to store records of awardees
             await insertBountyClaim(bountyClaim)
 
             // TODO: The implementation needs to be updated once we have the frame url
