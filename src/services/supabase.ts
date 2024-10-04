@@ -1,6 +1,10 @@
-import * as Sentry from '@sentry/node'
+import { Sentry } from '../clients/sentry'
 import { supabaseClient } from '../clients/supabase'
-import { BountyContent } from '../types/common'
+import {
+  BountyClaim,
+  BountyContent,
+  UserWithSelectedOption,
+} from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
 
@@ -42,4 +46,53 @@ export async function closeBounty(
     Sentry.captureException(error)
     throw new Error(getErrorMessage(error))
   }
+}
+
+export async function fetchResponse(questionId: number, userId: number) {
+  const { data, error } = await supabaseClient
+    .from('responses')
+    .select('*')
+    .eq('question_id', questionId)
+    .eq('user_id', userId)
+    .single()
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(getErrorMessage(error))
+  }
+
+  return data
+}
+
+// NOTE: We're using this to record those that were awarded on predictive polls as well
+export async function insertBountyClaim(
+  bountyClaim: BountyClaim
+): Promise<void> {
+  const table = 'bounty_claims'
+
+  // Update the bounty status to "completed"
+  const { error } = await supabaseClient.from(table).insert(bountyClaim)
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(getErrorMessage(error))
+  }
+}
+
+export async function fetchUsersForMostSelectedOption(
+  questionId: number
+): Promise<UserWithSelectedOption[]> {
+  const { data, error } = await supabaseClient.rpc(
+    'get_users_for_most_selected_option',
+    { q_id: questionId }
+  )
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(
+      `Error fetching users for most selected option: ${getErrorMessage(error)}`
+    )
+  }
+
+  return data
 }

@@ -1,18 +1,11 @@
-import * as Sentry from '@sentry/node'
 import { Engine } from '@thirdweb-dev/engine'
 import {
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT,
   WEB3_ACCESS_TOKEN,
   WEB3_ENGINE_URL,
   POLL_TIMEOUT,
   POLL_INTERVAL,
 } from '../utils/constants'
-
-Sentry.init({
-  dsn: SENTRY_DSN,
-  environment: SENTRY_ENVIRONMENT,
-})
+import { Sentry } from './sentry'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('WEB3_ACCESS_TOKEN is missing')

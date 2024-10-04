@@ -1,9 +1,6 @@
-import * as Sentry from '@sentry/node'
 import { Engine } from '@thirdweb-dev/engine'
 import logger from '../utils/logger'
 import {
-  SENTRY_DSN,
-  SENTRY_ENVIRONMENT,
   TRANSACTION_ADDRESS,
   WEB3_ACCESS_TOKEN,
   WEB3_ENGINE_URL,
@@ -14,16 +11,7 @@ import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
 import { Bounty } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
-
-Sentry.init({
-  dsn: SENTRY_DSN,
-  environment: SENTRY_ENVIRONMENT,
-  // Tracing
-  tracesSampleRate: 1.0, //  Capture 100% of the transactions
-
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-})
+import { Sentry } from 'clients/sentry'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')

@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/node'
+import { Sentry } from 'clients/sentry'
 import { CHAINS } from '../utils/constants'
 import { logger } from 'ethers'
 import { Bounty } from 'types/common'
