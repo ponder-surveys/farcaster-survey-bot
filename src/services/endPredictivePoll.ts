@@ -18,7 +18,11 @@ import { Poll } from '../types/polls'
 import { Bounty, BountyClaim, UserWithSelectedOption } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import sendDirectCastForPredictivePolls from 'utils/sendDirectCast'
-import { supabaseClient } from 'clients/supabase'
+import {
+  getEventSignatureHash,
+  getTransactionReceipt,
+  loadWeb3Provider,
+} from 'utils/services/web3'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -93,31 +97,46 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       if (status === 'mined' && transactionHash) {
         logger.info('distributeRewards transaction mined successfully')
 
-        // TODO: Get the logs from the RewardsDistributed event so you can get the bountyPerRecipient.
-        // We'll have to convert the amount from wei to another magnitude.
-        // Then take this amount and send a direct cast to each awardee.
-        const bountyPerRecipient = 123
+        const web3 = await loadWeb3Provider(chain.PROVIDER_URL)
+        const receipt = await getTransactionReceipt(transactionHash, web3)
 
-        for (const recipient of rewardRecipients) {
-          const { id: responseId } = await fetchResponse(poll.id, recipient.id)
+        // Get the event signature hash for the emitted event
+        const eventSignatureHash = getEventSignatureHash(
+          'distributeRewards',
+          web3
+        )
 
-          const bountyClaim: BountyClaim = {
-            bounty_id: bounty.id,
-            response_id: responseId,
-            amount: bountyPerRecipient,
+        const eventLog = receipt.logs.find(
+          (log) => log.topics && log.topics[0] === eventSignatureHash
+        )
+
+        if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
+          const bountyPerRecipient = Number(eventLog.topics[1])
+
+          for (const recipient of rewardRecipients) {
+            const { id: responseId } = await fetchResponse(
+              poll.id,
+              recipient.id
+            )
+
+            const bountyClaim: BountyClaim = {
+              bounty_id: bounty.id,
+              response_id: responseId,
+              amount: bountyPerRecipient,
+            }
+
+            await insertBountyClaim(bountyClaim)
+
+            // TODO: The implementation needs to be updated once we have the frame url
+            await sendDirectCastForPredictivePolls(
+              poll,
+              recipient.fid,
+              bountyCreator.username,
+              bountyPerRecipient,
+              token.name,
+              transactionHash
+            )
           }
-
-          await insertBountyClaim(bountyClaim)
-
-          // TODO: The implementation needs to be updated once we have the frame url
-          await sendDirectCastForPredictivePolls(
-            poll,
-            recipient.fid,
-            bountyCreator.username,
-            bountyPerRecipient,
-            token.name,
-            transactionHash
-          )
         }
       } else {
         // Handle case where the transaction did not mine successfully

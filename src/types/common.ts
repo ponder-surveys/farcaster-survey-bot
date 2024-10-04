@@ -63,3 +63,31 @@ interface Token {
   updated_at: string
   image_path: string
 }
+//
+// Smart Contracts
+
+export type SmartContractPayload<T extends Record<string, any>> = {
+  [K in keyof T]: T[K]
+}
+
+export type Web3FunctionArgs = string[]
+
+export type SmartContractFn =
+  | 'startPoll'
+  | 'endPoll'
+  | 'claimBounty_Poll'
+  | 'startQuestion'
+  | 'endQuestion'
+  | 'rewardBounty'
+  | 'distributeRewards'
+  | 'castVote'
+
+export type EventSignature =
+  | 'PollStarted(uint256,address)'
+  | 'PollEnded(uint256)'
+  | 'RewardClaimed(uint256,address,bool,uint256)'
+  | 'QuestionStarted(uint256,address)'
+  | 'QuestionEnded(uint256)'
+  | 'BountyRewarded(uint256,address,uint256)'
+  | 'RewardsDistributed(uint256,address[],uint256)'
+  | 'VoteCasted(uint256,address)'
