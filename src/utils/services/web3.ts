@@ -54,17 +54,16 @@ function getEventSignatureHash(
   return eventSignatureHash
 }
 
-function getContentId(startLog: any, web3: Web3): string {
-  // Assuming the content ID is the second topic (index 1) and is indexed
-  const contentIdEncoded = startLog.topics[1]
-  const contentId = web3.utils.toBigInt(contentIdEncoded).toString()
+function getFirstTopic(eventLog: any, web3: Web3): string {
+  const encoded = eventLog.topics[1]
+  const actual = web3.utils.toBigInt(encoded).toString()
 
-  return contentId
+  return actual
 }
 
 export {
   loadWeb3Provider,
   getTransactionReceipt,
   getEventSignatureHash,
-  getContentId,
+  getFirstTopic,
 }

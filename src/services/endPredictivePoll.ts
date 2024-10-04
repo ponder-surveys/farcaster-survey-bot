@@ -20,6 +20,7 @@ import getErrorMessage from '../utils/getErrorMessage'
 import sendDirectCastForPredictivePolls from 'utils/sendDirectCast'
 import {
   getEventSignatureHash,
+  getFirstTopic,
   getTransactionReceipt,
   loadWeb3Provider,
 } from 'utils/services/web3'
@@ -111,7 +112,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         )
 
         if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
-          const bountyPerRecipient = Number(eventLog.topics[1])
+          const bountyPerRecipient = Number(getFirstTopic(eventLog, web3))
 
           for (const recipient of rewardRecipients) {
             const { id: responseId } = await fetchResponse(
