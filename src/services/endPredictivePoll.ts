@@ -11,19 +11,21 @@ import {
   closeBounty,
   fetchResponse,
   fetchUsersForMostSelectedOption,
-  insertBountyClaim,
+  updateBountyClaim,
+  calculateWinningOption,
 } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
-import { Bounty, BountyClaim, UserWithSelectedOption } from '../types/common'
+import { Bounty, UserWithSelectedOption } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
   getEventSignatureHash,
-  getFirstTopic,
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
+import { PredictivePollABI } from '../utils/contracts'
+import Web3 from 'web3'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -81,13 +83,26 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         return userAddress
       })
 
+      // Calculate the winning option
+      const winningOption = await calculateWinningOption(poll.id)
+      if (winningOption === null) {
+        throw new Error(
+          `Could not determine winning option for poll ${poll.id}`
+        )
+      }
+
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
-          functionName: 'distributeRewards(uint256,address[])',
-          args: [String(smartContractId), String(rewardRecipientAddresses)],
+          functionName: 'distributeRewards(uint256,uint8,address[])',
+          args: [
+            String(smartContractId),
+            String(winningOption),
+            rewardRecipientAddresses as any,
+          ],
+          abi: PredictivePollABI,
         }
       )
 
@@ -103,7 +118,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         // Get the event signature hash for the emitted event
         const eventSignatureHash = getEventSignatureHash(
-          'distributeRewards',
+          'RewardsDistributed(uint256,address[],uint256)',
           web3
         )
 
@@ -112,7 +127,21 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         )
 
         if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
-          const bountyPerRecipient = Number(getFirstTopic(eventLog, web3))
+          console.log('eventLog', eventLog)
+
+          // Parse the event data
+          const pollId = Web3.utils.hexToNumber(eventLog.topics[1])
+          const bountyPerRecipientWei = Web3.utils.hexToNumber(
+            eventLog.topics[3]
+          )
+
+          // Convert wei to ether
+          const bountyPerRecipient = Number(
+            Web3.utils.fromWei(bountyPerRecipientWei.toString(), 'ether')
+          )
+
+          console.log('pollId', pollId)
+          console.log('bountyPerRecipient (in ether)', bountyPerRecipient)
 
           for (const recipient of rewardRecipients) {
             const { id: responseId } = await fetchResponse(
@@ -120,14 +149,11 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
               recipient.id
             )
 
-            const bountyClaim: BountyClaim = {
-              bounty_id: bounty.id,
-              response_id: responseId,
-              amount: bountyPerRecipient,
-            }
+            console.log('bounty.id', bounty.id)
+            console.log('responseId', responseId)
+            console.log('bountyPerRecipient (in ether)', bountyPerRecipient)
 
-            // Not actually a true bounty claim, but is being used to store records of awardees
-            await insertBountyClaim(bountyClaim)
+            await updateBountyClaim(bounty.id, responseId, bountyPerRecipient)
 
             // TODO: The implementation needs to be updated once we have the frame url
             await sendDirectCastForPredictivePolls(

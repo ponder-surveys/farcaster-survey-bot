@@ -65,17 +65,22 @@ export async function fetchResponse(questionId: number, userId: number) {
 }
 
 // NOTE: We're using this to record those that were awarded on predictive polls as well
-export async function insertBountyClaim(
-  bountyClaim: BountyClaim
+export async function updateBountyClaim(
+  bountyId: string,
+  responseId: number,
+  amount: number
 ): Promise<void> {
   const table = 'bounty_claims'
 
-  // Update the bounty status to "completed"
-  const { error } = await supabaseClient.from(table).insert(bountyClaim)
+  const { error } = await supabaseClient
+    .from(table)
+    .update({ amount: amount, status: 'approved' })
+    .eq('bounty_id', bountyId)
+    .eq('response_id', responseId)
 
   if (error) {
     Sentry.captureException(error)
-    throw new Error(getErrorMessage(error))
+    throw new Error(`Error updating bounty claim: ${getErrorMessage(error)}`)
   }
 }
 
@@ -92,6 +97,22 @@ export async function fetchUsersForMostSelectedOption(
     throw new Error(
       `Error fetching users for most selected option: ${getErrorMessage(error)}`
     )
+  }
+
+  return data
+}
+
+export async function calculateWinningOption(
+  pollId: number
+): Promise<number | null> {
+  const { data, error } = await supabaseClient.rpc('calculate_winning_option', {
+    q_id: pollId,
+  })
+
+  if (error) {
+    Sentry.captureException(error)
+    console.error('Error calculating winning option:', error)
+    return null
   }
 
   return data
