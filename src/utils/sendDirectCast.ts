@@ -1,5 +1,5 @@
 import { Poll } from '../types/polls'
-import { WARPCAST_API_KEY } from './constants'
+import { SURVEY_FRAME_URL, WARPCAST_API_KEY } from './constants'
 import { v4 as uuidv4 } from 'uuid'
 
 export default async function sendDirectCastForPredictivePolls(
@@ -10,9 +10,7 @@ export default async function sendDirectCastForPredictivePolls(
   tokenName: string,
   transactionHash: string
 ) {
-  // TODO: Finalize this
-  // const frameUrl = `https://frame.weponder.io/api/polls/${poll.id}/share/${answer.id}`
-  const frameUrl = 'placeholder'
+  const frameUrl = `${SURVEY_FRAME_URL}/${poll.id}/results`
 
   const directCastRequest = await fetch(
     'https://api.warpcast.com/v2/ext-send-direct-cast',
