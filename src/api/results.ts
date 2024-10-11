@@ -61,12 +61,13 @@ const updateNextResult = async (questionId: number) => {
 }
 
 const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
-  const now = Date.now()
+  const now = new Date().toISOString()
 
   const { data, error } = await supabaseClient
     .from('questions')
     .select('*')
     .eq('status', 'posted')
+    .eq('poll_type', 'predictive')
     .lte('expires_at', now)
     .order('id', { ascending: true })
 
