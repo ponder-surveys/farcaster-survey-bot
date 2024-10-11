@@ -3,8 +3,8 @@ import getErrorMessage from '../utils/getErrorMessage'
 import { getDateTag } from '../utils/getDateTag'
 import { endPoll } from '../services/endPoll'
 import { fetchBounty } from '../services/supabase'
-import { Poll } from 'types/polls'
-import { endPredictivePoll } from 'services/endPredictivePoll'
+import { Poll } from '../types/polls'
+import { endPredictivePoll } from '../services/endPredictivePoll'
 
 const getNextResults = async (): Promise<Question[]> => {
   const currentTime = new Date()

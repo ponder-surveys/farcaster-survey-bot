@@ -1,4 +1,4 @@
-import { Poll } from 'types/polls'
+import { Poll } from '../types/polls'
 import { WARPCAST_API_KEY } from './constants'
 import { v4 as uuidv4 } from 'uuid'
 

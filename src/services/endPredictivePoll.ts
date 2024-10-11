@@ -17,13 +17,13 @@ import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
 import { Bounty, BountyClaim, UserWithSelectedOption } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
-import sendDirectCastForPredictivePolls from 'utils/sendDirectCast'
+import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
   getEventSignatureHash,
   getFirstTopic,
   getTransactionReceipt,
   loadWeb3Provider,
-} from 'utils/services/web3'
+} from '../utils/services/web3'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')

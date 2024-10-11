@@ -1,7 +1,7 @@
-import type { SmartContractFn } from 'types/common'
-import { Sentry } from 'clients/sentry'
+import type { SmartContractFn } from '../../types/common'
+import { Sentry } from '../../clients/sentry'
 import { match } from 'ts-pattern'
-import getErrorMessage from 'utils/getErrorMessage'
+import getErrorMessage from '../../utils/getErrorMessage'
 import { Web3 } from 'web3'
 
 async function loadWeb3Provider(providerUrl: string) {

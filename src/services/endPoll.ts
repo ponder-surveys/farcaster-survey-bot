@@ -11,7 +11,7 @@ import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
 import { Bounty } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
-import { Sentry } from 'clients/sentry'
+import { Sentry } from '../clients/sentry'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')

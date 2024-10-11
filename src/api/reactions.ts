@@ -7,7 +7,7 @@ import { supabaseClient } from '../clients/supabase'
 import { neynarClient } from '../clients/neynar'
 import { getUserId } from './users'
 import { getDateTag } from '../utils/getDateTag'
-import { Poll } from 'types/polls'
+import { Poll } from '../types/polls'
 
 const addReaction = async ({
   userId,
