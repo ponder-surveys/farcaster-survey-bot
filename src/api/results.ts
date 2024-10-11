@@ -94,13 +94,19 @@ const updatePredictivePollResult = async (questionId: number) => {
     throw new Error(error.message)
   }
 
-  const bounty = await fetchBounty(poll.bounty_id)
+  if (poll.bounty_id) {
+    const bounty = await fetchBounty(poll.bounty_id)
 
-  if (bounty.id && poll.status === 'calculated' && bounty.status === 'active') {
-    try {
-      await endPredictivePoll(poll, bounty)
-    } catch (error) {
-      throw new Error(getErrorMessage(error))
+    if (
+      bounty.id &&
+      poll.status === 'calculated' &&
+      bounty.status === 'active'
+    ) {
+      try {
+        await endPredictivePoll(poll, bounty)
+      } catch (error) {
+        throw new Error(getErrorMessage(error))
+      }
     }
   }
 
