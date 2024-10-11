@@ -55,7 +55,7 @@ export const publishNextResults = async () => {
             'question reply',
             resultHash,
             replyToSurvey,
-            `${SURVEY_FRAME_URL}/${result.id}`
+            `${SURVEY_FRAME_URL}/${result.id}/results`
           )
         }
       } catch (error) {
