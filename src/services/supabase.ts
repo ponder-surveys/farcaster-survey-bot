@@ -1,10 +1,6 @@
 import { Sentry } from '../clients/sentry'
 import { supabaseClient } from '../clients/supabase'
-import {
-  BountyClaim,
-  BountyContent,
-  UserWithSelectedOption,
-} from '../types/common'
+import { BountyContent, UserWithSelectedOption } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
 
@@ -99,21 +95,5 @@ export async function fetchUsersForMostSelectedOption(
     )
   }
 
-  return data
-}
-
-export async function calculateWinningOption(
-  pollId: number
-): Promise<number | null> {
-  const { data, error } = await supabaseClient.rpc('calculate_winning_option', {
-    q_id: pollId,
-  })
-
-  if (error) {
-    Sentry.captureException(error)
-    console.error('Error calculating winning option:', error)
-    return null
-  }
-
-  return data
+  return data || []
 }

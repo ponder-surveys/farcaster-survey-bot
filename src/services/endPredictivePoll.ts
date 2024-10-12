@@ -12,11 +12,10 @@ import {
   fetchResponse,
   fetchUsersForMostSelectedOption,
   updateBountyClaim,
-  calculateWinningOption,
 } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
 import { Poll } from '../types/polls'
-import { Bounty, UserWithSelectedOption } from '../types/common'
+import { Bounty } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
@@ -67,8 +66,14 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     }
 
     try {
-      const rewardRecipients: UserWithSelectedOption[] =
-        await fetchUsersForMostSelectedOption(poll.id)
+      // Fetch users who voted for the winning option
+      const rewardRecipients = await fetchUsersForMostSelectedOption(poll.id)
+
+      if (rewardRecipients.length === 0) {
+        throw new Error(`No winning votes found for poll ${poll.id}`)
+      }
+
+      const winningOption = rewardRecipients[0].selected_option
 
       const rewardRecipientAddresses = rewardRecipients.map((user) => {
         const userAddress =
@@ -82,14 +87,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         return userAddress
       })
-
-      // Calculate the winning option
-      const winningOption = await calculateWinningOption(poll.id)
-      if (winningOption === null) {
-        throw new Error(
-          `Could not determine winning option for poll ${poll.id}`
-        )
-      }
 
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
@@ -130,7 +127,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           console.log('eventLog', eventLog)
 
           // Parse the event data
-          const pollId = Web3.utils.hexToNumber(eventLog.topics[1])
           const bountyPerRecipientWei = Web3.utils.hexToNumber(
             eventLog.topics[3]
           )
@@ -140,18 +136,11 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             Web3.utils.fromWei(bountyPerRecipientWei.toString(), 'ether')
           )
 
-          console.log('pollId', pollId)
-          console.log('bountyPerRecipient (in ether)', bountyPerRecipient)
-
           for (const recipient of rewardRecipients) {
             const { id: responseId } = await fetchResponse(
               poll.id,
               recipient.id
             )
-
-            console.log('bounty.id', bounty.id)
-            console.log('responseId', responseId)
-            console.log('bountyPerRecipient (in ether)', bountyPerRecipient)
 
             await updateBountyClaim(bounty.id, responseId, bountyPerRecipient)
 
