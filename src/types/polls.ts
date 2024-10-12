@@ -20,4 +20,5 @@ export interface Poll {
   id_uuid: string
   archived: boolean
   is_anonymous: boolean
+  poll_type: string
 }
