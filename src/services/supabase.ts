@@ -1,6 +1,10 @@
 import { Sentry } from '../clients/sentry'
 import { supabaseClient } from '../clients/supabase'
-import { BountyContent, UserWithSelectedOption } from '../types/common'
+import {
+  BountyContent,
+  UserWithSelectedOption,
+  BountyClaim,
+} from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
 
@@ -64,13 +68,19 @@ export async function fetchResponse(questionId: number, userId: number) {
 export async function updateBountyClaim(
   bountyId: string,
   responseId: number,
-  amount: number
+  status: 'awarded' | 'not_awarded',
+  amountAwarded?: number
 ): Promise<void> {
   const table = 'bounty_claims'
 
+  const updateData: { status: string; amount_awarded?: number } = { status }
+  if (amountAwarded !== undefined) {
+    updateData.amount_awarded = amountAwarded
+  }
+
   const { error } = await supabaseClient
     .from(table)
-    .update({ amount: amount, status: 'approved' })
+    .update(updateData)
     .eq('bounty_id', bountyId)
     .eq('response_id', responseId)
 
@@ -93,6 +103,37 @@ export async function fetchUsersForMostSelectedOption(
     throw new Error(
       `Error fetching users for most selected option: ${getErrorMessage(error)}`
     )
+  }
+
+  return data || []
+}
+
+export async function fetchBountyClaimsForPoll(
+  pollId: number
+): Promise<BountyClaim[]> {
+  const { data, error } = await supabaseClient
+    .from('bounty_claims')
+    .select(
+      `
+      *,
+      response:responses!inner(
+        id,
+        selected_option,
+        user:users(
+          id,
+          fid,
+          username,
+          holder_address,
+          connected_addresses
+        )
+      )
+    `
+    )
+    .eq('responses.question_id', pollId)
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(`Error fetching bounty claims: ${getErrorMessage(error)}`)
   }
 
   return data || []

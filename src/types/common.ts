@@ -28,6 +28,7 @@ export interface BountyClaim {
   amount: number
   created_at?: string
   updated_at?: string
+  response: any
 }
 
 export interface User {

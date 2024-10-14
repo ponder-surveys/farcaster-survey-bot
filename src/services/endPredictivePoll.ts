@@ -8,9 +8,7 @@ import {
 } from '../utils/constants'
 import { pollTransactionStatus } from '../clients/thirdweb'
 import {
-  closeBounty,
-  fetchResponse,
-  fetchUsersForMostSelectedOption,
+  fetchBountyClaimsForPoll,
   updateBountyClaim,
 } from '../services/supabase'
 import getChainDetails from '../utils/getChainDetails'
@@ -66,25 +64,33 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     }
 
     try {
-      // Fetch users who voted for the winning option
-      const rewardRecipients = await fetchUsersForMostSelectedOption(poll.id)
+      // Fetch all bounty claims for the poll
+      const bountyClaimsForPoll = await fetchBountyClaimsForPoll(poll.id)
 
-      if (rewardRecipients.length === 0) {
-        throw new Error(`No winning votes found for poll ${poll.id}`)
-      }
+      // Calculate the winning option
+      const optionCounts = bountyClaimsForPoll.reduce((acc, claim) => {
+        const option = claim.response.selected_option
+        acc[option] = (acc[option] || 0) + 1
+        return acc
+      }, {} as Record<number, number>)
 
-      const winningOption = rewardRecipients[0].selected_option
+      const winningOption = Object.entries(optionCounts).reduce((a, b) =>
+        a[1] > b[1] ? a : b
+      )[0]
 
-      const rewardRecipientAddresses = rewardRecipients.map((user) => {
+      // Filter winners and prepare addresses
+      const winners = bountyClaimsForPoll.filter(
+        (claim) => claim.response.selected_option === Number(winningOption)
+      )
+      const rewardRecipientAddresses = winners.map((winner) => {
         const userAddress =
-          user.holder_address || (user.connected_addresses?.shift() as string)
-
+          winner.response.user.holder_address ||
+          (winner.response.user.connected_addresses?.shift() as string)
         if (!userAddress) {
-          const msg = `Could not find address for user id ${user.id}`
-          Sentry.captureMessage(msg)
-          throw new Error(msg)
+          throw new Error(
+            `Could not find address for user id ${winner.response.user.id}`
+          )
         }
-
         return userAddress
       })
 
@@ -97,6 +103,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           args: [
             String(smartContractId),
             String(winningOption),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rewardRecipientAddresses as any,
           ],
           abi: PredictivePollABI,
@@ -135,24 +142,28 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           )
 
           // Calculate bounty per recipient
-          const bountyPerRecipient = totalDistribution / rewardRecipients.length
+          const bountyPerRecipient = totalDistribution / winners.length
 
-          for (const recipient of rewardRecipients) {
-            const { id: responseId } = await fetchResponse(
-              poll.id,
-              recipient.id
+          for (const claim of bountyClaimsForPoll) {
+            const isWinner =
+              claim.response.selected_option === Number(winningOption)
+            await updateBountyClaim(
+              bounty.id,
+              claim.response.id,
+              isWinner ? 'awarded' : 'not_awarded',
+              isWinner ? bountyPerRecipient : undefined
             )
 
-            await updateBountyClaim(bounty.id, responseId, bountyPerRecipient)
-
-            await sendDirectCastForPredictivePolls(
-              poll,
-              recipient.fid,
-              bountyCreator.username,
-              bountyPerRecipient,
-              token.name,
-              transactionHash
-            )
+            if (isWinner) {
+              await sendDirectCastForPredictivePolls(
+                poll,
+                claim.response.user.fid,
+                bountyCreator.username,
+                bountyPerRecipient,
+                token.name,
+                transactionHash
+              )
+            }
           }
         }
       } else {
@@ -168,38 +179,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         )}`
       )
     }
-
-    try {
-      const { result } = await web3Engine.contract.write(
-        String(chain.CHAIN_ID),
-        chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
-        TRANSACTION_ADDRESS,
-        {
-          functionName: 'endPoll(uint256)',
-          args: [String(smartContractId)],
-        }
-      )
-
-      // Poll transaction status
-      const { status, transactionHash, errorMessage } =
-        await pollTransactionStatus(result.queueId)
-
-      // Update response in database
-      if (status === 'mined' && transactionHash) {
-        logger.info('endPoll transaction mined successfully')
-
-        await closeBounty(String(smartContractId), 'predictive_poll')
-      } else {
-        // Handle case where the transaction did not mine successfully
-        logger.error(getErrorMessage(errorMessage))
-        Sentry.captureMessage(getErrorMessage(errorMessage))
-      }
-    } catch (error) {
-      Sentry.captureException(error)
-      throw new Error(
-        `Error calling endPoll on PredictivePoll.sol: ${getErrorMessage(error)}`
-      )
-    }
+    return
   }
 
   return
