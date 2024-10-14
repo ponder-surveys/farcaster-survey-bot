@@ -124,17 +124,18 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         )
 
         if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
-          console.log('eventLog', eventLog)
-
           // Parse the event data
-          const bountyPerRecipientWei = Web3.utils.hexToNumber(
+          const totalDistributionWei = Web3.utils.hexToNumber(
             eventLog.topics[3]
           )
 
           // Convert wei to ether
-          const bountyPerRecipient = Number(
-            Web3.utils.fromWei(bountyPerRecipientWei.toString(), 'ether')
+          const totalDistribution = Number(
+            Web3.utils.fromWei(totalDistributionWei.toString(), 'ether')
           )
+
+          // Calculate bounty per recipient
+          const bountyPerRecipient = totalDistribution / rewardRecipients.length
 
           for (const recipient of rewardRecipients) {
             const { id: responseId } = await fetchResponse(
@@ -144,7 +145,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
             await updateBountyClaim(bounty.id, responseId, bountyPerRecipient)
 
-            // TODO: The implementation needs to be updated once we have the frame url
             await sendDirectCastForPredictivePolls(
               poll,
               recipient.fid,
