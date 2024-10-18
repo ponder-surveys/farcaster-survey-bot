@@ -1,28 +1,28 @@
-import { Sentry } from '../clients/sentry'
 import { Engine } from '@thirdweb-dev/engine'
-import logger from '../utils/logger'
-import {
-  TRANSACTION_ADDRESS,
-  WEB3_ACCESS_TOKEN,
-  WEB3_ENGINE_URL,
-} from '../utils/constants'
+import Web3 from 'web3'
+import { Sentry } from '../clients/sentry'
 import { pollTransactionStatus } from '../clients/thirdweb'
 import {
   fetchBountyClaimsForPoll,
   updateBountyClaim,
 } from '../services/supabase'
-import getChainDetails from '../utils/getChainDetails'
+import { Bounty, BountyClaim } from '../types/common'
 import { Poll } from '../types/polls'
-import { Bounty } from '../types/common'
+import {
+  TRANSACTION_ADDRESS,
+  WEB3_ACCESS_TOKEN,
+  WEB3_ENGINE_URL,
+} from '../utils/constants'
+import { PredictivePollABI } from '../utils/contracts'
+import getChainDetails from '../utils/getChainDetails'
 import getErrorMessage from '../utils/getErrorMessage'
+import logger from '../utils/logger'
 import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
   getEventSignatureHash,
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
-import { PredictivePollABI } from '../utils/contracts'
-import Web3 from 'web3'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -65,7 +65,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
     try {
       // Fetch all bounty claims for the poll
-      const bountyClaimsForPoll = await fetchBountyClaimsForPoll(poll.id)
+      const bountyClaimsForPoll: BountyClaim[] = await fetchBountyClaimsForPoll(
+        poll.id
+      )
 
       // Calculate the winning option
       const optionCounts = bountyClaimsForPoll.reduce((acc, claim) => {
@@ -74,15 +76,20 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         return acc
       }, {} as Record<number, number>)
 
-      const winningOption = Object.entries(optionCounts).reduce((a, b) =>
-        a[1] > b[1] ? a : b
-      )[0]
+      // Find the highest count
+      const maxCount = Math.max(...Object.values(optionCounts))
+
+      // Find all options with the highest count (to handle ties)
+      const winningOptions: number[] = Object.entries(optionCounts)
+        .filter(([_, count]) => count === maxCount)
+        .map(([option, _]) => Number(option))
 
       // Filter winners and prepare addresses
-      const winners = bountyClaimsForPoll.filter(
-        (claim) => claim.response.selected_option === Number(winningOption)
+      const winners: BountyClaim[] = bountyClaimsForPoll.filter((claim) =>
+        winningOptions.includes(claim.response.selected_option)
       )
-      const rewardRecipientAddresses = winners.map((winner) => {
+
+      const rewardRecipientAddresses = winners.map((winner: BountyClaim) => {
         const userAddress =
           winner.response.user.holder_address ||
           (winner.response.user.connected_addresses?.shift() as string)
@@ -99,10 +106,11 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
-          functionName: 'distributeRewards(uint256,uint8,address[])',
+          functionName: 'distributeRewards(uint256,uint8[],address[])',
           args: [
             String(smartContractId),
-            String(winningOption),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            winningOptions as any,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             rewardRecipientAddresses as any,
           ],
@@ -145,8 +153,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           const bountyPerRecipient = totalDistribution / winners.length
 
           for (const claim of bountyClaimsForPoll) {
-            const isWinner =
-              claim.response.selected_option === Number(winningOption)
+            const isWinner = winningOptions.includes(
+              claim.response.selected_option
+            )
             await updateBountyClaim(
               bounty.id,
               claim.response.id,
