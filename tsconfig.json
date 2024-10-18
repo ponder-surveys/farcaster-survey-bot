@@ -1,15 +1,16 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2018",
-    "lib": ["es2018", "dom", "ES2021.String"],
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["esnext", "dom", "ES2021.String"],
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": "src",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "strict": true
+    "strict": true,
+    "types": ["bun-types"]
   },
   "include": ["**/*.ts", "**/*.tsx"]
 }

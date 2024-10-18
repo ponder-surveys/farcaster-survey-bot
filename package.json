@@ -7,10 +7,10 @@
   "author": "benadamsky <benadamsky@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "start": "tsc-watch --skipLibCheck --onSuccess 'node dist/app.js'",
-    "build": "tsc --skipLibCheck",
+    "start": "bun run --watch src/app.ts",
+    "build": "bun build src/app.ts --outdir dist",
     "prettier": "prettier --config .prettierrc '*/**/*.{js,ts}' --write",
-    "lint": "yarn prettier && eslint --max-warnings 0 --ext ts,tsx,json src"
+    "lint": "bun run prettier && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
     "@neynar/nodejs-sdk": "^1.20.1",
@@ -21,7 +21,6 @@
     "@thirdweb-dev/sdk": "^4.0.36",
     "axios": "^1.6.0",
     "cron-parser": "^4.8.1",
-    "dotenv": "^16.0.3",
     "ethers": "^5",
     "node-cron": "^3.0.2",
     "pino": "^9.4.0",
@@ -38,6 +37,7 @@
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^5.49.0",
     "@typescript-eslint/parser": "^5.49.0",
+    "bun-types": "^1.1.31",
     "eslint": "^8.32.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-import": "^2.27.5",
@@ -48,6 +48,5 @@
     "prettier": "^2.8.3",
     "tsc-watch": "^6.0.0",
     "typescript": "^5.6.2"
-  },
-  "packageManager": "yarn@3.3.1"
+  }
 }
