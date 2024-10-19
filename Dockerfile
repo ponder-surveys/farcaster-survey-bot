@@ -48,4 +48,4 @@ ARG RESULTS_CALL_TO_ACTION
 ARG LOG_LEVEL
 
 # Start the application
-CMD ["bun", "run", "start"]
+CMD ["bun", "run", "./dist/app.js"]

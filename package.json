@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "start": "bun run --watch src/app.ts",
-    "build": "bun build src/app.ts --outdir dist",
+    "build": "bun build ./src/app.ts --target node --outdir ./dist",
     "prettier": "prettier --config .prettierrc '*/**/*.{js,ts}' --write",
     "lint": "bun run prettier && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
