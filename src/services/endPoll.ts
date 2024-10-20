@@ -54,7 +54,7 @@ export const endPoll = async (poll: Poll, bounty: Bounty) => {
         chain.POLL_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
-          functionName: 'endPoll(uint256)',
+          functionName: 'endPoll',
           args: [String(smartContractId)],
         }
       )
