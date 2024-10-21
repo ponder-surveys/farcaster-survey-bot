@@ -106,7 +106,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
         TRANSACTION_ADDRESS,
         {
-          functionName: 'distributeRewards(uint256,uint8[],address[])',
+          functionName: 'distributeRewards',
           args: [
             String(smartContractId),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
