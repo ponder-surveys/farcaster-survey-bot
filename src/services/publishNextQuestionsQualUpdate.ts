@@ -31,19 +31,14 @@ const publishNextQuestionsQualUpdate = async () => {
           logger.info(`Publishing update for question ${questionQual.id}.`)
           logger.debug(`questionQualHash: ${questionQualHash}`)
           logger.debug(`responseCount: ${responseCount}`)
-          const publishReplyResponse = await publishReply(
+          const _publishReplyResponse = await publishReply(
             'question reply',
             questionQualHash,
             updateMessage,
             `${APP_URL}/questions/${questionQual.id}`
           )
-          logger.debug(`publishReplyResponse: ${publishReplyResponse}`)
-
-          const updateNextQuestionQualResponse = await updateNextQuestionQual(
+          const _updateNextQuestionQualResponse = await updateNextQuestionQual(
             questionQual.id
-          )
-          logger.debug(
-            `updateNextQuestionQualResponse: ${updateNextQuestionQualResponse}`
           )
           logger.info(`Update status updated for ${questionQual.id}.`)
         }

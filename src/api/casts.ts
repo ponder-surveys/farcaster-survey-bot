@@ -73,14 +73,11 @@ const publishReply = async (
     options.embeds = [{ url: imageUrl }]
   }
 
-  logger.debug(`options: ${util.inspect(options, true, null, true)}`)
   const replyCast = await neynarClient.publishCast(
     signer,
     formattedReply,
     options
   )
-
-  logger.debug(`replyCast: ${replyCast}`)
 
   if (formattedChainedReply) {
     await neynarClient.publishCast(signer, formattedChainedReply, {
