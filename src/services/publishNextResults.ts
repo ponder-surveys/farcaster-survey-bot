@@ -11,6 +11,7 @@ import { getCastsInThread, publishReply } from '../api/casts'
 import { formatReplyToSurvey } from '../utils/formatResult'
 import { getDateTag } from '../utils/getDateTag'
 import { SURVEY_FRAME_URL } from '../utils/constants'
+import getErrorMessage from 'utils/getErrorMessage'
 
 export const publishNextResults = async () => {
   const results = await getNextResults()
@@ -61,7 +62,7 @@ export const publishNextResults = async () => {
       } catch (error) {
         console.error(
           `${getDateTag()} Error publishing result ${result.id}:`,
-          error
+          getErrorMessage(error)
         )
       }
       try {
@@ -130,7 +131,7 @@ export const publishPredictivePollResults = async () => {
       } catch (error) {
         console.error(
           `${getDateTag()} Error publishing result ${poll.id}:`,
-          error
+          getErrorMessage(error)
         )
       }
       try {
