@@ -5,6 +5,7 @@ import {
 import logger from 'utils/logger'
 import { neynarClient, neynarSigner } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
+import * as util from 'node:util'
 
 interface EmbedOptions {
   embeds?: EmbeddedCast[]
@@ -72,8 +73,7 @@ const publishReply = async (
     options.embeds = [{ url: imageUrl }]
   }
 
-  logger.debug(`formattedReply: ${formattedReply}`)
-  logger.debug(`options: ${options}`)
+  logger.debug(`options: ${util.inspect(options, true, null, true)}`)
   const replyCast = await neynarClient.publishCast(
     signer,
     formattedReply,
