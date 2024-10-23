@@ -1,17 +1,17 @@
+import { getCastsInThread, publishReply } from '../api/casts'
+import { addResultReactions } from '../api/reactions'
+import { getResponses, updateResponse } from '../api/responses'
 import {
-  getNextResults,
   getExpiredPredictivePolls,
+  getNextResults,
   updateNextResult,
   updatePredictivePollResult,
 } from '../api/results'
-import { getResponses, updateResponse } from '../api/responses'
-import { addResultReactions } from '../api/reactions'
 import { getUserId } from '../api/users'
-import { getCastsInThread, publishReply } from '../api/casts'
-import { formatReplyToSurvey } from '../utils/formatResult'
-import { getDateTag } from '../utils/getDateTag'
 import { SURVEY_FRAME_URL } from '../utils/constants'
-import getErrorMessage from 'utils/getErrorMessage'
+import { formatReplyToSurvey } from '../utils/formatResult'
+import getErrorMessage from '../utils/getErrorMessage'
+import logger from '../utils/logger'
 
 export const publishNextResults = async () => {
   const results = await getNextResults()
@@ -46,8 +46,8 @@ export const publishNextResults = async () => {
             responses = await getResponses(result.id)
             await addResultReactions(result, responses)
           } catch (reactionError) {
-            console.error(
-              `${getDateTag()} Error adding reactions for result ${result.id}:`,
+            logger.error(
+              `Error adding reactions for result ${result.id}:`,
               reactionError
             )
           }
@@ -60,31 +60,29 @@ export const publishNextResults = async () => {
           )
         }
       } catch (error) {
-        console.error(
-          `${getDateTag()} Error publishing result ${result.id}:`,
+        logger.error(
+          `Error publishing result ${result.id}:`,
           getErrorMessage(error)
         )
       }
       try {
         await updateNextResult(result.id)
-        console.log(`${getDateTag()} Result status updated for ${result.id}.`)
+        logger.info(`Result status updated for ${result.id}.`)
       } catch (updateError) {
-        console.error(
-          `${getDateTag()} Error updating result status for ${result.id}:`,
-          updateError
+        logger.error(
+          `Error updating result status for ${result.id}:`,
+          getErrorMessage(updateError)
         )
       }
     } else {
-      console.log(
-        `${getDateTag()} Mock survey reply:\n${replyToSurvey}\n${SURVEY_FRAME_URL}/${
-          result.id
-        }`
+      logger.info(
+        `Mock survey reply:\n${replyToSurvey}\n${SURVEY_FRAME_URL}/${result.id}`
       )
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  console.log(`${getDateTag()} Published poll results.`)
+  logger.info(`Published poll results.`)
 }
 
 export const publishPredictivePollResults = async () => {
@@ -120,34 +118,34 @@ export const publishPredictivePollResults = async () => {
             responses = await getResponses(poll.id)
             await addResultReactions(poll, responses)
           } catch (reactionError) {
-            console.error(
-              `${getDateTag()} Error adding reactions for result ${poll.id}:`,
-              reactionError
+            logger.error(
+              `Error adding reactions for result ${poll.id}:`,
+              getErrorMessage(reactionError)
             )
           }
 
           // NOTE: Removed publishReply call as messaging is likely to be different
         }
       } catch (error) {
-        console.error(
-          `${getDateTag()} Error publishing result ${poll.id}:`,
+        logger.error(
+          `Error publishing result ${poll.id}:`,
           getErrorMessage(error)
         )
       }
       try {
         await updatePredictivePollResult(poll.id)
-        console.log(`${getDateTag()} Result status updated for ${poll.id}.`)
+        logger.info(`Result status updated for ${poll.id}.`)
       } catch (error) {
-        console.error(
-          `${getDateTag()} Error updating result status for ${poll.id}:`,
-          error
+        logger.error(
+          `Error updating result status for ${poll.id}:`,
+          getErrorMessage(error)
         )
       }
     } else {
-      console.log(replyToSurvey) // NOTE: Placeholder
+      logger.info(replyToSurvey) // NOTE: Placeholder
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  console.log(`${getDateTag()} Published poll results.`)
+  logger.info(`Published poll results.`)
 }

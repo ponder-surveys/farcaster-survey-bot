@@ -1,5 +1,6 @@
 import { supabaseClient } from '../clients/supabase'
-import { getDateTag } from '../utils/getDateTag'
+import getErrorMessage from '../utils/getErrorMessage'
+import logger from '../utils/logger'
 
 const getNextQuestion = async (
   type: QuestionType
@@ -25,8 +26,8 @@ const getNextQuestion = async (
   const { data, error } = await query
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   const question = data ? (data[0] as Question) : null
@@ -48,13 +49,11 @@ const updateNextQuestion = async (
     .eq('id', questionId)
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
-  console.log(
-    `${getDateTag()} Question status and cast hash successfully updated on db`
-  )
+  logger.info(`Question status and cast hash successfully updated on db`)
 }
 
 export { getNextQuestion, updateNextQuestion }

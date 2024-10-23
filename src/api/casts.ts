@@ -2,10 +2,9 @@ import {
   CastParamType,
   EmbeddedCast,
 } from '@neynar/nodejs-sdk/build/neynar-api/v2'
-import logger from 'utils/logger'
 import { neynarClient, neynarSigner } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
-import * as util from 'node:util'
+import logger from '../utils/logger'
 
 interface EmbedOptions {
   embeds?: EmbeddedCast[]
@@ -49,9 +48,7 @@ const publishCast = async (
       replyTo: cast.hash,
     })
   }
-  console.log(
-    `${getDateTag()} Next ${type} published successfully: ${cast.hash}`
-  )
+  logger.info(`Next ${type} published successfully: ${cast.hash}`)
 
   return cast
 }

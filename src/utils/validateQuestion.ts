@@ -1,17 +1,15 @@
 import { getNextQuestion } from '../api/questions'
 import { getUsername } from '../api/users'
 import { validateQuestionAndResultByteSize } from './byteSize'
-import { getDateTag } from './getDateTag'
+import logger from './logger'
 
 const validateQuestion = async (type: QuestionType) => {
   const question = await getNextQuestion(type)
 
   if (question) {
-    console.log(
-      `${getDateTag()} Validating ${type} question scheduled in 1 hour...`
-    )
+    logger.info(`Validating ${type} question scheduled in 1 hour...`)
   } else {
-    console.log(`${getDateTag()} No questions to validate.`)
+    logger.info(`No questions to validate.`)
     return
   }
 

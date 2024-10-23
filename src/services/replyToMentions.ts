@@ -1,6 +1,6 @@
+import logger from 'utils/logger'
 import { publishReply } from '../api/casts'
 import { CREATE_SURVEY_FRAME_URL } from '../utils/constants'
-import { getDateTag } from '../utils/getDateTag'
 import { pollNotifications } from '../utils/pollNotifications'
 
 const processedNotifications = new Map<number, Set<string>>()
@@ -75,7 +75,7 @@ const handleNotification = async (
       signer
     )
   } else {
-    console.log(`${getDateTag()} Mock reply:\n${reply}`)
+    logger.info(`Mock reply:\n${reply}`)
   }
 }
 

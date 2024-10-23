@@ -1,8 +1,9 @@
-import { ethers } from 'ethers'
 import { ThirdwebSDK } from '@thirdweb-dev/sdk'
+import { ethers } from 'ethers'
+import getErrorMessage from 'utils/getErrorMessage'
+import logger from 'utils/logger'
 import { neynarClient } from '../clients/neynar'
 import { supabaseClient } from '../clients/supabase'
-import { getDateTag } from '../utils/getDateTag'
 
 const sdk = new ThirdwebSDK('base', {
   secretKey: process.env.THIRDWEB_SECRET_KEY,
@@ -18,8 +19,8 @@ const getUsername = async (userId?: number): Promise<string | null> => {
     .single()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   return data?.username || null
@@ -35,8 +36,8 @@ const getUserFid = async (userId?: number): Promise<string | null> => {
     .single()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   return data?.fid || null
@@ -51,7 +52,10 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
     .limit(1)
 
   if (error) {
-    console.error(`Error fetching user with fid ${user.fid}:`, error)
+    logger.error(
+      `Error fetching user with fid ${user.fid}:`,
+      getErrorMessage(error)
+    )
     throw error
   }
 
@@ -89,7 +93,10 @@ const getUserId = async (user: NeynarUser): Promise<number> => {
       }
     }
   } catch (verificationError) {
-    console.error('Error fetching verifications:', verificationError)
+    logger.error(
+      'Error fetching verifications:',
+      getErrorMessage(verificationError)
+    )
     throw verificationError
   }
 
@@ -117,7 +124,10 @@ const addUser = async (
     .select('*')
 
   if (error) {
-    console.error(`Error inserting user with fid ${user.fid}:`, error)
+    logger.error(
+      `Error inserting user with fid ${user.fid}:`,
+      getErrorMessage(error)
+    )
     throw error
   }
 
@@ -134,4 +144,4 @@ const addUser = async (
   }
 }
 
-export { getUsername, getUserFid, getUserId, addUser }
+export { addUser, getUserFid, getUserId, getUsername }

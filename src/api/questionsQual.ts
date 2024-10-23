@@ -1,5 +1,6 @@
+import getErrorMessage from 'utils/getErrorMessage'
+import logger from 'utils/logger'
 import { supabaseClient } from '../clients/supabase'
-import { getDateTag } from '../utils/getDateTag'
 
 const getNextQuestionsQual = async (): Promise<QuestionQual[]> => {
   const updateInterval = Number(
@@ -20,8 +21,8 @@ const getNextQuestionsQual = async (): Promise<QuestionQual[]> => {
     .order('created_at', { ascending: true })
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(`Error fetching next Q&A question: ${getErrorMessage(error)}`)
+    throw new Error(getErrorMessage(error))
   }
 
   return data as QuestionQual[]
@@ -38,13 +39,15 @@ const updateNextQuestionQual = async (questionId: string) => {
     .select()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(
+      `Error updating Q&A question status for ${questionId}: ${getErrorMessage(
+        error
+      )}`
+    )
+    throw new Error(getErrorMessage(error))
   }
 
-  console.log(
-    `${getDateTag()} Q&A question status successfully updated for ${questionId}`
-  )
+  logger.info(`Q&A question status successfully updated for ${questionId}`)
 }
 
 const getQuestionBountyAmount = async (questionId: string) => {
@@ -70,8 +73,12 @@ const getQuestionBountyAmount = async (questionId: string) => {
     .single()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(
+      `Error fetching question bounty amount for ${questionId}: ${getErrorMessage(
+        error
+      )}`
+    )
+    throw new Error(getErrorMessage(error))
   }
 
   if (data && data.bounty) {
@@ -103,4 +110,4 @@ const getQuestionBountyAmount = async (questionId: string) => {
   return { amount: 0, tokenName: '' }
 }
 
-export { getNextQuestionsQual, updateNextQuestionQual, getQuestionBountyAmount }
+export { getNextQuestionsQual, getQuestionBountyAmount, updateNextQuestionQual }

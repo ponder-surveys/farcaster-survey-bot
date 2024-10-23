@@ -1,10 +1,10 @@
+import logger from 'utils/logger'
 import { supabaseClient } from '../clients/supabase'
-import getErrorMessage from '../utils/getErrorMessage'
-import { getDateTag } from '../utils/getDateTag'
 import { endPoll } from '../services/endPoll'
+import { endPredictivePoll } from '../services/endPredictivePoll'
 import { fetchBounty } from '../services/supabase'
 import { Poll } from '../types/polls'
-import { endPredictivePoll } from '../services/endPredictivePoll'
+import getErrorMessage from '../utils/getErrorMessage'
 
 const getNextResults = async (): Promise<Question[]> => {
   const currentTime = new Date()
@@ -17,8 +17,8 @@ const getNextResults = async (): Promise<Question[]> => {
     .order('id', { ascending: true })
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   const questions = data as Question[]
@@ -36,8 +36,8 @@ const updateNextResult = async (questionId: number) => {
     .single()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   const bountyId = poll.bounty_id
@@ -57,7 +57,7 @@ const updateNextResult = async (questionId: number) => {
     }
   }
 
-  console.log(`${getDateTag()} Question status successfully updated on db`)
+  logger.info(`Question status successfully updated on db`)
 }
 
 const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
@@ -72,8 +72,8 @@ const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
     .order('id', { ascending: true })
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   return data
@@ -90,8 +90,8 @@ const updatePredictivePollResult = async (questionId: number) => {
     .single()
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   if (poll.bounty_id) {
@@ -110,12 +110,12 @@ const updatePredictivePollResult = async (questionId: number) => {
     }
   }
 
-  console.log(`${getDateTag()} Question status successfully updated on db`)
+  logger.info(`Question status successfully updated on db`)
 }
 
 export {
+  getExpiredPredictivePolls,
   getNextResults,
   updateNextResult,
-  getExpiredPredictivePolls,
   updatePredictivePollResult,
 }

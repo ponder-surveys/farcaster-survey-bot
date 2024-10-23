@@ -3,11 +3,12 @@ import {
   ReactionForCast,
   ReactionsCastResponse,
 } from '@neynar/nodejs-sdk/build/neynar-api/v2'
-import { supabaseClient } from '../clients/supabase'
+import getErrorMessage from 'utils/getErrorMessage'
+import logger from 'utils/logger'
 import { neynarClient } from '../clients/neynar'
-import { getUserId } from './users'
-import { getDateTag } from '../utils/getDateTag'
+import { supabaseClient } from '../clients/supabase'
 import { Poll } from '../types/polls'
+import { getUserId } from './users'
 
 const addReaction = async ({
   userId,
@@ -31,8 +32,8 @@ const addReaction = async ({
   }
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log(
-      `${getDateTag()} Mock ${type} for user ${userId} on question ${questionId}${
+    logger.info(
+      `Mock ${type} for user ${userId} on question ${questionId}${
         responseId ? `, response ${responseId}` : ''
       }.`
     )
@@ -44,11 +45,11 @@ const addReaction = async ({
   } catch (error) {
     const err = error as { code?: string }
     if (err.code === '23505') {
-      console.warn(
-        `${getDateTag()} Duplicate reaction detected for user ${userId} on question ${questionId} with type ${type}. Skipping.`
+      logger.warn(
+        `Duplicate reaction detected for user ${userId} on question ${questionId} with type ${type}. Skipping.`
       )
     } else {
-      console.error(`${getDateTag()} Error inserting reaction: `, error)
+      logger.error(`Error inserting reaction: ${getErrorMessage(error)}`)
     }
   }
 }
@@ -180,11 +181,10 @@ const addResultReactions = async (
             recasts: recasts,
           })
         } catch (error) {
-          console.error(
-            `${getDateTag()} Error fetching reactions for response ${
+          logger.error(
+            `Error fetching reactions for response ${
               response.id
-            }: `,
-            error
+            }: ${getErrorMessage(error)}`
           )
           continue
         }
@@ -192,8 +192,9 @@ const addResultReactions = async (
     }
   } catch (error) {
     console.error(
-      `${getDateTag()} Error fetching reactions for question ${question.id}: `,
-      error
+      `Error fetching reactions for question ${question.id}: ${getErrorMessage(
+        error
+      )}`
     )
   }
 }

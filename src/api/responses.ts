@@ -1,5 +1,6 @@
+import getErrorMessage from 'utils/getErrorMessage'
+import logger from 'utils/logger'
 import { supabaseClient } from '../clients/supabase'
-import { getDateTag } from '../utils/getDateTag'
 
 const getResponses = async (question_id: number) => {
   const { data, error } = await supabaseClient
@@ -8,8 +9,8 @@ const getResponses = async (question_id: number) => {
     .eq('question_id', question_id)
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
   return data as QuestionResponse[]
@@ -30,8 +31,8 @@ const updateResponse = async (
     .match({ user_id: userId, question_id: questionId })
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 }
 
@@ -42,13 +43,13 @@ const addResponses = async (responses: QuestionResponse[]) => {
     .select('*')
 
   if (error) {
-    console.error(`${getDateTag()} ${error}`)
-    throw new Error(error.message)
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
   }
 
-  console.log(`${getDateTag()} Responses successfully uploaded on db`)
+  logger.info(`Responses successfully uploaded on db`)
 
   return data as QuestionResponse[]
 }
 
-export { getResponses, updateResponse, addResponses }
+export { addResponses, getResponses, updateResponse }
