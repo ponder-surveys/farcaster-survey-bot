@@ -1,14 +1,15 @@
+import getErrorMessage from 'utils/getErrorMessage'
+import logger from 'utils/logger'
+import { getAnswersCount } from '../api/answersQual'
+import { publishReply } from '../api/casts'
 import {
   getNextQuestionsQual,
   getQuestionBountyAmount,
   updateNextQuestionQual,
 } from '../api/questionsQual'
-import { publishReply } from '../api/casts'
-import { getDateTag } from '../utils/getDateTag'
-import { getAnswersCount } from '../api/answersQual'
 import { APP_URL } from '../utils/constants'
 import { formatReplyToQuestionQual } from '../utils/formatQuestionQual'
-import getErrorMessage from 'utils/getErrorMessage'
+import { getDateTag } from '../utils/getDateTag'
 
 const publishNextQuestionsQualUpdate = async () => {
   const questionsQual = await getNextQuestionsQual()
@@ -28,6 +29,9 @@ const publishNextQuestionsQualUpdate = async () => {
     if (process.env.NODE_ENV === 'production') {
       try {
         if (questionQualHash && responseCount > 0) {
+          logger.info(`Publishing update for question ${questionQual.id}.`)
+          logger.debug(`questionQualHash: ${questionQualHash}`)
+          logger.debug(`responseCount: ${responseCount}`)
           await publishReply(
             'question reply',
             questionQualHash,
