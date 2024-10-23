@@ -13,9 +13,6 @@ RUN bun install --frozen-lockfile
 # Copy the rest of the application code
 COPY . .
 
-# Build the application
-RUN bun run build
-
 # Define environment variables
 ARG NEYNAR_API_KEY
 ARG NEYNAR_SIGNER_UUID
@@ -46,7 +43,11 @@ ARG NEXT_QUESTION_QUAL_UPDATE_INTERVAL_HOURS
 ARG CALL_TO_ACTION
 ARG RESULTS_CALL_TO_ACTION
 ARG LOG_LEVEL
-ARG NODE_ENV
+
+ENV NODE_ENV=production
+
+# Build the application
+RUN bun run build
 
 # Start the application
 CMD ["bun", "run", "./dist/app.js"]
