@@ -5,6 +5,7 @@ import {
 } from './services/cron'
 import { getDateTag } from './utils/getDateTag'
 
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`)
 console.log(`${getDateTag()} Surveying the casters...`)
 
 const nextPollResultsTime = Bun.env.NEXT_POLL_RESULTS_CRON as string
