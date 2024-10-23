@@ -1,7 +1,8 @@
 import {
-  EmbeddedCast,
   CastParamType,
+  EmbeddedCast,
 } from '@neynar/nodejs-sdk/build/neynar-api/v2'
+import logger from 'utils/logger'
 import { neynarClient, neynarSigner } from '../clients/neynar'
 import { getDateTag } from '../utils/getDateTag'
 
@@ -71,11 +72,15 @@ const publishReply = async (
     options.embeds = [{ url: imageUrl }]
   }
 
+  logger.debug(`formattedReply: ${formattedReply}`)
+  logger.debug(`options: ${options}`)
   const replyCast = await neynarClient.publishCast(
     signer,
     formattedReply,
     options
   )
+
+  logger.debug(`replyCast: ${replyCast}`)
 
   if (formattedChainedReply) {
     await neynarClient.publishCast(signer, formattedChainedReply, {
@@ -83,9 +88,7 @@ const publishReply = async (
     })
   }
 
-  console.log(
-    `${getDateTag()} Next ${type} published successfully: ${replyCast.hash}`
-  )
+  logger.info(`Next ${type} published successfully: ${replyCast.hash}`)
 
   return replyCast
 }
