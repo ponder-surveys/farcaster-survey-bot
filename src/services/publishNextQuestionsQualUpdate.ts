@@ -9,7 +9,6 @@ import {
 } from '../api/questionsQual'
 import { APP_URL } from '../utils/constants'
 import { formatReplyToQuestionQual } from '../utils/formatQuestionQual'
-import { getDateTag } from '../utils/getDateTag'
 
 const publishNextQuestionsQualUpdate = async () => {
   const questionsQual = await getNextQuestionsQual()
@@ -32,39 +31,39 @@ const publishNextQuestionsQualUpdate = async () => {
           logger.info(`Publishing update for question ${questionQual.id}.`)
           logger.debug(`questionQualHash: ${questionQualHash}`)
           logger.debug(`responseCount: ${responseCount}`)
-          await publishReply(
+          const publishReplyResponse = await publishReply(
             'question reply',
             questionQualHash,
             updateMessage,
             `${APP_URL}/questions/${questionQual.id}`
           )
+          logger.debug(`publishReplyResponse: ${publishReplyResponse}`)
 
-          await updateNextQuestionQual(questionQual.id)
-          console.log(
-            `${getDateTag()} Update status updated for ${questionQual.id}.`
+          const updateNextQuestionQualResponse = await updateNextQuestionQual(
+            questionQual.id
           )
+          logger.debug(
+            `updateNextQuestionQualResponse: ${updateNextQuestionQualResponse}`
+          )
+          logger.info(`Update status updated for ${questionQual.id}.`)
         }
       } catch (error) {
-        console.error(
-          `${getDateTag()} Error publishing update for question ${
-            questionQual.id
-          }:`,
+        logger.error(
+          `Error publishing update for question ${questionQual.id}:`,
           getErrorMessage(error)
         )
       }
     } else {
       if (questionQualHash && responseCount > 0) {
-        console.log(
-          `${getDateTag()} Mock question update:\n${updateMessage}\n${APP_URL}/questions/${
-            questionQual.id
-          }`
+        logger.info(
+          `Mock question update:\n${updateMessage}\n${APP_URL}/questions/${questionQual.id}`
         )
       }
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  console.log(`${getDateTag()} Published Q&A updates.`)
+  logger.info('Published Q&A updates.')
 }
 
 export { publishNextQuestionsQualUpdate }
