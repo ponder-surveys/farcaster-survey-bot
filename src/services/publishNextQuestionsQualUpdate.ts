@@ -43,7 +43,7 @@ const publishNextQuestionsQualUpdate = async () => {
           logger.info(`Update status updated for ${questionQual.id}.`)
         }
       } catch (error) {
-        logger.error(
+        logger.warn(
           `Error publishing update for question ${questionQual.id}:`,
           getErrorMessage(error)
         )
