@@ -7,6 +7,7 @@ import { Poll } from '../types/polls'
 import getErrorMessage from '../utils/getErrorMessage'
 
 const getNextResults = async (): Promise<Question[]> => {
+  logger.info('Checking for expired basic polls')
   const currentTime = new Date()
 
   const { data, error } = await supabaseClient
@@ -62,6 +63,7 @@ const updateNextResult = async (questionId: number) => {
 }
 
 const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
+  logger.info('Checking for expired predictive polls')
   const now = new Date().toISOString()
 
   const { data, error } = await supabaseClient
