@@ -29,7 +29,7 @@ export const endPoll = async (poll: Poll, bounty: Bounty) => {
   }
 
   try {
-    logger.debug(poll)
+    logger.trace(poll)
 
     const { status } = poll
 

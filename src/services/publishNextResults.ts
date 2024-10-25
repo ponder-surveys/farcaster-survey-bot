@@ -20,7 +20,7 @@ export const publishNextResults = async () => {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
 
-    if (process.env.NODE_ENV === 'production') {
+    if (Bun.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string
 
       try {
@@ -58,6 +58,8 @@ export const publishNextResults = async () => {
             replyToSurvey,
             `${SURVEY_FRAME_URL}/${result.id}/results`
           )
+        } else {
+          logger.warn('poll resultHash not found')
         }
       } catch (error) {
         logger.error(
@@ -65,6 +67,7 @@ export const publishNextResults = async () => {
           getErrorMessage(error)
         )
       }
+
       try {
         await updateNextResult(result.id)
         logger.info(`Result status updated for ${result.id}.`)
@@ -82,7 +85,9 @@ export const publishNextResults = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  logger.info(`Published poll results.`)
+  if (results.length > 0) {
+    logger.info(`Published poll results.`)
+  }
 }
 
 export const publishPredictivePollResults = async () => {
@@ -132,6 +137,7 @@ export const publishPredictivePollResults = async () => {
           getErrorMessage(error)
         )
       }
+
       try {
         await updatePredictivePollResult(poll.id)
         logger.info(`Result status updated for ${poll.id}.`)

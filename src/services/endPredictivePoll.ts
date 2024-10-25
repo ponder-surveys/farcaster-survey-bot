@@ -40,8 +40,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     throw new Error('Transaction address not found')
   }
 
-  logger.debug(poll)
-
   const { status } = poll
 
   const {

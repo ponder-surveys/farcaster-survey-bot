@@ -5,6 +5,7 @@ import { endPredictivePoll } from '../services/endPredictivePoll'
 import { fetchBounty } from '../services/supabase'
 import { Poll } from '../types/polls'
 import getErrorMessage from '../utils/getErrorMessage'
+import * as util from 'node:util'
 
 const getNextResults = async (): Promise<Question[]> => {
   const currentTime = new Date()
