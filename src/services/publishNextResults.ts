@@ -89,7 +89,9 @@ export const publishNextResults = async () => {
     await new Promise((resolve) => setTimeout(resolve, 500))
   }
 
-  logger.info(`Published poll results.`)
+  if (results.length > 0) {
+    logger.info(`Published poll results.`)
+  }
 }
 
 export const publishPredictivePollResults = async () => {
