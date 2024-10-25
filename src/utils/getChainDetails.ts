@@ -1,7 +1,7 @@
-import { Sentry } from '../clients/sentry'
-import { CHAINS } from '../utils/constants'
 import { logger } from 'ethers'
+import { Sentry } from '../clients/sentry'
 import { Bounty } from '../types/common'
+import { CHAINS } from '../utils/constants'
 
 export default async function getChainDetails(bounty: Bounty) {
   const chainName = bounty.token?.chain

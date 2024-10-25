@@ -18,7 +18,12 @@ export const publishNextResults = async () => {
 
   for await (const result of results) {
     let responses = await getResponses(result.id)
-    const replyToSurvey = formatReplyToSurvey(responses.length)
+
+    const replyToSurvey = formatReplyToSurvey(
+      responses.length,
+      result.created_at!,
+      result.expires_at!
+    )
 
     if (Bun.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string

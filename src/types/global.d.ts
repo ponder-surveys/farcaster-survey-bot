@@ -11,6 +11,8 @@ interface Question {
   channel?: string
   user_id?: number
   inspired_by: boolean
+  created_at?: string
+  expires_at?: string
 }
 
 interface QuestionQual {

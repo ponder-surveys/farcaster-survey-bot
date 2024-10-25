@@ -1,3 +1,4 @@
+import { differenceInMinutes } from 'date-fns'
 import { roundPercentages } from './roundPercentages'
 
 const formatResult = (
@@ -37,14 +38,41 @@ const formatReply = (hash: string) => {
   return `${title}\n\n${process.env.RESULTS_CALL_TO_ACTION}`
 }
 
-const formatReplyToSurvey = (totalVotes: number) => {
-  const timeInterval = Number(
-    process.env.NEXT_POLL_RESULTS_INTERVAL_HOURS || 48
+const formatReplyToSurvey = (
+  totalVotes: number,
+  createdAt?: string,
+  expiresAt?: string
+) => {
+  const elapsedMinutes = differenceInMinutes(
+    new Date(expiresAt!),
+    new Date(createdAt!)
   )
 
-  const title = `💭 Poll has ended after ${timeInterval} hours and received ${totalVotes} votes. View the results here:`
+  let timeInterval: number
+  let timeUnit: string
 
+  if (elapsedMinutes >= 1440) {
+    // 24 hours * 60 minutes
+    timeInterval = Math.floor(elapsedMinutes / 1440)
+    timeUnit = timeInterval === 1 ? 'day' : 'days'
+  } else if (elapsedMinutes >= 60) {
+    timeInterval = Math.floor(elapsedMinutes / 60)
+    timeUnit = timeInterval === 1 ? 'hour' : 'hours'
+  } else {
+    timeInterval = elapsedMinutes
+    timeUnit = elapsedMinutes === 1 ? 'minute' : 'minutes'
+  }
+
+  const title = `💭 Poll has ended after ${timeInterval} ${timeUnit} and received ${totalVotes} votes. View the results here:`
+
+  console.log(title)
   return `${title}`
 }
 
-export { formatResult, formatReply, formatReplyToSurvey }
+export { formatReply, formatReplyToSurvey, formatResult }
+
+formatReplyToSurvey(
+  100,
+  '2024-10-26 18:00:12.466753+00',
+  '2024-10-26 18:05:09.777+00'
+)
