@@ -95,9 +95,6 @@ const updatePredictivePollResult = async (questionId: number) => {
     throw new Error(getErrorMessage(error))
   }
 
-  logger.debug(
-    `updatePredictivePollResult: ${util.inspect(poll, true, null, true)}`
-  )
   if (poll.bounty_id) {
     const bounty = await fetchBounty(poll.bounty_id)
 
