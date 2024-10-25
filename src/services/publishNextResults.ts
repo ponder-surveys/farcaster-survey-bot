@@ -20,8 +20,10 @@ export const publishNextResults = async () => {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
 
-    if (process.env.NODE_ENV === 'production') {
+    logger.debug(`publishNextResults NODE_ENV: ${Bun.env.NODE_ENV}`)
+    if (Bun.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string
+      logger.debug(`poll resultHash: ${resultHash}`)
 
       try {
         if (resultHash) {
@@ -65,6 +67,7 @@ export const publishNextResults = async () => {
           getErrorMessage(error)
         )
       }
+
       try {
         await updateNextResult(result.id)
         logger.info(`Result status updated for ${result.id}.`)
