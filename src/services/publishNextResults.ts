@@ -12,11 +12,12 @@ import { SURVEY_FRAME_URL } from '../utils/constants'
 import { formatReplyToSurvey } from '../utils/formatResult'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
+import * as util from 'node:util'
 
 export const publishNextResults = async () => {
   const results = await getNextResults()
 
-  logger.debug(`nextResults: ${results}`)
+  logger.debug(`nextResults: ${util.inspect(results, true, null, true)}`)
   for await (const result of results) {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
@@ -61,6 +62,8 @@ export const publishNextResults = async () => {
             replyToSurvey,
             `${SURVEY_FRAME_URL}/${result.id}/results`
           )
+        } else {
+          logger.warn('poll resultHash not found')
         }
       } catch (error) {
         logger.error(
