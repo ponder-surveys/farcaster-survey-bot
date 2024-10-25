@@ -12,20 +12,16 @@ import { SURVEY_FRAME_URL } from '../utils/constants'
 import { formatReplyToSurvey } from '../utils/formatResult'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
-import * as util from 'node:util'
 
 export const publishNextResults = async () => {
   const results = await getNextResults()
 
-  logger.debug(`nextResults: ${util.inspect(results, true, null, true)}`)
   for await (const result of results) {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
 
-    logger.debug(`publishNextResults NODE_ENV: ${Bun.env.NODE_ENV}`)
     if (Bun.env.NODE_ENV === 'production') {
       const resultHash = result.cast_hash as string
-      logger.debug(`poll resultHash: ${resultHash}`)
 
       try {
         if (resultHash) {
