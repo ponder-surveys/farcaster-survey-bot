@@ -100,6 +100,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         return userAddress
       })
 
+      logger.info(
+        `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
+      )
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
@@ -177,6 +180,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         // Update the status to 'completed'
         closeBounty(String(smartContractId), 'predictive_poll')
+        logger.info(`Closed bounty for predictive poll ${poll.id}`)
       } else {
         // Handle case where the transaction did not mine successfully
         logger.error(getErrorMessage(errorMessage))

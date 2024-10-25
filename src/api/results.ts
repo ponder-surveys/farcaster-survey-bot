@@ -5,7 +5,6 @@ import { endPredictivePoll } from '../services/endPredictivePoll'
 import { fetchBounty } from '../services/supabase'
 import { Poll } from '../types/polls'
 import getErrorMessage from '../utils/getErrorMessage'
-import * as util from 'node:util'
 
 const getNextResults = async (): Promise<Question[]> => {
   const currentTime = new Date()
@@ -14,6 +13,7 @@ const getNextResults = async (): Promise<Question[]> => {
     .from('questions')
     .select('*')
     .eq('status', 'posted')
+    .eq('poll_type', 'basic')
     .lte('expires_at', currentTime.toISOString())
     .order('id', { ascending: true })
 
@@ -111,7 +111,7 @@ const updatePredictivePollResult = async (questionId: number) => {
     }
   }
 
-  logger.info(`Question status successfully updated on db`)
+  logger.info(`Predictive poll status successfully updated on db`)
 }
 
 export {
