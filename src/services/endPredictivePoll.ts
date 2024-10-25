@@ -178,7 +178,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         }
 
         // Update the status to 'completed'
-        await closeBounty(String(smartContractId), 'predictive_poll')
+        closeBounty(String(smartContractId), 'predictive_poll')
       } else {
         // Handle case where the transaction did not mine successfully
         logger.error(getErrorMessage(errorMessage))
