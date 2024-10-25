@@ -105,6 +105,7 @@ const updatePredictivePollResult = async (questionId: number) => {
     ) {
       try {
         await endPredictivePoll(poll, bounty)
+        logger.info(`Ended predictive poll ${poll.id}`)
       } catch (error) {
         throw new Error(getErrorMessage(error))
       }
