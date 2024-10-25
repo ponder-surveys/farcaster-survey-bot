@@ -103,6 +103,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       logger.info(
         `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
       )
+      logger.info(`Predictive poll winning options: ${winningOptions}`)
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
@@ -180,22 +181,22 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         // Update the status to 'completed'
         closeBounty(String(smartContractId), 'predictive_poll')
-        logger.info(`Closed bounty for predictive poll ${poll.id}`)
+        return { message: `Ended predictive poll ${poll.id}`, error: null }
       } else {
         // Handle case where the transaction did not mine successfully
-        logger.error(getErrorMessage(errorMessage))
+        logger.error(
+          `Error calling predictive poll contract address: ${getErrorMessage(
+            errorMessage
+          )}`
+        )
         Sentry.captureMessage(getErrorMessage(errorMessage))
+        return { message: null, error: getErrorMessage(errorMessage) }
       }
     } catch (error) {
       Sentry.captureException(error)
-      throw new Error(
-        `Error calling distributeRewards on PredictivePoll.sol: ${getErrorMessage(
-          error
-        )}`
-      )
+      return { message: null, error: getErrorMessage(error) }
     }
-    return
   }
 
-  return
+  return { message: `Predictive poll ${poll.id} not processed`, error: null }
 }
