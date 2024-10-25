@@ -104,6 +104,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
       )
       logger.info(`Predictive poll winning options: ${winningOptions}`)
+      logger.info(`Reward recipient addresses: ${rewardRecipientAddresses}`)
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
