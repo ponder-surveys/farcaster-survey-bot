@@ -3,6 +3,7 @@ import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
 import { pollTransactionStatus } from '../clients/thirdweb'
 import {
+  closeBounty,
   fetchBountyClaimsForPoll,
   updateBountyClaim,
 } from '../services/supabase'
@@ -175,6 +176,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             }
           }
         }
+
+        // Update the status to 'completed'
+        await closeBounty(String(smartContractId), 'predictive_poll')
       } else {
         // Handle case where the transaction did not mine successfully
         logger.error(getErrorMessage(errorMessage))
