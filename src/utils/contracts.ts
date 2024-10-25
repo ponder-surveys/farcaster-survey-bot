@@ -18,6 +18,7 @@ const PredictivePollABI = [
   { inputs: [], name: 'InvalidAddress', type: 'error' },
   { inputs: [], name: 'InvalidInitialization', type: 'error' },
   { inputs: [], name: 'InvalidNumberOfRecipients', type: 'error' },
+  { inputs: [], name: 'InvalidNumberOfWinningOptions', type: 'error' },
   { inputs: [], name: 'InvalidOption', type: 'error' },
   { inputs: [], name: 'InvalidPollId', type: 'error' },
   { inputs: [], name: 'InvalidSponsor', type: 'error' },
@@ -279,7 +280,7 @@ const PredictivePollABI = [
   {
     inputs: [
       { internalType: 'uint256', name: 'pollId', type: 'uint256' },
-      { internalType: 'uint8', name: 'winningOption', type: 'uint8' },
+      { internalType: 'uint8[]', name: 'winningOptions', type: 'uint8[]' },
       { internalType: 'address[]', name: 'recipients', type: 'address[]' },
     ],
     name: 'distributeRewards',

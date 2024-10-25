@@ -137,6 +137,7 @@ export const publishPredictivePollResults = async () => {
           getErrorMessage(error)
         )
       }
+
       try {
         await updatePredictivePollResult(poll.id)
         logger.info(`Result status updated for ${poll.id}.`)
