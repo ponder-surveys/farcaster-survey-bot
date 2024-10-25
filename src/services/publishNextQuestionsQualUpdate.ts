@@ -29,8 +29,8 @@ const publishNextQuestionsQualUpdate = async () => {
       try {
         if (questionQualHash && responseCount > 0) {
           logger.info(`Publishing update for question ${questionQual.id}.`)
-          logger.debug(`questionQualHash: ${questionQualHash}`)
-          logger.debug(`responseCount: ${responseCount}`)
+          logger.trace(`questionQualHash: ${questionQualHash}`)
+          logger.trace(`responseCount: ${responseCount}`)
           const _publishReplyResponse = await publishReply(
             'question reply',
             questionQualHash,
