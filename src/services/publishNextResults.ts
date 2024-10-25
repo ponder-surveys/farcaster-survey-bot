@@ -16,6 +16,7 @@ import logger from '../utils/logger'
 export const publishNextResults = async () => {
   const results = await getNextResults()
 
+  logger.debug(`nextResults: ${results}`)
   for await (const result of results) {
     let responses = await getResponses(result.id)
     const replyToSurvey = formatReplyToSurvey(responses.length)
