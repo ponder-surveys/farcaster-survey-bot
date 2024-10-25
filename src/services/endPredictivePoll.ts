@@ -24,6 +24,7 @@ import {
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
+import * as util from 'node:util'
 
 if (!WEB3_ACCESS_TOKEN) {
   throw new Error('Web3 access token not found')
@@ -40,7 +41,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     throw new Error('Transaction address not found')
   }
 
-  logger.trace(poll)
+  logger.debug(`endPredictivePoll: ${util.inspect(poll, true, null, true)}`)
 
   const { status } = poll
 

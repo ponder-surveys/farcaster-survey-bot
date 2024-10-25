@@ -5,6 +5,7 @@ import { endPredictivePoll } from '../services/endPredictivePoll'
 import { fetchBounty } from '../services/supabase'
 import { Poll } from '../types/polls'
 import getErrorMessage from '../utils/getErrorMessage'
+import * as util from 'node:util'
 
 const getNextResults = async (): Promise<Question[]> => {
   const currentTime = new Date()
@@ -94,6 +95,9 @@ const updatePredictivePollResult = async (questionId: number) => {
     throw new Error(getErrorMessage(error))
   }
 
+  logger.debug(
+    `updatePredictivePollResult: ${util.inspect(poll, true, null, true)}`
+  )
   if (poll.bounty_id) {
     const bounty = await fetchBounty(poll.bounty_id)
 
