@@ -103,10 +103,8 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       )
 
       const smartContractIdString = smartContractId.toString()
-      const winningOptionsString = JSON.stringify(winningOptions)
-      const rewardRecipientAddressesString = JSON.stringify(
-        rewardRecipientAddresses
-      )
+      const winningOptionsString = winningOptions.toString()
+      const rewardRecipientAddressesString = rewardRecipientAddresses.toString()
 
       logger.info(
         `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS} for poll ${poll.id}`
