@@ -88,23 +88,35 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         winningOptions.includes(claim.response.selected_option)
       )
 
-      const rewardRecipientAddresses = winners.map((winner: BountyClaim) => {
-        const userAddress =
-          winner.response.user.holder_address ||
-          (winner.response.user.connected_addresses?.shift() as string)
-        if (!userAddress) {
-          throw new Error(
-            `Could not find address for user id ${winner.response.user.id}`
-          )
+      const rewardRecipientAddresses: string[] = winners.map(
+        (winner: BountyClaim) => {
+          const userAddress =
+            winner.response.user.holder_address ||
+            (winner.response.user.connected_addresses?.shift() as string)
+          if (!userAddress) {
+            throw new Error(
+              `Could not find address for user id ${winner.response.user.id}`
+            )
+          }
+          return userAddress
         }
-        return userAddress
-      })
+      )
+
+      const smartContractIdString = smartContractId.toString()
+      const winningOptionsString = JSON.stringify(winningOptions)
+      const rewardRecipientAddressesString = JSON.stringify(
+        rewardRecipientAddresses
+      )
 
       logger.info(
-        `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
+        `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS} for poll ${poll.id}`
       )
-      logger.info(`Predictive poll winning options: ${winningOptions}`)
-      logger.info(`Reward recipient addresses: ${rewardRecipientAddresses}`)
+      logger.info(
+        `Predictive poll ${poll.id} winning options: ${winningOptionsString}`
+      )
+      logger.info(
+        `Predictive poll ${poll.id} reward recipient addresses: ${rewardRecipientAddressesString}`
+      )
       const { result } = await web3Engine.contract.write(
         String(chain.CHAIN_ID),
         chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
@@ -112,11 +124,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         {
           functionName: 'distributeRewards',
           args: [
-            String(smartContractId),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            winningOptions as any,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rewardRecipientAddresses as any,
+            smartContractIdString,
+            winningOptionsString,
+            rewardRecipientAddressesString,
           ],
           abi: PredictivePollABI,
         }
