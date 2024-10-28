@@ -1,7 +1,6 @@
 import { Engine } from '@thirdweb-dev/engine'
 import { PredictivePollABI } from 'utils/contracts'
 import getErrorMessage from 'utils/getErrorMessage'
-import { encodePacked } from 'viem'
 import {
   POLL_INTERVAL,
   POLL_TIMEOUT,
@@ -30,12 +29,6 @@ export async function distributeRewards(
     throw new Error('Transaction address not found')
   }
 
-  const encodedWinningOptions = encodePacked(['uint8[]'], [winningOptions])
-  const encodedRewardRecipientAddresses = encodePacked(
-    ['address[]'],
-    [rewardRecipientAddresses as any]
-  )
-
   try {
     const { result } = await web3Engine.contract.write(
       String(chain.CHAIN_ID),
@@ -45,8 +38,8 @@ export async function distributeRewards(
         functionName: 'distributeRewards',
         args: [
           String(smartContractId),
-          encodedWinningOptions,
-          encodedRewardRecipientAddresses,
+          winningOptions as any,
+          rewardRecipientAddresses as any,
         ],
         abi: PredictivePollABI,
       }
