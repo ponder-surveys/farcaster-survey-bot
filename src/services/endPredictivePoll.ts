@@ -104,7 +104,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         await pollTransactionStatus(result.queueId)
 
       if (status === 'mined' && transactionHash) {
-        logger.info('distributeRewards transaction mined successfully')
+        logger.info(
+          `distributeRewards transaction mined successfully for poll ${poll.id}`
+        )
 
         const web3 = await loadWeb3Provider(chain.PROVIDER_URL)
         const receipt = await getTransactionReceipt(transactionHash, web3)
