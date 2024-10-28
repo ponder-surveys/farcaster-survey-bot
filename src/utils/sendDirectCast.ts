@@ -1,6 +1,6 @@
+import { v4 as uuidv4 } from 'uuid'
 import { Poll } from '../types/polls'
 import { SURVEY_FRAME_URL, WARPCAST_API_KEY } from './constants'
-import { v4 as uuidv4 } from 'uuid'
 
 export default async function sendDirectCastForPredictivePolls(
   poll: Poll,
@@ -22,7 +22,7 @@ export default async function sendDirectCastForPredictivePolls(
       },
       body: JSON.stringify({
         recipientFid,
-        message: `💰 Congrats! You won ${amount} ${tokenName} on the recent predictive poll by @${username}.\n\nTx: ${transactionHash}\n\n${frameUrl}`,
+        message: `💰 Congrats! You won ${amount} ${tokenName} on the recent predictive poll by @${username}.\n\nTo create your own, go to the Predict section of the Ponder Poll composer action.\n\nTx: ${transactionHash}\n\n${frameUrl}`,
         idempotencyKey: uuidv4(),
       }),
     }

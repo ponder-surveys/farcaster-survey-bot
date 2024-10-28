@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Engine } from '@thirdweb-dev/engine'
 import { PredictivePollABI } from 'utils/contracts'
 import getErrorMessage from 'utils/getErrorMessage'
@@ -30,6 +31,9 @@ export async function distributeRewards(
   }
 
   try {
+    // NOTE: Need to adjust the winning options to be zero-indexed due to discrepancies between the contract db
+    const adjustedWinningOptions = winningOptions.map((option) => option - 1)
+
     const { result } = await web3Engine.contract.write(
       String(chain.CHAIN_ID),
       chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
@@ -38,7 +42,7 @@ export async function distributeRewards(
         functionName: 'distributeRewards',
         args: [
           String(smartContractId),
-          winningOptions as any,
+          adjustedWinningOptions as any,
           rewardRecipientAddresses as any,
         ],
         abi: PredictivePollABI,
