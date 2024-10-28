@@ -28,9 +28,10 @@ const publishNextQuestionsQualUpdate = async () => {
     if (process.env.NODE_ENV === 'production') {
       try {
         if (questionQualHash && responseCount > 0) {
-          logger.info(`Publishing update for question ${questionQual.id}.`)
+          // NOTE: This is trace for now because an error is expected every time so this isn't
+          // useful.
+          logger.trace(`Publishing update for question ${questionQual.id}.`)
           logger.trace(`questionQualHash: ${questionQualHash}`)
-          logger.trace(`responseCount: ${responseCount}`)
           const _publishReplyResponse = await publishReply(
             'question reply',
             questionQualHash,
@@ -43,7 +44,9 @@ const publishNextQuestionsQualUpdate = async () => {
           logger.info(`Update status updated for ${questionQual.id}.`)
         }
       } catch (error) {
-        logger.warn(
+        // NOTE: This is trace for now because we're currently expecting this error and don't
+        // want to pollute the log stream.
+        logger.trace(
           `Error publishing update for question ${questionQual.id}:`,
           getErrorMessage(error)
         )
