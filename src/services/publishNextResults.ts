@@ -15,6 +15,7 @@ import logger from '../utils/logger'
 
 export const publishNextResults = async () => {
   const results = await getNextResults()
+  logger.info(`Found ${results.length} expired basic polls`)
 
   for await (const result of results) {
     let responses = await getResponses(result.id)
@@ -97,6 +98,7 @@ export const publishNextResults = async () => {
 
 export const publishPredictivePollResults = async () => {
   const predictivePolls = await getExpiredPredictivePolls()
+  logger.info(`Found ${predictivePolls.length} expired predictive polls`)
 
   for await (const poll of predictivePolls) {
     let responses = await getResponses(poll.id)

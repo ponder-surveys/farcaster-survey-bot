@@ -7,6 +7,7 @@ import { Poll } from '../types/polls'
 import getErrorMessage from '../utils/getErrorMessage'
 
 const getNextResults = async (): Promise<Question[]> => {
+  logger.info('Checking for expired basic polls')
   const currentTime = new Date()
 
   const { data, error } = await supabaseClient
@@ -62,18 +63,18 @@ const updateNextResult = async (questionId: number) => {
 }
 
 const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
+  logger.info('Checking for expired predictive polls')
   const now = new Date().toISOString()
 
   const { data, error } = await supabaseClient
     .from('questions')
-    .select('*')
-    .eq('status', 'posted')
+    .select(`*, bounties!inner(*)`)
     .eq('poll_type', 'predictive')
+    .eq('bounties.status', 'active')
     .lte('expires_at', now)
     .order('id', { ascending: true })
 
   if (error) {
-    logger.error(getErrorMessage(error))
     throw new Error(getErrorMessage(error))
   }
 
@@ -91,7 +92,6 @@ const updatePredictivePollResult = async (questionId: number) => {
     .single()
 
   if (error) {
-    logger.error(getErrorMessage(error))
     throw new Error(getErrorMessage(error))
   }
 
@@ -104,8 +104,13 @@ const updatePredictivePollResult = async (questionId: number) => {
       bounty.status === 'active'
     ) {
       try {
-        await endPredictivePoll(poll, bounty)
-        logger.info(`Ended predictive poll ${poll.id}`)
+        const { message, error } = await endPredictivePoll(poll, bounty)
+
+        if (message) {
+          logger.info(message)
+        } else {
+          logger.error(error)
+        }
       } catch (error) {
         throw new Error(getErrorMessage(error))
       }

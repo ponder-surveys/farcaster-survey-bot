@@ -1,7 +1,6 @@
-import { Engine } from '@thirdweb-dev/engine'
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
-import { pollTransactionStatus } from '../clients/thirdweb'
+import { distributeRewards, pollTransactionStatus } from '../clients/thirdweb'
 import {
   closeBounty,
   fetchBountyClaimsForPoll,
@@ -9,12 +8,6 @@ import {
 } from '../services/supabase'
 import { Bounty, BountyClaim } from '../types/common'
 import { Poll } from '../types/polls'
-import {
-  TRANSACTION_ADDRESS,
-  WEB3_ACCESS_TOKEN,
-  WEB3_ENGINE_URL,
-} from '../utils/constants'
-import { PredictivePollABI } from '../utils/contracts'
 import getChainDetails from '../utils/getChainDetails'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
@@ -25,21 +18,7 @@ import {
   loadWeb3Provider,
 } from '../utils/services/web3'
 
-if (!WEB3_ACCESS_TOKEN) {
-  throw new Error('Web3 access token not found')
-}
-
-const web3Engine = new Engine({
-  url: `https://${WEB3_ENGINE_URL}`,
-  accessToken: WEB3_ACCESS_TOKEN,
-})
-
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
-  // Check here so we prevent a non-null assertion later
-  if (!TRANSACTION_ADDRESS) {
-    throw new Error('Transaction address not found')
-  }
-
   const { status } = poll
 
   const {
@@ -88,36 +67,36 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         winningOptions.includes(claim.response.selected_option)
       )
 
-      const rewardRecipientAddresses = winners.map((winner: BountyClaim) => {
-        const userAddress =
-          winner.response.user.holder_address ||
-          (winner.response.user.connected_addresses?.shift() as string)
-        if (!userAddress) {
-          throw new Error(
-            `Could not find address for user id ${winner.response.user.id}`
-          )
+      const rewardRecipientAddresses: string[] = winners.map(
+        (winner: BountyClaim) => {
+          const userAddress =
+            winner.response.user.holder_address ||
+            (winner.response.user.connected_addresses?.shift() as string)
+          if (!userAddress) {
+            throw new Error(
+              `Could not find address for user id ${winner.response.user.id}`
+            )
+          }
+          return userAddress
         }
-        return userAddress
-      })
+      )
 
       logger.info(
-        `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
+        `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS} for poll ${poll.id}`
       )
-      const { result } = await web3Engine.contract.write(
-        String(chain.CHAIN_ID),
-        chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
-        TRANSACTION_ADDRESS,
-        {
-          functionName: 'distributeRewards',
-          args: [
-            String(smartContractId),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            winningOptions as any,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            rewardRecipientAddresses as any,
-          ],
-          abi: PredictivePollABI,
-        }
+      logger.info(
+        `Predictive poll ${poll.id} winning options: ${winningOptions}`
+      )
+      logger.info(
+        `Predictive poll ${poll.id} reward recipient addresses: ${rewardRecipientAddresses}`
+      )
+
+      // Call the smart contract
+      const result = await distributeRewards(
+        smartContractId,
+        winningOptions,
+        rewardRecipientAddresses,
+        chain
       )
 
       // Poll transaction status
@@ -125,7 +104,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         await pollTransactionStatus(result.queueId)
 
       if (status === 'mined' && transactionHash) {
-        logger.info('distributeRewards transaction mined successfully')
+        logger.info(
+          `distributeRewards transaction mined successfully for poll ${poll.id}`
+        )
 
         const web3 = await loadWeb3Provider(chain.PROVIDER_URL)
         const receipt = await getTransactionReceipt(transactionHash, web3)
@@ -180,22 +161,23 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         // Update the status to 'completed'
         closeBounty(String(smartContractId), 'predictive_poll')
-        logger.info(`Closed bounty for predictive poll ${poll.id}`)
+        return { message: `Ended predictive poll ${poll.id}`, error: null }
       } else {
         // Handle case where the transaction did not mine successfully
-        logger.error(getErrorMessage(errorMessage))
+        logger.error(
+          `Error calling predictive poll contract address: ${getErrorMessage(
+            errorMessage
+          )}`
+        )
         Sentry.captureMessage(getErrorMessage(errorMessage))
+        return { message: null, error: getErrorMessage(errorMessage) }
       }
     } catch (error) {
       Sentry.captureException(error)
-      throw new Error(
-        `Error calling distributeRewards on PredictivePoll.sol: ${getErrorMessage(
-          error
-        )}`
-      )
+      logger.error(error)
+      return { message: null, error }
     }
-    return
   }
 
-  return
+  return { message: `Predictive poll ${poll.id} not processed`, error: null }
 }
