@@ -68,8 +68,9 @@ const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
 
   const { data, error } = await supabaseClient
     .from('questions')
-    .select('*')
+    .select(`*, bounties!inner(*)`)
     .eq('poll_type', 'predictive')
+    .eq('bounties.status', 'active')
     .lte('expires_at', now)
     .order('id', { ascending: true })
 
