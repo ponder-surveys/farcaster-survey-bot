@@ -12,6 +12,10 @@ export default async function sendDirectCastForPredictivePolls(
 ) {
   const frameUrl = `${SURVEY_FRAME_URL}/${poll.id}/results`
 
+  const formattedAmount = Number.isInteger(amount)
+    ? amount.toString()
+    : Number(amount.toFixed(4)).toString()
+
   const directCastRequest = await fetch(
     'https://api.warpcast.com/v2/ext-send-direct-cast',
     {
@@ -22,7 +26,7 @@ export default async function sendDirectCastForPredictivePolls(
       },
       body: JSON.stringify({
         recipientFid,
-        message: `💰 Congrats! You won ${amount} ${tokenName} on the recent predictive poll by @${username}.\n\nTo create your own, go to the Predict section of the Ponder Poll composer action.\n\nTx: ${transactionHash}\n\n${frameUrl}`,
+        message: `💰 Congrats! You won ${formattedAmount} ${tokenName} on the recent predictive poll by @${username}.\n\nTo create your own, go to the Predict section of the Ponder Poll composer action.\n\nTx: ${transactionHash}\n\n${frameUrl}`,
         idempotencyKey: uuidv4(),
       }),
     }
