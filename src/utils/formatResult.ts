@@ -67,7 +67,6 @@ const formatReplyToSurvey = (
     totalVotes === 1 ? '' : 's'
   }. View the results here:`
 
-  console.log(title)
   return `${title}`
 }
 
