@@ -102,7 +102,11 @@ export const publishPredictivePollResults = async () => {
 
   for await (const poll of predictivePolls) {
     let responses = await getResponses(poll.id)
-    const replyToSurvey = 'Predictive poll finished!' // NOTE: Placeholder
+    const replyToSurvey = formatReplyToSurvey(
+      responses.length,
+      poll.created_at!,
+      poll.expires_at!
+    )
 
     if (process.env.NODE_ENV === 'production') {
       const resultHash = poll.cast_hash as string
@@ -136,7 +140,12 @@ export const publishPredictivePollResults = async () => {
             )
           }
 
-          // NOTE: Removed publishReply call as messaging is likely to be different
+          await publishReply(
+            'predictive poll reply',
+            resultHash,
+            replyToSurvey,
+            `${SURVEY_FRAME_URL}/${poll.id}/results`
+          )
         }
       } catch (error) {
         logger.error(
@@ -155,7 +164,9 @@ export const publishPredictivePollResults = async () => {
         )
       }
     } else {
-      logger.info(replyToSurvey) // NOTE: Placeholder
+      logger.info(
+        `Mock predictive poll reply:\n${replyToSurvey}\n${SURVEY_FRAME_URL}/${poll.id}`
+      )
     }
     await new Promise((resolve) => setTimeout(resolve, 500))
   }

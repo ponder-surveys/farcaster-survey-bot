@@ -63,7 +63,9 @@ const formatReplyToSurvey = (
     timeUnit = elapsedMinutes === 1 ? 'minute' : 'minutes'
   }
 
-  const title = `💭 Poll has ended after ${timeInterval} ${timeUnit} and received ${totalVotes} votes. View the results here:`
+  const title = `💭 Poll has ended after ${timeInterval} ${timeUnit} and received ${totalVotes} vote${
+    totalVotes === 1 ? '' : 's'
+  }. View the results here:`
 
   console.log(title)
   return `${title}`
