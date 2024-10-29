@@ -69,13 +69,11 @@ const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
   const { data, error } = await supabaseClient
     .from('questions')
     .select('*')
-    .eq('status', 'posted')
     .eq('poll_type', 'predictive')
     .lte('expires_at', now)
     .order('id', { ascending: true })
 
   if (error) {
-    logger.error(getErrorMessage(error))
     throw new Error(getErrorMessage(error))
   }
 
@@ -93,7 +91,6 @@ const updatePredictivePollResult = async (questionId: number) => {
     .single()
 
   if (error) {
-    logger.error(getErrorMessage(error))
     throw new Error(getErrorMessage(error))
   }
 
