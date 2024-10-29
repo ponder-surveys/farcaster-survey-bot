@@ -72,9 +72,3 @@ const formatReplyToSurvey = (
 }
 
 export { formatReply, formatReplyToSurvey, formatResult }
-
-formatReplyToSurvey(
-  100,
-  '2024-10-26 18:00:12.466753+00',
-  '2024-10-26 18:05:09.777+00'
-)
