@@ -21,6 +21,8 @@ import {
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
+import { viemClient } from 'clients/viem'
+import { PredictivePollABI } from 'utils/contracts'
 
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
@@ -43,6 +45,22 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       const msg = `Could not fetch chain details for bounty ${bounty.id}`
       Sentry.captureMessage(msg)
       throw new Error(msg)
+    }
+
+    // NOTE: This is a temporary fix until we confirm our lifecycle is more resilient
+    const pollIsActive = await viemClient.readContract({
+      address: chain.PREDICTIVE_POLL_CONTRACT_ADDRESS as `0x${string}`,
+      abi: PredictivePollABI,
+      functionName: 'pollIsActive',
+      args: [smartContractId],
+    })
+    if (!pollIsActive) {
+      // Update the status to 'completed'
+      closeBounty(String(smartContractId), 'predictive_poll')
+      return {
+        message: `Closed predictive poll ${poll.id} on database to match contract state`,
+        error: null,
+      }
     }
 
     try {
