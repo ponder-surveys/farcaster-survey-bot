@@ -21,4 +21,5 @@ export interface Poll {
   archived: boolean
   is_anonymous: boolean
   poll_type: string
+  expires_at: string
 }
