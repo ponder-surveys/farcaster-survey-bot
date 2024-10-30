@@ -71,6 +71,7 @@ const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
     .select(`*, bounties!inner(*)`)
     .eq('poll_type', 'predictive')
     .eq('bounties.status', 'active')
+    .not('bounties.smart_contract_id', 'is', null)
     .lte('expires_at', now)
     .order('id', { ascending: true })
 

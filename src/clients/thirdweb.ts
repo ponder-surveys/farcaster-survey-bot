@@ -55,6 +55,32 @@ export async function distributeRewards(
   }
 }
 
+export async function endPoll(
+  smartContractId: number,
+  chain: { CHAIN_ID: number; PREDICTIVE_POLL_CONTRACT_ADDRESS: string }
+) {
+  if (!TRANSACTION_ADDRESS) {
+    throw new Error('Transaction address not found')
+  }
+
+  try {
+    const { result } = await web3Engine.contract.write(
+      String(chain.CHAIN_ID),
+      chain.PREDICTIVE_POLL_CONTRACT_ADDRESS,
+      TRANSACTION_ADDRESS,
+      {
+        functionName: 'endPoll',
+        args: [String(smartContractId)],
+        abi: PredictivePollABI,
+      }
+    )
+
+    return result
+  } catch (error) {
+    throw new Error(getErrorMessage(error))
+  }
+}
+
 export const pollTransactionStatus = async (
   queueId: string,
   elapsedTime = 0

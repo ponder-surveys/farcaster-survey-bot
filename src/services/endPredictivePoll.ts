@@ -1,6 +1,10 @@
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
-import { distributeRewards, pollTransactionStatus } from '../clients/thirdweb'
+import {
+  distributeRewards,
+  endPoll,
+  pollTransactionStatus,
+} from '../clients/thirdweb'
 import {
   closeBounty,
   fetchBountyClaimsForPoll,
@@ -17,6 +21,8 @@ import {
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
+import { viemClient } from 'clients/viem'
+import { PredictivePollABI } from 'utils/contracts'
 
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
@@ -39,6 +45,22 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       const msg = `Could not fetch chain details for bounty ${bounty.id}`
       Sentry.captureMessage(msg)
       throw new Error(msg)
+    }
+
+    // NOTE: This is a temporary fix until we confirm our lifecycle is more resilient
+    const pollIsActive = await viemClient.readContract({
+      address: chain.PREDICTIVE_POLL_CONTRACT_ADDRESS as `0x${string}`,
+      abi: PredictivePollABI,
+      functionName: 'pollIsActive',
+      args: [smartContractId],
+    })
+    if (!pollIsActive) {
+      // Update the status to 'completed'
+      closeBounty(String(smartContractId), 'predictive_poll')
+      return {
+        message: `Closed predictive poll ${poll.id} on database to match contract state`,
+        error: null,
+      }
     }
 
     try {
@@ -90,6 +112,27 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       logger.info(
         `Predictive poll ${poll.id} reward recipient addresses: ${rewardRecipientAddresses}`
       )
+
+      // If nobody voted, end the poll
+      // NOTE: This is temporary because ideally we should always be calling distributeRewards.
+      // We'll remove this once we update the smart contract itself.
+      if (winningOptions.length === 0) {
+        const result = await endPoll(smartContractId, chain)
+
+        // Poll transaction status
+        const { errorMessage } = await pollTransactionStatus(result.queueId)
+
+        if (errorMessage) {
+          return { message: null, error: getErrorMessage(errorMessage) }
+        }
+
+        // Update the status to 'completed'
+        closeBounty(String(smartContractId), 'predictive_poll')
+        return {
+          message: `Closed predictive poll ${poll.id} with no votes`,
+          error: null,
+        }
+      }
 
       // Call the smart contract
       const result = await distributeRewards(
@@ -163,12 +206,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         closeBounty(String(smartContractId), 'predictive_poll')
         return { message: `Ended predictive poll ${poll.id}`, error: null }
       } else {
-        // Handle case where the transaction did not mine successfully
-        logger.error(
-          `Error calling predictive poll contract address: ${getErrorMessage(
-            errorMessage
-          )}`
-        )
         Sentry.captureMessage(getErrorMessage(errorMessage))
         return { message: null, error: getErrorMessage(errorMessage) }
       }
