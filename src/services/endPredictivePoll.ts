@@ -163,12 +163,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         closeBounty(String(smartContractId), 'predictive_poll')
         return { message: `Ended predictive poll ${poll.id}`, error: null }
       } else {
-        // Handle case where the transaction did not mine successfully
-        logger.error(
-          `Error calling predictive poll contract address: ${getErrorMessage(
-            errorMessage
-          )}`
-        )
         Sentry.captureMessage(getErrorMessage(errorMessage))
         return { message: null, error: getErrorMessage(errorMessage) }
       }
