@@ -1,6 +1,10 @@
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
-import { distributeRewards, pollTransactionStatus } from '../clients/thirdweb'
+import {
+  distributeRewards,
+  endPoll,
+  pollTransactionStatus,
+} from '../clients/thirdweb'
 import {
   closeBounty,
   fetchBountyClaimsForPoll,
@@ -90,6 +94,27 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       logger.info(
         `Predictive poll ${poll.id} reward recipient addresses: ${rewardRecipientAddresses}`
       )
+
+      // If nobody voted, end the poll
+      // NOTE: This is temporary because ideally we should always be calling distributeRewards.
+      // We'll remove this once we update the smart contract itself.
+      if (winningOptions.length === 0) {
+        const result = await endPoll(smartContractId, chain)
+
+        // Poll transaction status
+        const { errorMessage } = await pollTransactionStatus(result.queueId)
+
+        if (errorMessage) {
+          return { message: null, error: getErrorMessage(errorMessage) }
+        }
+
+        // Update the status to 'completed'
+        closeBounty(String(smartContractId), 'predictive_poll')
+        return {
+          message: `Closed predictive poll ${poll.id} with no votes`,
+          error: null,
+        }
+      }
 
       // Call the smart contract
       const result = await distributeRewards(
