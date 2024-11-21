@@ -18,12 +18,11 @@ const PredictivePollABI = [
   { inputs: [], name: 'InvalidAddress', type: 'error' },
   { inputs: [], name: 'InvalidInitialization', type: 'error' },
   { inputs: [], name: 'InvalidNumberOfRecipients', type: 'error' },
+  { inputs: [], name: 'InvalidNumberOfSelectedOptions', type: 'error' },
   { inputs: [], name: 'InvalidNumberOfWinningOptions', type: 'error' },
   { inputs: [], name: 'InvalidOption', type: 'error' },
   { inputs: [], name: 'InvalidPollId', type: 'error' },
   { inputs: [], name: 'InvalidSponsor', type: 'error' },
-  { inputs: [], name: 'NoRewardsToDistribute', type: 'error' },
-  { inputs: [], name: 'NoWinningVotes', type: 'error' },
   { inputs: [], name: 'NotInitializing', type: 'error' },
   {
     inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
@@ -183,6 +182,25 @@ const PredictivePollABI = [
         name: 'recipients',
         type: 'address[]',
       },
+    ],
+    name: 'RecipientsCalculated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'pollId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'address[]',
+        name: 'recipients',
+        type: 'address[]',
+      },
       {
         indexed: true,
         internalType: 'uint256',
@@ -247,15 +265,27 @@ const PredictivePollABI = [
         name: 'voter',
         type: 'address',
       },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'tokenAmount',
-        type: 'uint256',
-      },
-      { indexed: false, internalType: 'uint8', name: 'option', type: 'uint8' },
     ],
     name: 'VoteCasted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'uint256',
+        name: 'pollId',
+        type: 'uint256',
+      },
+      {
+        indexed: true,
+        internalType: 'uint8[]',
+        name: 'winningOptions',
+        type: 'uint8[]',
+      },
+    ],
+    name: 'WinningOptionsCalculated',
     type: 'event',
   },
   {
@@ -282,6 +312,7 @@ const PredictivePollABI = [
       { internalType: 'uint256', name: 'pollId', type: 'uint256' },
       { internalType: 'uint8[]', name: 'winningOptions', type: 'uint8[]' },
       { internalType: 'address[]', name: 'recipients', type: 'address[]' },
+      { internalType: 'uint8[]', name: 'selectedOptions', type: 'uint8[]' },
     ],
     name: 'distributeRewards',
     outputs: [],
