@@ -1,3 +1,5 @@
+// Keeping this as archive for now in case we want to work with DCs in the future.
+
 import { v4 as uuidv4 } from 'uuid'
 import { Poll } from '../types/polls'
 import {
