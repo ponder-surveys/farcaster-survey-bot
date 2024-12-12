@@ -1,3 +1,6 @@
+import { viemClient } from 'clients/viem'
+import { PredictivePollABI } from 'utils/contracts'
+import { sendFrameNotifications } from 'utils/sendFrameNotifications'
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
 import {
@@ -15,14 +18,12 @@ import { Poll } from '../types/polls'
 import getChainDetails from '../utils/getChainDetails'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
-import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
   getEventSignatureHash,
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
-import { viemClient } from 'clients/viem'
-import { PredictivePollABI } from 'utils/contracts'
+import { getOptionText } from 'api/questions'
 
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
@@ -182,23 +183,37 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             const isWinner = winningOptions.includes(
               claim.response.selected_option
             )
+
             await updateBountyClaim(
               bounty.id,
               claim.response.id,
               isWinner ? 'awarded' : 'not_awarded',
               isWinner ? bountyPerRecipient : undefined
             )
+          }
 
-            if (isWinner) {
-              await sendDirectCastForPredictivePolls(
-                poll,
-                claim.response.user.fid,
-                bountyCreator.username,
-                bountyPerRecipient,
-                token.name,
-                transactionHash
-              )
-            }
+          const winnersByOption = bountyClaimsForPoll
+            .filter((claim) => claim.status === 'awarded')
+            .reduce<Record<number, { fids: number[]; amountAwarded: number }>>(
+              (acc, claim) => {
+                const option = claim.response.selected_option
+                if (!acc[option]) {
+                  acc[option] = {
+                    fids: [],
+                    amountAwarded: claim.amount_awarded ?? 0,
+                  }
+                }
+                acc[option].fids.push(claim.response.user.fid)
+                return acc
+              },
+              {}
+            )
+
+          for (const [option, { fids, amountAwarded }] of Object.entries(
+            winnersByOption
+          )) {
+            const optionText = await getOptionText(poll.id, Number(option))
+            await sendFrameNotifications(fids)
           }
         }
 

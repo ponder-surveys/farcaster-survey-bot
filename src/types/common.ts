@@ -26,9 +26,11 @@ export interface BountyClaim {
   bounty_id: string
   response_id: number
   amount: number
+  amount_awarded?: number
   created_at?: string
   updated_at?: string
   response: any
+  status: 'submitted' | 'awarded' | 'not_awarded'
 }
 
 export interface User {

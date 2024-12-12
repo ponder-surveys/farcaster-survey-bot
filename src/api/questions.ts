@@ -56,4 +56,20 @@ const updateNextQuestion = async (
   logger.info(`Question status and cast hash successfully updated on db`)
 }
 
-export { getNextQuestion, updateNextQuestion }
+const getOptionText = async (pollId: number, optionInt: number) => {
+  const { data, error } = await supabaseClient
+    .from('questions')
+    .select(`option_${optionInt}`)
+    .eq('id', pollId)
+    .limit(1)
+    .single()
+
+  if (error) {
+    logger.error(getErrorMessage(error))
+    throw new Error(getErrorMessage(error))
+  }
+
+  return Object.values(data)[0]
+}
+
+export { getNextQuestion, updateNextQuestion, getOptionText }
