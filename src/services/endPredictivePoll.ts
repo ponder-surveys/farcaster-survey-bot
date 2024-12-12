@@ -193,30 +193,32 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             )
           }
 
-          // Aggregate the winners by selected option
-          const winnersByOption = bountyClaimsForPoll
-            .filter((claim) => claim.status === 'awarded')
-            .reduce<Record<number, { fids: number[]; amountAwarded: number }>>(
-              (acc, claim) => {
-                const option = claim.response.selected_option
-                if (!acc[option]) {
-                  acc[option] = {
-                    fids: [],
-                    amountAwarded: claim.amount_awarded ?? 0,
-                  }
-                }
-                acc[option].fids.push(claim.response.user.fid)
-                return acc
-              },
-              {}
-            )
+          // Aggregate the voters by selected option
+          const votersByOption = bountyClaimsForPoll.reduce<
+            Record<
+              number,
+              { fids: number[]; amountAwarded: number; isWinner: boolean }
+            >
+          >((acc, claim) => {
+            const option = claim.response.selected_option
+            if (!acc[option]) {
+              acc[option] = {
+                fids: [],
+                amountAwarded: claim.amount_awarded ?? 0,
+                isWinner: claim.status === 'awarded' ? true : false,
+              }
+            }
+            acc[option].fids.push(claim.response.user.fid)
+            return acc
+          }, {})
 
           // Iterate through the aggregated winners and send batch notifications by selected option.
           // The reasoning for this is that the messaging will be different per selected option but the
           // amount awarded will be the same.
-          for (const [option, { fids, amountAwarded }] of Object.entries(
-            winnersByOption
-          )) {
+          for (const [
+            option,
+            { fids, amountAwarded, isWinner },
+          ] of Object.entries(votersByOption)) {
             const optionText = await getOptionText(poll.id, Number(option))
             const tokenName = await getTokenName(bounty.id)
 
@@ -227,7 +229,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
                 fidsBatch,
                 amountAwarded,
                 tokenName,
-                optionText
+                optionText,
+                isWinner,
+                poll.id
               )
             }
           }
