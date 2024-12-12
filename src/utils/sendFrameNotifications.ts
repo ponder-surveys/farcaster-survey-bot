@@ -18,8 +18,10 @@ export async function sendFrameNotifications(
     await neynarClientV2.publishFrameNotifications({
       targetFids,
       notification: {
-        title: `You won ${formattedAmount} ${tokenName}!`,
-        body: JSON.stringify(`For your correct answer: "${optionText}"`),
+        title: `You won ${formattedAmount} ${tokenName}`,
+        body: JSON.stringify(
+          `Your answer "${optionText}" was right! Tap to view results.`
+        ),
         target_url: `${APP_URL}/predictive/${pollId}`,
         uuid: uuidv4(),
       },
@@ -28,9 +30,9 @@ export async function sendFrameNotifications(
     await neynarClientV2.publishFrameNotifications({
       targetFids,
       notification: {
-        title: `You didn't win this time.`,
+        title: `Prediction Ended`,
         body: JSON.stringify(
-          `Your vote "${optionText}" wasn't the consensus pick. Tap to view the winner.`
+          `Your vote "${optionText}" wasn't the consensus pick this time. Tap to view winner.`
         ),
         target_url: `${APP_URL}/predictive/${pollId}`,
         uuid: uuidv4(),
