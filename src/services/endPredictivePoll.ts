@@ -213,6 +213,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             winnersByOption
           )) {
             const optionText = await getOptionText(poll.id, Number(option))
+
             await sendFrameNotifications(fids)
           }
         }
