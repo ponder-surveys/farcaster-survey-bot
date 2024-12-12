@@ -1,3 +1,5 @@
+import { getTokenName } from 'api/bounties'
+import { getOptionText } from 'api/questions'
 import { viemClient } from 'clients/viem'
 import { PredictivePollABI } from 'utils/contracts'
 import { sendFrameNotifications } from 'utils/sendFrameNotifications'
@@ -23,7 +25,6 @@ import {
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
-import { getOptionText } from 'api/questions'
 
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
@@ -192,6 +193,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             )
           }
 
+          // Aggregate the winners by selected option
           const winnersByOption = bountyClaimsForPoll
             .filter((claim) => claim.status === 'awarded')
             .reduce<Record<number, { fids: number[]; amountAwarded: number }>>(
@@ -209,12 +211,25 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
               {}
             )
 
+          // Iterate through the aggregated winners and send batch notifications by selected option.
+          // The reasoning for this is that the messaging will be different per selected option but the
+          // amount awarded will be the same.
           for (const [option, { fids, amountAwarded }] of Object.entries(
             winnersByOption
           )) {
             const optionText = await getOptionText(poll.id, Number(option))
+            const tokenName = await getTokenName(bounty.id)
 
-            await sendFrameNotifications(fids)
+            // Split fids into batches of 100
+            for (let i = 0; i < fids.length; i += 100) {
+              const fidsBatch = fids.slice(i, i + 100)
+              await sendFrameNotifications(
+                fidsBatch,
+                amountAwarded,
+                tokenName,
+                optionText
+              )
+            }
           }
         }
 

@@ -15,7 +15,8 @@ const getTokenName = async (bountyId: string) => {
     throw new Error(getErrorMessage(error))
   }
 
-  return Object.values(data.tokens)[0]
+  // @ts-expect-error There will only ever be one token per bounty
+  return data.tokens.name
 }
 
 export { getTokenName }
