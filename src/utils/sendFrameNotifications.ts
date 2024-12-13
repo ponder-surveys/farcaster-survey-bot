@@ -22,7 +22,7 @@ export async function sendFrameNotifications(
         body: JSON.stringify(
           `Your answer "${optionText}" was right! Tap to view results.`
         ),
-        target_url: `${APP_URL}/predictive/${pollId}`,
+        target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
         uuid: uuidv4(),
       },
     })
@@ -34,7 +34,7 @@ export async function sendFrameNotifications(
         body: JSON.stringify(
           `Your vote "${optionText}" wasn't the consensus pick this time. Tap to view winner.`
         ),
-        target_url: `${APP_URL}/predictive/${pollId}`,
+        target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
         uuid: uuidv4(),
       },
     })
