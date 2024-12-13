@@ -51,6 +51,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       throw new Error(msg)
     }
 
+    logger.debug(
+      `chain.PREDICTIVE_POLL_CONTRACT_ADDRESS: ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
+    )
     // NOTE: This is a temporary fix until we confirm our lifecycle is more resilient
     const pollIsActive = await viemClient.readContract({
       address: chain.PREDICTIVE_POLL_CONTRACT_ADDRESS as `0x${string}`,
