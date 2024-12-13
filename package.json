@@ -13,7 +13,7 @@
     "lint": "bun run prettier && eslint --max-warnings 0 --ext ts,tsx,json src"
   },
   "dependencies": {
-    "@neynar/nodejs-sdk": "^1.20.1",
+    "@neynar/nodejs-sdk": "^1.71.0",
     "@sentry/node": "^8.30.0",
     "@supabase/supabase-js": "^2.8.0",
     "@t3-oss/env-core": "^0.11.1",
@@ -23,6 +23,7 @@
     "cron-parser": "^4.8.1",
     "date-fns": "^4.1.0",
     "ethers": "^5",
+    "neynarv2": "npm:@neynar/nodejs-sdk@2",
     "node-cron": "^3.0.2",
     "pino": "^9.4.0",
     "pino-pretty": "^11.2.2",

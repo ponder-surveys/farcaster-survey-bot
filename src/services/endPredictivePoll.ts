@@ -1,5 +1,8 @@
+import { getTokenName } from 'api/bounties'
+import { getOptionText } from 'api/questions'
 import { viemClient } from 'clients/viem'
 import { PredictivePollABI } from 'utils/contracts'
+import { sendFrameNotifications } from 'utils/sendFrameNotifications'
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
 import {
@@ -17,7 +20,6 @@ import { Poll } from '../types/polls'
 import getChainDetails from '../utils/getChainDetails'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
-import sendDirectCastForPredictivePolls from '../utils/sendDirectCast'
 import {
   getEventSignatureHash,
   getTransactionReceipt,
@@ -196,21 +198,54 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
             const isWinner = winningOptions.includes(
               claim.response.selected_option
             )
+
             await updateBountyClaim(
               bounty.id,
               claim.response.id,
               isWinner ? 'awarded' : 'not_awarded',
               isWinner ? bountyPerRecipient : undefined
             )
+          }
 
-            if (isWinner) {
-              await sendDirectCastForPredictivePolls(
-                poll,
-                claim.response.user.fid,
-                bountyCreator.username,
-                bountyPerRecipient,
-                token.name,
-                transactionHash
+          // Aggregate the voters by selected option
+          const votersByOption = bountyClaimsForPoll.reduce<
+            Record<
+              number,
+              { fids: number[]; amountAwarded: number; isWinner: boolean }
+            >
+          >((acc, claim) => {
+            const option = claim.response.selected_option
+            if (!acc[option]) {
+              acc[option] = {
+                fids: [],
+                amountAwarded: claim.amount_awarded ?? 0,
+                isWinner: claim.status === 'awarded' ? true : false,
+              }
+            }
+            acc[option].fids.push(claim.response.user.fid)
+            return acc
+          }, {})
+
+          // Iterate through the aggregated winners and send batch notifications by selected option.
+          // The reasoning for this is that the messaging will be different per selected option but the
+          // amount awarded will be the same.
+          for (const [
+            option,
+            { fids, amountAwarded, isWinner },
+          ] of Object.entries(votersByOption)) {
+            const optionText = await getOptionText(poll.id, Number(option))
+            const tokenName = await getTokenName(bounty.id)
+
+            // Split fids into batches of 100
+            for (let i = 0; i < fids.length; i += 100) {
+              const fidsBatch = fids.slice(i, i + 100)
+              await sendFrameNotifications(
+                fidsBatch,
+                amountAwarded,
+                tokenName,
+                optionText,
+                isWinner,
+                poll.id
               )
             }
           }
