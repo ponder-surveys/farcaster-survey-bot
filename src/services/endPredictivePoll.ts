@@ -105,6 +105,10 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         }
       )
 
+      const selectedOptions: number[] = winners.map(
+        (winner: BountyClaim) => winner.response.selected_option
+      )
+
       logger.info(
         `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS} for poll ${poll.id}`
       )
@@ -141,6 +145,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         smartContractId,
         winningOptions,
         rewardRecipientAddresses,
+        selectedOptions,
         chain
       )
 
