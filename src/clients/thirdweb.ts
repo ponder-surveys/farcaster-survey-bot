@@ -24,6 +24,7 @@ export async function distributeRewards(
   smartContractId: number,
   winningOptions: number[],
   rewardRecipientAddresses: string[],
+  selectedOptions: number[],
   chain: { CHAIN_ID: number; PREDICTIVE_POLL_CONTRACT_ADDRESS: string }
 ) {
   if (!TRANSACTION_ADDRESS) {
@@ -33,6 +34,7 @@ export async function distributeRewards(
   try {
     // NOTE: Need to adjust the winning options to be zero-indexed due to discrepancies between the contract db
     const adjustedWinningOptions = winningOptions.map((option) => option - 1)
+    const adjustedSelectedOptions = selectedOptions.map((option) => option - 1)
 
     const { result } = await web3Engine.contract.write(
       String(chain.CHAIN_ID),
@@ -44,6 +46,7 @@ export async function distributeRewards(
           String(smartContractId),
           adjustedWinningOptions as any,
           rewardRecipientAddresses as any,
+          adjustedSelectedOptions as any,
         ],
         abi: PredictivePollABI,
       }

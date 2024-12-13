@@ -1,3 +1,5 @@
+import { viemClient } from 'clients/viem'
+import { PredictivePollABI } from 'utils/contracts'
 import Web3 from 'web3'
 import { Sentry } from '../clients/sentry'
 import {
@@ -21,8 +23,6 @@ import {
   getTransactionReceipt,
   loadWeb3Provider,
 } from '../utils/services/web3'
-import { viemClient } from 'clients/viem'
-import { PredictivePollABI } from 'utils/contracts'
 
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
@@ -103,6 +103,10 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         }
       )
 
+      const selectedOptions: number[] = winners.map(
+        (winner: BountyClaim) => winner.response.selected_option
+      )
+
       logger.info(
         `Calling predictive poll contract address ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS} for poll ${poll.id}`
       )
@@ -139,6 +143,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         smartContractId,
         winningOptions,
         rewardRecipientAddresses,
+        selectedOptions,
         chain
       )
 
