@@ -33,6 +33,10 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     user: bountyCreator,
   } = bounty
 
+  logger.debug(`bounty: ${bounty}`)
+  logger.debug(`status: ${status}`)
+  logger.debug(`bounty.status: ${bounty.status}`)
+  logger.debug(`smartContractId: ${smartContractId}`)
   if (
     bounty &&
     status === 'calculated' &&
