@@ -54,6 +54,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       functionName: 'pollIsActive',
       args: [smartContractId],
     })
+    logger.debug(`poll id: ${poll.id} pollIsActive: ${pollIsActive}`)
     if (!pollIsActive) {
       // Update the status to 'completed'
       closeBounty(String(smartContractId), 'predictive_poll')
@@ -69,6 +70,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         poll.id
       )
 
+      logger.debug(`bountyClaimsForPoll: ${bountyClaimsForPoll}`)
       // Calculate the winning option
       const optionCounts = bountyClaimsForPoll.reduce((acc, claim) => {
         const option = claim.response.selected_option
