@@ -229,6 +229,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           // Iterate through the aggregated winners and send batch notifications by selected option.
           // The reasoning for this is that the messaging will be different per selected option but the
           // amount awarded will be the same.
+          logger.info(`Sending frame notifications for poll ${poll.id}`)
+          logger.debug(`Voters by option: ${JSON.stringify(votersByOption)}`)
+
           for (const [
             option,
             { fids, amountAwarded, isWinner },
