@@ -1,4 +1,4 @@
-import { logger } from 'ethers'
+import logger from './logger'
 import { Sentry } from '../clients/sentry'
 import { Bounty } from '../types/common'
 import { CHAINS } from '../utils/constants'

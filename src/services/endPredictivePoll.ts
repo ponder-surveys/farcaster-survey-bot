@@ -35,6 +35,10 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     user: bountyCreator,
   } = bounty
 
+  logger.debug(`bounty: ${bounty}`)
+  logger.debug(`status: ${status}`)
+  logger.debug(`bounty.status: ${bounty.status}`)
+  logger.debug(`smartContractId: ${smartContractId}`)
   if (
     bounty &&
     status === 'calculated' &&
@@ -49,6 +53,9 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       throw new Error(msg)
     }
 
+    logger.debug(
+      `chain.PREDICTIVE_POLL_CONTRACT_ADDRESS: ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
+    )
     // NOTE: This is a temporary fix until we confirm our lifecycle is more resilient
     const pollIsActive = await viemClient.readContract({
       address: chain.PREDICTIVE_POLL_CONTRACT_ADDRESS as `0x${string}`,
@@ -56,6 +63,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       functionName: 'pollIsActive',
       args: [smartContractId],
     })
+    logger.debug(`poll id: ${poll.id} pollIsActive: ${pollIsActive}`)
     if (!pollIsActive) {
       // Update the status to 'completed'
       closeBounty(String(smartContractId), 'predictive_poll')
@@ -71,6 +79,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
         poll.id
       )
 
+      logger.debug(`bountyClaimsForPoll: ${bountyClaimsForPoll}`)
       // Calculate the winning option
       const optionCounts = bountyClaimsForPoll.reduce((acc, claim) => {
         const option = claim.response.selected_option
