@@ -1,6 +1,7 @@
 import { neynarClientV2 } from 'clients/neynar'
 import { v4 as uuidv4 } from 'uuid'
 import { APP_URL } from './constants'
+import logger from './logger'
 
 export async function sendFrameNotifications(
   targetFids: number[],
@@ -10,6 +11,12 @@ export async function sendFrameNotifications(
   isWinner: boolean,
   pollId: number
 ) {
+  logger.debug(`Target FIDs: ${targetFids}`)
+  logger.debug(`Amount Awarded: ${amountAwarded}`)
+  logger.debug(`Token Name: ${tokenName}`)
+  logger.debug(`Option Text: ${optionText}`)
+  logger.debug(`Is Winner: ${isWinner}`)
+
   if (isWinner) {
     const formattedAmount = Number.isInteger(amountAwarded)
       ? amountAwarded.toString()
