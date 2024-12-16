@@ -1,6 +1,7 @@
 import { getTokenName } from 'api/bounties'
 import { getOptionText } from 'api/questions'
 import { viemClient } from 'clients/viem'
+import * as util from 'util'
 import { PredictivePollABI } from 'utils/contracts'
 import { sendFrameNotifications } from 'utils/sendFrameNotifications'
 import Web3 from 'web3'
@@ -29,11 +30,7 @@ import {
 export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
   const { status } = poll
 
-  const {
-    smart_contract_id: smartContractId,
-    token,
-    user: bountyCreator,
-  } = bounty
+  const { smart_contract_id: smartContractId } = bounty
 
   logger.debug(`bounty: ${bounty}`)
   logger.debug(`status: ${status}`)
@@ -169,17 +166,22 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         const web3 = await loadWeb3Provider(chain.PROVIDER_URL)
         const receipt = await getTransactionReceipt(transactionHash, web3)
+        logger.debug(`receipt: ${util.inspect(receipt)}`)
 
         // Get the event signature hash for the emitted event
         const eventSignatureHash = getEventSignatureHash(
           'RewardsDistributed(uint256,address[],uint256)',
           web3
         )
+        logger.debug(`eventSignatureHash: ${eventSignatureHash}`)
 
+        logger.debug(`receipt.logs: ${util.inspect(receipt.logs)}`)
         const eventLog = receipt.logs.find(
           (log) => log.topics && log.topics[0] === eventSignatureHash
         )
+        logger.debug(`eventLog: ${util.inspect(eventLog)}`)
 
+        logger.debug(`eventLog.topics: ${util.inspect(eventLog?.topics)}`)
         if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
           // Parse the event data
           const totalDistributionWei = Web3.utils.hexToNumber(
