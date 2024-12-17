@@ -53,6 +53,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
     logger.debug(
       `chain.PREDICTIVE_POLL_CONTRACT_ADDRESS: ${chain.PREDICTIVE_POLL_CONTRACT_ADDRESS}`
     )
+
     // NOTE: This is a temporary fix until we confirm our lifecycle is more resilient
     const pollIsActive = await viemClient.readContract({
       address: chain.PREDICTIVE_POLL_CONTRACT_ADDRESS as `0x${string}`,
@@ -60,6 +61,7 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
       functionName: 'pollIsActive',
       args: [smartContractId],
     })
+
     logger.debug(`poll id: ${poll.id} pollIsActive: ${pollIsActive}`)
     if (!pollIsActive) {
       // Update the status to 'completed'
@@ -99,12 +101,11 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
       const rewardRecipientAddresses: string[] = winners.map(
         (winner: BountyClaim) => {
-          const userAddress =
-            winner.response.user.holder_address ||
-            (winner.response.user.connected_addresses?.shift() as string)
+          const userAddress = winner.response.user.smart_wallet
+
           if (!userAddress) {
             throw new Error(
-              `Could not find address for user id ${winner.response.user.id}`
+              `Could not find smart wallet for user id ${winner.response.user.id}`
             )
           }
           return userAddress
