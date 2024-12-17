@@ -123,8 +123,7 @@ export async function fetchBountyClaimsForPoll(
           id,
           fid,
           username,
-          holder_address,
-          connected_addresses
+          smart_wallet
         )
       )
     `
