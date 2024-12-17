@@ -13,6 +13,7 @@ import {
 } from '../clients/thirdweb'
 import {
   closeBounty,
+  fetchBounty,
   fetchBountyClaimsForPoll,
   updateBountyClaim,
 } from '../services/supabase'
@@ -174,39 +175,48 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           'RewardsDistributed(uint256,address[],uint256)',
           web3
         )
-        logger.debug(`eventSignatureHash: ${eventSignatureHash}`)
 
-        logger.debug(`receipt.logs: ${util.inspect(receipt.logs)}`)
         const eventLog = receipt.logs.find(
           (log) => log.topics && log.topics[0] === eventSignatureHash
         )
-        logger.debug(`eventLog: ${util.inspect(eventLog)}`)
 
-        logger.debug(`eventLog.topics: ${util.inspect(eventLog?.topics)}`)
         if (eventLog && eventLog.topics && eventLog.topics.length > 1) {
           // Parse the event data
-          const totalDistributionWei = Web3.utils.hexToNumber(
-            eventLog.topics[3]
+          const totalDistribution = Number(
+            Web3.utils.hexToNumber(eventLog.topics[3])
           )
 
-          // Convert wei to ether
-          const totalDistribution = Number(
-            Web3.utils.fromWei(totalDistributionWei.toString(), 'ether')
-          )
+          logger.debug(`totalDistribution: ${totalDistribution}`)
+
+          const {
+            token: { decimals },
+          } = await fetchBounty(bounty.id)
 
           // Calculate bounty per recipient
-          const bountyPerRecipient = totalDistribution / winners.length
+          const bountyPerRecipient =
+            (totalDistribution * 10 ** (decimals * -1)) / winners.length
+
+          logger.debug(`bountyPerRecipient: ${bountyPerRecipient}`)
 
           for (const claim of bountyClaimsForPoll) {
+            logger.debug(
+              `claim before update: ${util.inspect(claim, true, null, true)}`
+            )
+
             const isWinner = winningOptions.includes(
               claim.response.selected_option
             )
 
+            logger.debug(`isWinner: ${isWinner}`)
+
+            claim.status = isWinner ? 'awarded' : 'not_awarded'
+            claim.amount_awarded = isWinner ? bountyPerRecipient : undefined
+
             await updateBountyClaim(
               bounty.id,
               claim.response.id,
-              isWinner ? 'awarded' : 'not_awarded',
-              isWinner ? bountyPerRecipient : undefined
+              claim.status,
+              claim.amount_awarded
             )
           }
 
@@ -217,6 +227,14 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
               { fids: number[]; amountAwarded: number; isWinner: boolean }
             >
           >((acc, claim) => {
+            logger.debug(
+              `claim in votersByOption: ${util.inspect(
+                claim,
+                true,
+                null,
+                true
+              )}`
+            )
             const option = claim.response.selected_option
             if (!acc[option]) {
               acc[option] = {
