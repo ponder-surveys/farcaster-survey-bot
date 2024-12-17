@@ -64,7 +64,7 @@ const updateNextResult = async (questionId: number) => {
 
 const getExpiredPredictivePolls = async (): Promise<Poll[]> => {
   logger.debug('Checking for expired predictive polls')
-  const now = new Date().toISOString()
+  const now = new Date(Date.now() - 10000).toISOString()
 
   const { data, error } = await supabaseClient
     .from('questions')
