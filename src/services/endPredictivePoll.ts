@@ -168,7 +168,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
 
         const web3 = await loadWeb3Provider(chain.PROVIDER_URL)
         const receipt = await getTransactionReceipt(transactionHash, web3)
-        logger.debug(`receipt: ${util.inspect(receipt)}`)
 
         // Get the event signature hash for the emitted event
         const eventSignatureHash = getEventSignatureHash(
