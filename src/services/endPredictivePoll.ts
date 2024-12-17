@@ -199,10 +199,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
           logger.debug(`bountyPerRecipient: ${bountyPerRecipient}`)
 
           for (const claim of bountyClaimsForPoll) {
-            logger.debug(
-              `claim before update: ${util.inspect(claim, true, null, true)}`
-            )
-
             const isWinner = winningOptions.includes(
               claim.response.selected_option
             )
@@ -227,14 +223,6 @@ export const endPredictivePoll = async (poll: Poll, bounty: Bounty) => {
               { fids: number[]; amountAwarded: number; isWinner: boolean }
             >
           >((acc, claim) => {
-            logger.debug(
-              `claim in votersByOption: ${util.inspect(
-                claim,
-                true,
-                null,
-                true
-              )}`
-            )
             const option = claim.response.selected_option
             if (!acc[option]) {
               acc[option] = {
