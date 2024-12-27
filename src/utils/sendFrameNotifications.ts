@@ -43,3 +43,28 @@ export async function sendFrameNotifications(
     })
   }
 }
+
+export async function sendDailyPredictionFrameNotification(
+  targetFids: number[],
+  pollText: string,
+  tokenAmount: number,
+  tokenName: string,
+  pollId: number
+) {
+  const formattedAmount = Number.isInteger(tokenAmount)
+    ? tokenAmount.toString()
+    : tokenAmount.toFixed(3)
+
+  const formattedPollText =
+    pollText.slice(0, 40) + (pollText.length > 40 ? '...' : '')
+
+  await neynarClientV2.publishFrameNotifications({
+    targetFids,
+    notification: {
+      title: `💥 Daily prediction | ${formattedAmount} ${tokenName}`,
+      body: `'${formattedPollText}' Tap to vote.`,
+      target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
+      uuid: uuidv4(),
+    },
+  })
+}

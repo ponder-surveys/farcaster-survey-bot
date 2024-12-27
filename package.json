@@ -15,7 +15,7 @@
   "dependencies": {
     "@neynar/nodejs-sdk": "^1.71.0",
     "@sentry/node": "^8.30.0",
-    "@supabase/supabase-js": "^2.8.0",
+    "@supabase/supabase-js": "^2.47.10",
     "@t3-oss/env-core": "^0.11.1",
     "@thirdweb-dev/engine": "^0.0.15",
     "@thirdweb-dev/sdk": "^4.0.36",

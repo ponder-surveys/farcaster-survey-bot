@@ -29,10 +29,11 @@ export const POLL_INTERVAL = 1000 // Poll every 1 second
 export const POLL_TIMEOUT = 60000 // Stop after 60 seconds
 export const WEB3_ENGINE_URL = process.env.WEB3_ENGINE_URL
 export const WEB3_ACCESS_TOKEN = process.env.WEB3_ACCESS_TOKEN
-
 export const TRANSACTION_ADDRESS = process.env.TRANSACTION_ADDRESS
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY
+
+export const MIN_NEYNAR_USER_SCORE_THRESHOLD = 0.75
 
 export const CHAINS = new Map<
   string,

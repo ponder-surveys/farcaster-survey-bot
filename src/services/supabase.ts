@@ -1,9 +1,9 @@
 import { Sentry } from '../clients/sentry'
 import { supabaseClient } from '../clients/supabase'
 import {
+  BountyClaim,
   BountyContent,
   UserWithSelectedOption,
-  BountyClaim,
 } from '../types/common'
 import getErrorMessage from '../utils/getErrorMessage'
 import logger from '../utils/logger'
@@ -136,4 +136,110 @@ export async function fetchBountyClaimsForPoll(
   }
 
   return data || []
+}
+
+export async function fetchActiveFrameUsersFids(
+  pollType: string,
+  userScoreThreshold: number
+) {
+  const { data, error } = await supabaseClient.rpc('get_active_frame_users', {
+    p_type: pollType,
+    user_score_threshold: userScoreThreshold,
+  })
+
+  if (error) {
+    console.error('Error fetching frame users:', error)
+    throw new Error('Failed to fetch frame users')
+  }
+
+  const fids = data ? data.map((user: any) => user.fid) : []
+
+  return fids
+}
+
+export async function fetchLargestActivePrediction() {
+  const now = new Date()
+  // Add 30 minutes to current time for the minimum expiration threshold
+  const minExpirationTime = new Date(now.getTime() + 30 * 60 * 1000)
+
+  const { data, error } = await supabaseClient
+    .from('questions')
+    .select(
+      `
+      id,
+      title, 
+      bounty:bounties!inner(
+        *,
+        token:tokens(*),
+        bounty_seed:bounty_seeds(*),
+        bounty_claims(*)
+      )
+    `
+    )
+    .eq('poll_type', 'predictive')
+    .eq('bounties.status', 'active')
+    .gte('expires_at', minExpirationTime.toISOString())
+    // Only get polls created today (comparing the date portion)
+    .gte('created_at', now.toISOString().split('T')[0])
+    .lt(
+      'created_at',
+      new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    )
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(
+      `Error fetching largest active predictive poll: ${getErrorMessage(error)}`
+    )
+  }
+
+  const largestPoll = data?.reduce((max: any, current: any) => {
+    const currentTotal =
+      current.bounty.token_amount +
+      (current.bounty.bounty_seed?.[0]?.amount || 0) +
+      (current.bounty.bounty_claims?.reduce(
+        (sum: number, claim: any) => sum + claim.amount,
+        0
+      ) || 0)
+
+    const maxTotal =
+      max.bounty.token_amount +
+      (max.bounty.bounty_seed?.[0]?.amount || 0) +
+      (max.bounty.bounty_claims?.reduce(
+        (sum: number, claim: any) => sum + claim.amount,
+        0
+      ) || 0)
+
+    return currentTotal > maxTotal ? current : max
+  })
+
+  return largestPoll
+}
+
+export async function fetchPollById(pollId: number) {
+  const { data, error } = await supabaseClient
+    .from('questions')
+    .select(
+      `
+      id,
+      title, 
+      bounty:bounties!inner(
+        *,
+        token:tokens(*)
+      )
+    `
+    )
+    .eq('poll_type', 'predictive')
+    .eq('id', pollId)
+    .limit(1)
+    .single()
+
+  if (error) {
+    Sentry.captureException(error)
+    throw new Error(
+      `Error fetching largest active predictive poll: ${getErrorMessage(error)}`
+    )
+  }
+
+  return data
 }
