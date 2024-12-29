@@ -193,7 +193,11 @@ export async function fetchLargestActivePrediction() {
     )
   }
 
-  const largestPoll = data?.reduce((max: any, current: any) => {
+  if (!data || data.length === 0) {
+    return null
+  }
+
+  const largestPoll = data.reduce((max: any, current: any) => {
     const currentTotal =
       current.bounty.token_amount +
       (current.bounty.bounty_seed?.[0]?.amount || 0) +
@@ -201,6 +205,9 @@ export async function fetchLargestActivePrediction() {
         (sum: number, claim: any) => sum + claim.amount,
         0
       ) || 0)
+
+    // Use the first item as initial value
+    if (!max) return current
 
     const maxTotal =
       max.bounty.token_amount +
