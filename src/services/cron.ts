@@ -6,6 +6,7 @@ import {
   publishPredictivePollResults,
 } from './publishNextResults'
 import { publishNextQuestionsQualUpdate } from './publishNextQuestionsQualUpdate'
+import { publishDailyPrediction } from './publishDailyPrediction'
 
 const scheduleValidateNextQuestion = (cronTime: string, type: QuestionType) =>
   cron.schedule(cronTime, () => validateQuestion(type), {
@@ -32,10 +33,16 @@ const scheduleQuestionQualUpdate = (cronTime: string) =>
     timezone: 'UTC',
   })
 
+const schedulePublishDailyPrediction = (cronTime: string) =>
+  cron.schedule(cronTime, () => publishDailyPrediction(), {
+    timezone: 'UTC',
+  })
+
 export {
   scheduleValidateNextQuestion,
   schedulePublishNextQuestion,
   schedulePollResults,
   schedulePredictivePollResults,
   scheduleQuestionQualUpdate,
+  schedulePublishDailyPrediction,
 }

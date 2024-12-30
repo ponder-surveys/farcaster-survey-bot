@@ -2,6 +2,7 @@ import logger from 'utils/logger'
 import {
   schedulePollResults,
   schedulePredictivePollResults,
+  schedulePublishDailyPrediction,
   scheduleQuestionQualUpdate,
 } from './services/cron'
 
@@ -13,6 +14,8 @@ const nextPredictivePollResultsTime = Bun.env
   .NEXT_PREDICTIVE_POLL_RESULTS_CRON as string
 const nextQuestionUQualTime = Bun.env.NEXT_QUESTION_QUAL_UPDATE_CRON as string
 
+const nextDailyPredictionTime = Bun.env.NEXT_DAILY_PREDICTION_CRON as string
+
 // Poll for results
 schedulePollResults(nextPollResultsTime)
 
@@ -21,3 +24,6 @@ scheduleQuestionQualUpdate(nextQuestionUQualTime)
 
 // Update expired predictive polls
 schedulePredictivePollResults(nextPredictivePollResultsTime)
+
+// Daily prediction
+schedulePublishDailyPrediction(nextDailyPredictionTime)
