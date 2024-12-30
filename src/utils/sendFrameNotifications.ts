@@ -53,7 +53,7 @@ export async function sendDailyPredictionFrameNotification(
 ) {
   const formattedAmount = Number.isInteger(tokenAmount)
     ? tokenAmount.toString()
-    : tokenAmount.toFixed(3)
+    : tokenAmount.toFixed(2)
 
   const formattedPollText =
     pollText.slice(0, 40) + (pollText.length > 40 ? '...' : '')
@@ -61,7 +61,7 @@ export async function sendDailyPredictionFrameNotification(
   await neynarClientV2.publishFrameNotifications({
     targetFids,
     notification: {
-      title: `💥 Daily prediction | ${formattedAmount} ${tokenName}`,
+      title: `💥 Daily prediction: ${formattedAmount} ${tokenName}`,
       body: `'${formattedPollText}' Tap to vote.`,
       target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
       uuid: uuidv4(),
