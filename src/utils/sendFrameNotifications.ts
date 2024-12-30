@@ -58,13 +58,31 @@ export async function sendDailyPredictionFrameNotification(
   const formattedPollText =
     pollText.slice(0, 40) + (pollText.length > 40 ? '...' : '')
 
-  await neynarClientV2.publishFrameNotifications({
-    targetFids,
-    notification: {
-      title: `💥 Daily prediction: ${formattedAmount} ${tokenName}`,
-      body: `'${formattedPollText}' Tap to vote.`,
-      target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
-      uuid: uuidv4(),
-    },
-  })
+  // Split targetFids into chunks of 100
+  const chunkSize = 100
+  for (let i = 0; i < targetFids.length; i += chunkSize) {
+    const chunk = targetFids.slice(i, i + chunkSize)
+
+    try {
+      await neynarClientV2.publishFrameNotifications({
+        targetFids: chunk,
+        notification: {
+          title: `💥 Daily prediction: ${formattedAmount} ${tokenName}`,
+          body: `'${formattedPollText}' Tap to vote.`,
+          target_url: `${APP_URL}/fc-mini-app/predictive-polls/${pollId}`,
+          uuid: uuidv4(),
+        },
+      })
+
+      // Add a small delay between batches to avoid rate limits
+      if (i + chunkSize < targetFids.length) {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+    } catch (error) {
+      logger.error(
+        `Error sending notification batch ${i / chunkSize + 1}:`,
+        error
+      )
+    }
+  }
 }
