@@ -20,7 +20,7 @@ export async function sendFrameNotifications(
   if (isWinner) {
     const formattedAmount = Number.isInteger(amountAwarded)
       ? amountAwarded.toString()
-      : amountAwarded.toFixed(3)
+      : amountAwarded.toFixed(2)
 
     await neynarClientV2.publishFrameNotifications({
       targetFids,
